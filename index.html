@@ -8,13 +8,89 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────────────── */
+:root[data-theme="light"] {
+  --bg:            #f6f8fa;
+  --bg-panel:      #ffffff;
+  --bg-raised:    #f1f4f7;
+  --bg-sunken:    #eef1f5;
+  --bg-input:      #ffffff;
+  --border:        #e3e8ef;
+  --border-strong: #d0d7de;
+  --text:          #0f1e2e;
+  --text-muted:    #5a6573;
+  --text-dim:      #8b95a3;
+  --text-faint:    #b4bcc7;
+  --accent:        #0891b2;      /* cyan-600 — quick survey bright teal */
+  --accent-hover:  #0e7490;
+  --accent-bg:     #cffafe;
+  --accent-text:   #0e7490;
+  --accent-2:      #4f46e5;      /* indigo-600 */
+  --accent-2-bg:   #e0e7ff;
+  --success:       #059669;
+  --success-bg:    #d1fae5;
+  --warn:          #d97706;
+  --danger:        #dc2626;
+  --shadow-sm:     0 1px 2px rgba(15,30,46,0.04);
+  --shadow-md:     0 2px 8px rgba(15,30,46,0.06);
+  --shadow-lg:     0 8px 24px rgba(15,30,46,0.10);
+}
+
+:root[data-theme="dark"] {
+  --bg:            #0a1520;       /* deep navy-teal (not pure black) */
+  --bg-panel:      #0f1e2e;
+  --bg-raised:    #142838;
+  --bg-sunken:    #091420;
+  --bg-input:      #0a1826;
+  --border:        #1e3448;
+  --border-strong: #2a4a62;
+  --text:          #e6eef7;
+  --text-muted:    #8a9cb0;
+  --text-dim:      #5a6f85;
+  --text-faint:    #3d5168;
+  --accent:        #22d3ee;      /* cyan-400 — bright teal from screenshot */
+  --accent-hover:  #67e8f9;
+  --accent-bg:     #083344;
+  --accent-text:   #67e8f9;
+  --accent-2:      #818cf8;      /* indigo-400 */
+  --accent-2-bg:   #1e1b4b;
+  --success:       #34d399;
+  --success-bg:    #064e3b;
+  --warn:          #fbbf24;
+  --danger:        #f87171;
+  --shadow-sm:     0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:     0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg:     0 8px 24px rgba(0,0,0,0.5);
+}
+
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e8e8e8;min-height:100vh;}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:#111;}
-::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background 0.2s,color 0.2s;
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-dim);}
 input,textarea,select,button{font-family:'Inter',sans-serif;}
+input:focus,textarea:focus{border-color:var(--accent)!important;}
+
+/* Small-caps label style used everywhere */
+.label-caps{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  font-weight:600;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+}
 </style>
 </head>
 <body>
@@ -48,123 +124,130 @@ const INFO_FIELDS = [
 
 const EMOJI_GRID = ['📁','📂','🏗️','🏢','🏙️','🛠️','🔧','🧰','⚙️','🦺','🪢','🧗','🚧','⚠️','🛡️','📋','📌','🗂️','📊','📈','💼','💬','📣','🗣️','🎯','⭐','🔥','✅','❌','🔒','🔓','🔑','🌏','🌐','🇳🇿','🇦🇺','⏰','📅','🧪','🔬'];
 
-// ── STYLES ──────────────────────────────────────────────────────────────────
+// ── STYLES (using CSS vars) ──────────────────────────────────────────────────
 const s = {
-app: {display:'flex',height:'100vh',overflow:'hidden'},
-sidebar: {width:272,background:'#111',borderRight:'1px solid #1e1e1e',display:'flex',flexDirection:'column',flexShrink:0},
-main: {flex:1,display:'flex',flexDirection:'column',overflow:'hidden'},
+app: {display:'flex',height:'100vh',overflow:'hidden',background:'var(--bg)'},
+sidebar: {width:264,background:'var(--bg-panel)',borderRight:'1px solid var(--border)',display:'flex',flexDirection:'column',flexShrink:0},
+main: {flex:1,display:'flex',flexDirection:'column',overflow:'hidden',background:'var(--bg)'},
 
-// Server header
-serverHeader: {padding:'18px 18px 14px',borderBottom:'1px solid #1e1e1e',display:'flex',alignItems:'center',gap:10},
-serverIcon: {width:40,height:40,borderRadius:12,background:'linear-gradient(135deg,#1d4ed8 0%,#3b82f6 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,fontWeight:800,color:'#fff',letterSpacing:0.5,flexShrink:0},
+// Server header (Quick Survey style — compact badge + title)
+serverHeader: {padding:'14px 14px 12px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:10},
+serverIcon: {width:36,height:36,borderRadius:8,background:'linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',letterSpacing:0.5,flexShrink:0,boxShadow:'var(--shadow-sm)'},
 serverMeta: {flex:1,minWidth:0},
-serverName: {fontSize:14,fontWeight:700,color:'#fff',letterSpacing:0.3},
-serverSub: {fontSize:10,color:'#555',marginTop:1},
+serverSmallCap: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14},
+serverName: {fontSize:14,fontWeight:700,color:'var(--text)',letterSpacing:0.2,marginTop:1},
+themeToggle: {width:28,height:28,borderRadius:6,border:'1px solid var(--border)',background:'var(--bg-raised)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0,color:'var(--text-muted)'},
 
 // Action bar
-actionBar: {padding:'10px 12px 6px',display:'flex',gap:6},
-actionBtn: {flex:1,padding:'7px 8px',background:'#1a1a1a',border:'1px dashed #2a2a2a',borderRadius:7,color:'#888',fontSize:11,cursor:'pointer',fontWeight:500,transition:'all 0.1s'},
+actionBar: {padding:'10px 12px 8px',display:'flex',gap:6},
+actionBtn: {flex:1,padding:'8px 8px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',letterSpacing:0.2,transition:'all 0.12s'},
 
-projList: {flex:1,overflowY:'auto',padding:'6px 8px 12px'},
+projList: {flex:1,overflowY:'auto',padding:'4px 8px 12px'},
 
 // Category
-catWrap: {marginBottom:4},
-catHeader: {display:'flex',alignItems:'center',gap:6,padding:'8px 8px 6px',fontSize:11,color:'#666',fontWeight:600,textTransform:'uppercase',letterSpacing:0.5,cursor:'pointer',userSelect:'none',borderRadius:4},
-catHeaderHover: {background:'#151515'},
-catCaret: {fontSize:8,color:'#444',transition:'transform 0.15s',display:'inline-block',width:8},
+catWrap: {marginBottom:6},
+catHeader: {display:'flex',alignItems:'center',gap:6,padding:'9px 8px 6px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.12,cursor:'pointer',userSelect:'none',borderRadius:4},
+catCaret: {fontSize:8,color:'var(--text-faint)',transition:'transform 0.15s',display:'inline-block',width:8},
 catEmoji: {fontSize:13},
 catLabel: {flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'},
-catCount: {fontSize:9,color:'#444',background:'#1a1a1a',padding:'1px 6px',borderRadius:10},
-catAddBtn: {background:'none',border:'none',color:'#444',cursor:'pointer',fontSize:13,padding:'0 4px',opacity:0.7},
+catCount: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',background:'var(--bg-raised)',padding:'2px 6px',borderRadius:10,fontWeight:600},
+catAddBtn: {background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:13,padding:'0 4px',opacity:0.8,fontWeight:600},
 
 // Channel item
-chanItem: {display:'flex',alignItems:'center',gap:8,padding:'7px 10px 7px 18px',borderRadius:6,cursor:'pointer',marginBottom:1,transition:'all 0.1s'},
-chanItemActive: {background:'#1e1e1e'},
-chanItemInactive: {},
+chanItem: {display:'flex',alignItems:'center',gap:8,padding:'7px 10px 7px 18px',borderRadius:6,cursor:'pointer',marginBottom:2,transition:'all 0.1s'},
+chanItemActive: {background:'var(--accent-bg)',boxShadow:'inset 2px 0 0 var(--accent)'},
 chanItemDone: {opacity:0.5},
-chanHash: {fontSize:13,color:'#555',flexShrink:0},
-chanName: {fontSize:13,color:'#bbb',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flex:1},
-chanNameActive: {color:'#fff',fontWeight:500},
+chanHash: {fontSize:13,color:'var(--text-faint)',flexShrink:0,fontFamily:"'JetBrains Mono',monospace",fontWeight:500},
+chanName: {fontSize:13,color:'var(--text-muted)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flex:1},
+chanNameActive: {color:'var(--accent-text)',fontWeight:600},
 
-emptyCat: {fontSize:10,color:'#333',padding:'4px 18px',fontStyle:'italic'},
+emptyCat: {fontSize:10,color:'var(--text-faint)',padding:'4px 18px',fontStyle:'italic'},
 
 // Header
-header: {padding:'16px 24px',borderBottom:'1px solid #1e1e1e',display:'flex',alignItems:'center',justifyContent:'space-between',background:'#0f0f0f',gap:12,flexWrap:'wrap'},
-headerTitle: {fontSize:20,fontWeight:700,color:'#fff'},
-headerMeta: {fontSize:12,color:'#555',marginTop:3},
-badge: {display:'inline-flex',alignItems:'center',gap:4,padding:'4px 10px',borderRadius:20,fontSize:12,fontWeight:500},
+header: {padding:'14px 24px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'var(--bg-panel)',gap:12,flexWrap:'wrap'},
+headerTitleWrap:{minWidth:0,flex:1},
+headerKicker: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
+headerTitle: {fontSize:20,fontWeight:700,color:'var(--text)',letterSpacing:-0.2},
+headerMeta: {fontSize:12,color:'var(--text-dim)',marginTop:3},
+
+badge: {display:'inline-flex',alignItems:'center',gap:5,padding:'5px 11px',borderRadius:6,fontSize:11,fontWeight:600,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.2,textTransform:'uppercase',border:'1px solid transparent'},
+badgeGhost:{background:'var(--bg-raised)',color:'var(--text-muted)',border:'1px solid var(--border)',cursor:'pointer'},
+badgePrimary:{background:'var(--accent-bg)',color:'var(--accent-text)',border:'1px solid var(--accent)',cursor:'pointer'},
+badgeSuccess:{background:'var(--success-bg)',color:'var(--success)',border:'1px solid var(--success)'},
+badgeDone:{background:'var(--bg-raised)',color:'var(--text-dim)',border:'1px solid var(--border)'},
 
 // Threads
-threadBar: {display:'flex',gap:4,padding:'12px 24px',borderBottom:'1px solid #1e1e1e',background:'#0f0f0f',overflowX:'auto',alignItems:'center'},
-threadBtn: {padding:'6px 14px',borderRadius:6,border:'1px solid #1e1e1e',fontSize:13,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.1s',background:'transparent',color:'#888',display:'inline-flex',alignItems:'center',gap:5},
-threadBtnActive: {background:'#1d4ed8',border:'1px solid #1d4ed8',color:'#fff',fontWeight:600},
-threadAdd: {padding:'6px 10px',borderRadius:6,border:'1px dashed #2a2a2a',background:'transparent',color:'#555',fontSize:13,cursor:'pointer',fontWeight:500,flexShrink:0},
-threadRemove: {marginLeft:4,background:'none',border:'none',color:'#888',cursor:'pointer',fontSize:13,padding:0,opacity:0.6},
+threadBar: {display:'flex',gap:4,padding:'10px 24px',borderBottom:'1px solid var(--border)',background:'var(--bg-panel)',overflowX:'auto',alignItems:'center'},
+threadBtn: {padding:'7px 13px',borderRadius:6,border:'1px solid var(--border)',fontSize:12,fontWeight:500,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.12s',background:'transparent',color:'var(--text-muted)',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'Inter',sans-serif"},
+threadBtnActive: {background:'var(--accent)',border:'1px solid var(--accent)',color:'#fff',fontWeight:600,boxShadow:'var(--shadow-sm)'},
+threadAdd: {padding:'7px 11px',borderRadius:6,border:'1px dashed var(--border-strong)',background:'transparent',color:'var(--text-dim)',fontSize:13,cursor:'pointer',fontWeight:700,flexShrink:0},
+threadRemove: {marginLeft:3,background:'none',border:'none',color:'currentColor',cursor:'pointer',fontSize:14,padding:0,opacity:0.8,lineHeight:1},
 
-content: {flex:1,overflowY:'auto',padding:'20px 24px'},
+content: {flex:1,overflowY:'auto',padding:'24px'},
 
 // Info tab
-infoList: {background:'#0f0f0f',border:'1px solid #1e1e1e',borderRadius:12,padding:'22px 26px',maxWidth:820},
-infoLine: {display:'flex',gap:10,padding:'7px 0',fontSize:15,lineHeight:1.55,alignItems:'flex-start'},
-infoEmoji: {fontSize:18,flexShrink:0,width:24},
-infoLabelBold: {fontWeight:700,color:'#fff'},
-infoValText: {color:'#d8d8d8',marginLeft:4,wordBreak:'break-word'},
-infoEmpty: {color:'#555',marginLeft:4,fontStyle:'italic'},
-infoLinksRow: {display:'flex',gap:10,marginTop:20,flexWrap:'wrap',paddingTop:18,borderTop:'1px solid #1e1e1e'},
-infoLinkBtn: {padding:'10px 18px',borderRadius:10,fontSize:13,fontWeight:600,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6},
+infoList: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'22px 26px',maxWidth:820,boxShadow:'var(--shadow-sm)'},
+infoLine: {display:'flex',gap:10,padding:'8px 0',fontSize:14,lineHeight:1.55,alignItems:'flex-start'},
+infoEmoji: {fontSize:17,flexShrink:0,width:24},
+infoLabelBold: {fontWeight:700,color:'var(--text)'},
+infoValText: {color:'var(--text-muted)',marginLeft:4,wordBreak:'break-word'},
+infoEmpty: {color:'var(--text-faint)',marginLeft:4,fontStyle:'italic'},
+infoLinksRow: {display:'flex',gap:10,marginTop:20,flexWrap:'wrap',paddingTop:18,borderTop:'1px solid var(--border)'},
+infoLinkBtn: {padding:'10px 16px',borderRadius:8,fontSize:12,fontWeight:700,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3,border:'1px solid'},
 
 // Notes
-noteInput: {width:'100%',background:'#141414',border:'1px solid #1e1e1e',borderRadius:10,padding:'12px 16px',color:'#e8e8e8',fontSize:14,resize:'none',outline:'none',marginBottom:12,lineHeight:1.6},
-sendBtn: {padding:'8px 20px',background:'#1d4ed8',border:'none',borderRadius:8,color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer'},
-note: {background:'#141414',border:'1px solid #1e1e1e',borderRadius:10,padding:'14px 16px',marginBottom:10},
-noteText: {fontSize:14,color:'#e8e8e8',lineHeight:1.6,whiteSpace:'pre-wrap'},
-noteMeta: {fontSize:11,color:'#444',marginTop:8},
+noteInput: {width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:8,padding:'12px 14px',color:'var(--text)',fontSize:14,resize:'none',outline:'none',marginBottom:10,lineHeight:1.6},
+sendBtn: {padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
+note: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,padding:'13px 16px',marginBottom:8,boxShadow:'var(--shadow-sm)'},
+noteText: {fontSize:14,color:'var(--text)',lineHeight:1.55,whiteSpace:'pre-wrap'},
+noteMeta: {fontSize:10,color:'var(--text-dim)',marginTop:8,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.1},
 
-empty: {display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:12,color:'#333'},
-emptyIcon: {fontSize:48},
+empty: {display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:12,color:'var(--text-faint)'},
+emptyIcon: {fontSize:44,opacity:0.5},
+emptyText: {fontSize:13,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14},
 
 // Modal
-overlay: {position:'fixed',inset:0,background:'rgba(0,0,0,0.8)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100,padding:20},
-modal: {background:'#111',border:'1px solid #222',borderRadius:16,width:'100%',maxWidth:540,maxHeight:'90vh',overflowY:'auto'},
+overlay: {position:'fixed',inset:0,background:'rgba(10,21,32,0.72)',backdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100,padding:20},
+modal: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:12,width:'100%',maxWidth:540,maxHeight:'90vh',overflowY:'auto',boxShadow:'var(--shadow-lg)'},
 modalSm: {maxWidth:420},
-modalHeader: {padding:'20px 24px',borderBottom:'1px solid #1e1e1e',display:'flex',alignItems:'center',justifyContent:'space-between'},
-modalTitle: {fontSize:18,fontWeight:700,color:'#fff'},
-modalBody: {padding:'20px 24px'},
-modalFooter: {padding:'16px 24px',borderTop:'1px solid #1e1e1e',display:'flex',justifyContent:'flex-end',gap:8},
-closeBtn: {background:'none',border:'none',color:'#555',fontSize:22,cursor:'pointer',lineHeight:1},
-label: {fontSize:12,color:'#666',fontWeight:500,marginBottom:6,display:'block'},
-input: {width:'100%',background:'#1a1a1a',border:'1px solid #2a2a2a',borderRadius:8,padding:'10px 12px',color:'#e8e8e8',fontSize:14,outline:'none',marginBottom:16},
+modalHeader: {padding:'18px 22px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between'},
+modalKicker:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:2},
+modalTitle: {fontSize:17,fontWeight:700,color:'var(--text)'},
+modalBody: {padding:'20px 22px'},
+modalFooter: {padding:'14px 22px',borderTop:'1px solid var(--border)',display:'flex',justifyContent:'flex-end',gap:8},
+closeBtn: {background:'none',border:'none',color:'var(--text-dim)',fontSize:22,cursor:'pointer',lineHeight:1},
+label: {fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.14},
+input: {width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',color:'var(--text)',fontSize:14,outline:'none',marginBottom:16,transition:'border-color 0.15s'},
 row2: {display:'grid',gridTemplateColumns:'1fr 1fr',gap:12},
-cancelBtn: {padding:'9px 20px',background:'transparent',border:'1px solid #2a2a2a',borderRadius:8,color:'#888',fontSize:13,cursor:'pointer'},
-primaryBtn: {padding:'9px 20px',background:'#1d4ed8',border:'none',borderRadius:8,color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer'},
+cancelBtn: {padding:'9px 18px',background:'transparent',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:12,cursor:'pointer',fontWeight:600,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
+primaryBtn: {padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
 stepDot: {width:8,height:8,borderRadius:'50%',display:'inline-block',marginRight:4},
 
 // Emoji picker
 emojiGrid: {display:'grid',gridTemplateColumns:'repeat(10,1fr)',gap:4,marginBottom:12},
-emojiCell: {aspectRatio:'1',background:'#1a1a1a',border:'1px solid #2a2a2a',borderRadius:6,fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.1s'},
-emojiCellActive: {background:'#1e3a8a',border:'1px solid #3b82f6'},
+emojiCell: {aspectRatio:'1',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,fontSize:17,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.1s'},
+emojiCellActive: {background:'var(--accent-bg)',border:'1px solid var(--accent)'},
 
 // Channel type picker
-typeRow: {display:'flex',gap:10,marginBottom:16},
-typeCard: {flex:1,padding:'16px',border:'1px solid #2a2a2a',borderRadius:10,cursor:'pointer',background:'#1a1a1a',transition:'all 0.1s'},
-typeCardActive: {background:'#1e3a8a',border:'1px solid #3b82f6'},
+typeRow: {display:'flex',gap:10,marginBottom:8},
+typeCard: {flex:1,padding:'16px',border:'1px solid var(--border)',borderRadius:10,cursor:'pointer',background:'var(--bg-raised)',transition:'all 0.1s'},
 typeIcon: {fontSize:22,marginBottom:6},
-typeTitle: {fontSize:13,fontWeight:600,color:'#e8e8e8',marginBottom:2},
-typeDesc: {fontSize:11,color:'#666',lineHeight:1.4},
+typeTitle: {fontSize:13,fontWeight:700,color:'var(--text)',marginBottom:3},
+typeDesc: {fontSize:11,color:'var(--text-dim)',lineHeight:1.4},
 
 // Share
-sharePreview: {background:'#0a0a0a',border:'1px solid #1e1e1e',borderRadius:10,padding:'14px 16px',fontSize:13,color:'#bbb',lineHeight:1.7,whiteSpace:'pre-wrap',fontFamily:"'JetBrains Mono',monospace",maxHeight:280,overflowY:'auto',marginBottom:12},
-copyBtn: {padding:'8px 14px',background:'#1a1a1a',border:'1px solid #2a2a2a',borderRadius:8,color:'#bbb',fontSize:12,fontWeight:500,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6},
-linkBox: {background:'#0a0a0a',border:'1px solid #1e1e1e',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#888',fontFamily:"'JetBrains Mono',monospace",wordBreak:'break-all',marginBottom:8,maxHeight:80,overflowY:'auto'},
+sharePreview: {background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:8,padding:'14px 16px',fontSize:12,color:'var(--text)',lineHeight:1.7,whiteSpace:'pre-wrap',fontFamily:"'JetBrains Mono',monospace",maxHeight:280,overflowY:'auto',marginBottom:12},
+copyBtn: {padding:'8px 13px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2},
+linkBox: {background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',fontSize:10,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace",wordBreak:'break-all',marginBottom:8,maxHeight:80,overflowY:'auto'},
 
 // Shared view
-sharedWrap: {minHeight:'100vh',background:'#0a0a0a',padding:'40px 20px',display:'flex',justifyContent:'center'},
-sharedCard: {width:'100%',maxWidth:680,background:'#111',border:'1px solid #1e1e1e',borderRadius:16,overflow:'hidden'},
-sharedHeader: {padding:'28px 32px 20px',borderBottom:'1px solid #1e1e1e'},
-sharedBadge: {display:'inline-block',padding:'4px 10px',background:'#1e1e1e',borderRadius:20,fontSize:11,color:'#888',fontWeight:500,letterSpacing:0.5,textTransform:'uppercase',marginBottom:12},
-sharedTitle: {fontSize:24,fontWeight:700,color:'#fff',marginBottom:6},
-sharedSub: {fontSize:13,color:'#666'},
-sharedSection: {padding:'24px 32px',borderBottom:'1px solid #1e1e1e'},
+sharedWrap: {minHeight:'100vh',background:'var(--bg)',padding:'40px 20px',display:'flex',justifyContent:'center'},
+sharedCard: {width:'100%',maxWidth:680,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:14,overflow:'hidden',boxShadow:'var(--shadow-lg)'},
+sharedHeader: {padding:'28px 32px 22px',borderBottom:'1px solid var(--border)'},
+sharedBadge: {display:'inline-block',padding:'4px 10px',background:'var(--accent-bg)',color:'var(--accent-text)',borderRadius:6,fontSize:10,fontWeight:700,letterSpacing:0.18,textTransform:'uppercase',marginBottom:12,fontFamily:"'JetBrains Mono',monospace",border:'1px solid var(--accent)'},
+sharedTitle: {fontSize:24,fontWeight:700,color:'var(--text)',marginBottom:6,letterSpacing:-0.3},
+sharedSub: {fontSize:13,color:'var(--text-dim)'},
+sharedSection: {padding:'24px 32px',borderBottom:'1px solid var(--border)'},
 };
 
 // ── HOOKS ───────────────────────────────────────────────────────────────────
@@ -174,6 +257,17 @@ try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : init; } ca
 });
 useEffect(() => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }, [key, val]);
 return [val, setVal];
+}
+
+function useTheme() {
+const [theme, setTheme] = useState(() => {
+try { return localStorage.getItem('ral-theme') || 'light'; } catch { return 'light'; }
+});
+useEffect(() => {
+document.documentElement.setAttribute('data-theme', theme);
+try { localStorage.setItem('ral-theme', theme); } catch {}
+}, [theme]);
+return [theme, setTheme];
 }
 
 function formatDate(iso) {
@@ -223,24 +317,24 @@ if(ch.surveyLink) lines.push('🔍 *Quick Survey:* ' + ch.surveyLink);
 return lines.join('\n');
 }
 
-// ── SEED DATA (new structure) ───────────────────────────────────────────────
+// ── SEED DATA ───────────────────────────────────────────────────────────────
 function seedData() {
 const now = Date.now();
-const jobDefaults = (name, data) => ({
-id: 'seed-' + name.toLowerCase().replace(/\s+/g,'-'),
+const jobDefaults = (name, extra) => ({
+id: 'seed-' + name.toLowerCase().replace(/\s+/g,'-').replace(/[^\w-]/g,''),
 type: 'job',
 name,
 status: 'running',
 customThreads: [],
 createdAt: new Date(now).toISOString(),
-...data
+...extra
 });
 
 return {
 categories: [
 {id:'cat-run',   name:'Projects on Run', emoji:'🚧', system:'running', collapsed:false},
 {id:'cat-done',  name:'Done',            emoji:'✅', system:'done',    collapsed:true},
-{id:'cat-general', name:'General',       emoji:'💬', system:null,      collapsed:false},
+{id:'cat-general',name:'General',        emoji:'💬', system:null,      collapsed:false},
 ],
 channels: [
 {...jobDefaults('80 Queen Street', {
@@ -256,7 +350,7 @@ clientName:'Tony Martinez',
 clientMobile:'+64 21 555 0101',
 teamLeader:'Felipe',
 whatsapp:'https://chat.whatsapp.com/example-80queen',
-surveyLink:'https://quicksurvey.example/job/80-queen',
+surveyLink:'https://ralsolutions.github.io/Survey/',
 startDate:'2026-04-12',
 })},
 {...jobDefaults('Sky Tower — Facade Clean', {
@@ -272,7 +366,7 @@ clientName:'Sarah Chen',
 clientMobile:'+64 27 555 0202',
 teamLeader:'Lionel',
 whatsapp:'https://chat.whatsapp.com/example-skytower',
-surveyLink:'https://quicksurvey.example/job/sky-tower',
+surveyLink:'https://ralsolutions.github.io/Survey/',
 startDate:'2026-04-14',
 })},
 {...jobDefaults('2 Bond St Sydney', {
@@ -316,7 +410,6 @@ clientMobile:'+64 27 555 0404',
 teamLeader:'Felipe',
 startDate:'2026-02-15',
 })},
-// Plain channel example
 {
 id:'seed-general',
 type:'plain',
@@ -391,11 +484,11 @@ const steps = [
 {title:'Links', fields:(<>
 <label style={s.label}>WhatsApp group invite link</label>
 <input style={s.input} value={data.whatsapp} onChange={set('whatsapp')} placeholder="https://chat.whatsapp.com/..."/>
-<div style={{fontSize:12,color:'#555',marginTop:-8,marginBottom:16}}>
+<div style={{fontSize:11,color:'var(--text-dim)',marginTop:-10,marginBottom:16,lineHeight:1.5}}>
 Create the group manually in WhatsApp first, then paste the invite link here. Reset the link in WhatsApp once everyone has joined.
 </div>
 <label style={s.label}>Quick Survey link</label>
-<input style={s.input} value={data.surveyLink} onChange={set('surveyLink')} placeholder="https://..."/>
+<input style={s.input} value={data.surveyLink} onChange={set('surveyLink')} placeholder="https://ralsolutions.github.io/Survey/..."/>
 </>)}
 ];
 
@@ -419,12 +512,13 @@ return (
 <div style={s.modal} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
 <div>
+<div style={s.modalKicker}>{editing ? 'Edit' : 'New'} · Job Channel</div>
 <div style={s.modalTitle}>{editing ? 'Edit project' : 'New project'}</div>
-<div style={{display:'flex',gap:6,marginTop:8,alignItems:'center'}}>
+<div style={{display:'flex',gap:6,marginTop:10,alignItems:'center'}}>
 {steps.map((st,i) => (
-<span key={i} style={{...s.stepDot, background: i <= step ? '#3b82f6' : '#2a2a2a', width: i===step?24:8, borderRadius: i===step?4:'50%', transition:'all 0.2s'}}/>
+<span key={i} style={{...s.stepDot, background: i <= step ? 'var(--accent)' : 'var(--border-strong)', width: i===step?22:8, borderRadius: i===step?4:'50%', transition:'all 0.2s'}}/>
 ))}
-<span style={{fontSize:12,color:'#555',marginLeft:4}}>{steps[step].title}</span>
+<span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',marginLeft:6,textTransform:'uppercase',letterSpacing:0.14}}>{steps[step].title}</span>
 </div>
 </div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
@@ -437,7 +531,7 @@ return (
 }
 {step < steps.length - 1
 ? <button style={{...s.primaryBtn, opacity: canNext?1:0.5}} disabled={!canNext} onClick={() => setStep(p => p+1)}>Next →</button>
-: <button style={s.primaryBtn} onClick={handleSave}>{editing ? 'Save changes' : 'Create project'}</button>
+: <button style={s.primaryBtn} onClick={handleSave}>{editing ? 'Save' : 'Create'}</button>
 }
 </div>
 </div>
@@ -467,7 +561,10 @@ return (
 <div style={s.overlay} onClick={onClose}>
 <div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
+<div>
+<div style={s.modalKicker}>{editing ? 'Edit' : 'New'} · Category</div>
 <div style={s.modalTitle}>{editing ? 'Edit category' : 'New category'}</div>
+</div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
@@ -491,7 +588,7 @@ onClick={() => { setEmoji(em); setCustomEmoji(''); }}>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
 <button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>
-{editing ? 'Save changes' : 'Create category'}
+{editing ? 'Save' : 'Create'}
 </button>
 </div>
 </div>
@@ -509,7 +606,10 @@ return (
 <div style={s.overlay} onClick={onClose}>
 <div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div style={s.modalTitle}>New plain channel</div>
+<div>
+<div style={s.modalKicker}>New · Plain Channel</div>
+<div style={s.modalTitle}>Channel name</div>
+</div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
@@ -517,14 +617,14 @@ return (
 <input style={s.input} value={plainName} onChange={e => setPlainName(e.target.value)}
 placeholder="e.g. general, announcements..." autoFocus
 onKeyDown={e => { if(e.key==='Enter' && plainName.trim()) onPickPlain(plainName.trim()); }}/>
-<div style={{fontSize:12,color:'#555',marginTop:-8}}>
+<div style={{fontSize:11,color:'var(--text-dim)',marginTop:-10,lineHeight:1.5}}>
 A plain channel is just a notes feed — no project info, no threads. Use it for announcements, banter, or reference material.
 </div>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={() => setType(null)}>← Back</button>
 <button style={{...s.primaryBtn, opacity: plainName.trim()?1:0.5}} disabled={!plainName.trim()} onClick={() => onPickPlain(plainName.trim())}>
-Create channel
+Create
 </button>
 </div>
 </div>
@@ -537,20 +637,19 @@ return (
 <div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
 <div>
-<div style={s.modalTitle}>New channel</div>
-<div style={{fontSize:12,color:'#555',marginTop:4}}>in {categoryName}</div>
+<div style={s.modalKicker}>New Channel · in {categoryName}</div>
+<div style={s.modalTitle}>Pick channel type</div>
 </div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
-<label style={s.label}>Pick channel type</label>
 <div style={s.typeRow}>
-<div style={{...s.typeCard}} onClick={onPickJob}>
+<div style={s.typeCard} onClick={onPickJob}>
 <div style={s.typeIcon}>🏗️</div>
 <div style={s.typeTitle}>Job channel</div>
 <div style={s.typeDesc}>Full rope access job with wizard, info tab, toolbox talks, RAMS, surveys.</div>
 </div>
-<div style={{...s.typeCard}} onClick={() => setType('plain')}>
+<div style={s.typeCard} onClick={() => setType('plain')}>
 <div style={s.typeIcon}>💬</div>
 <div style={s.typeTitle}>Plain channel</div>
 <div style={s.typeDesc}>Just a notes feed. For general chat, announcements, or reference material.</div>
@@ -585,7 +684,10 @@ return (
 <div style={s.overlay} onClick={onClose}>
 <div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div style={s.modalTitle}>New thread</div>
+<div>
+<div style={s.modalKicker}>New · Thread</div>
+<div style={s.modalTitle}>Custom thread</div>
+</div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
@@ -598,7 +700,7 @@ onKeyDown={e => { if(e.key==='Enter' && name.trim()) save(); }}/>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>Create thread</button>
+<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>Create</button>
 </div>
 </div>
 </div>
@@ -623,7 +725,10 @@ return (
 <div style={s.overlay} onClick={onClose}>
 <div style={s.modal} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
+<div>
+<div style={s.modalKicker}>Share</div>
 <div style={s.modalTitle}>Share project</div>
+</div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
@@ -635,8 +740,8 @@ return (
 </button>
 {channel.whatsapp && (
 <a href={channel.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.copyBtn,background:'#14532d',color:'#4ade80',border:'1px solid #166534',textDecoration:'none'}}>
-💬 Open WhatsApp group
+style={{...s.copyBtn,background:'var(--success-bg)',color:'var(--success)',border:'1px solid var(--success)',textDecoration:'none'}}>
+💬 Open group
 </a>
 )}
 </div>
@@ -645,7 +750,7 @@ style={{...s.copyBtn,background:'#14532d',color:'#4ade80',border:'1px solid #166
 <button style={s.copyBtn} onClick={() => copy(shareUrl, setCopiedLink)}>
 {copiedLink ? '✓ Copied' : '🔗 Copy link'}
 </button>
-<div style={{fontSize:11,color:'#444',marginTop:16,lineHeight:1.6}}>
+<div style={{fontSize:11,color:'var(--text-dim)',marginTop:16,lineHeight:1.6}}>
 The shareable link contains the project info encoded in the URL — anyone with the link can view it without logging in.
 </div>
 </div>
@@ -689,14 +794,14 @@ return (
 <div style={s.infoLinksRow}>
 {channel.whatsapp && (
 <a href={channel.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'#14532d',color:'#4ade80'}}>
-💬 Join WhatsApp group
+style={{...s.infoLinkBtn,background:'var(--success-bg)',color:'var(--success)',borderColor:'var(--success)'}}>
+💬 Join WhatsApp
 </a>
 )}
 {channel.surveyLink && (
 <a href={channel.surveyLink} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'#1d4ed8',color:'#fff'}}>
-🔍 Open Quick Survey
+style={{...s.infoLinkBtn,background:'var(--accent-bg)',color:'var(--accent-text)',borderColor:'var(--accent)'}}>
+🔍 Quick Survey
 </a>
 )}
 </div>
@@ -719,7 +824,7 @@ return (
 <InfoDisplay channel={channel}/>
 </div>
 <div style={{padding:'16px 32px 28px',textAlign:'center'}}>
-<button onClick={onExit} style={{background:'none',border:'none',color:'#444',fontSize:12,cursor:'pointer'}}>
+<button onClick={onExit} style={{background:'none',border:'none',color:'var(--text-dim)',fontSize:11,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2}}>
 ← Back to project manager
 </button>
 </div>
@@ -765,20 +870,20 @@ return (
 {feed.length === 0
 ? <div style={{...s.empty,height:'60%'}}>
 <span style={s.emptyIcon}>📝</span>
-<span style={{fontSize:14}}>No entries yet</span>
+<span style={s.emptyText}>No entries yet</span>
 </div>
 : feed.map(n => (
 <div key={n.id} style={s.note}>
 <div style={s.noteText}>{n.text}</div>
 <div style={{...s.noteMeta,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
 <span>{formatTime(n.createdAt)}</span>
-<button onClick={() => deleteNote(n.id)} style={{background:'none',border:'none',color:'#333',cursor:'pointer',fontSize:13,padding:'0 4px'}}>×</button>
+<button onClick={() => deleteNote(n.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:'0 4px'}}>×</button>
 </div>
 </div>
 ))
 }
 </div>
-<div style={{paddingTop:12,borderTop:'1px solid #1e1e1e'}}>
+<div style={{paddingTop:12,borderTop:'1px solid var(--border)'}}>
 <textarea
 style={s.noteInput}
 value={text}
@@ -788,7 +893,7 @@ rows={3}
 onKeyDown={e => { if(e.key==='Enter' && e.metaKey) addNote(); }}
 />
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-<span style={{fontSize:11,color:'#444'}}>⌘ + Enter to send</span>
+<span style={{fontSize:10,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14}}>⌘ + Enter to send</span>
 <button style={s.sendBtn} onClick={addNote}>Add entry</button>
 </div>
 </div>
@@ -806,12 +911,12 @@ if(thread.id === 'info') return <InfoDisplay channel={channel}/>;
 
 if(thread.id === 'rams') {
 return (
-<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:16}}>
-<div style={{fontSize:40}}>📋</div>
-<div style={{fontSize:16,fontWeight:600,color:'#e8e8e8'}}>RAMS Form</div>
-<div style={{fontSize:13,color:'#555',textAlign:'center',maxWidth:320}}>Opens the RAMS form in a new tab. Fill it out, sign it and send it directly from there.</div>
+<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}>
+<div style={{fontSize:40,opacity:0.7}}>📋</div>
+<div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>RAMS Form</div>
+<div style={{fontSize:12,color:'var(--text-dim)',textAlign:'center',maxWidth:320,lineHeight:1.5}}>Opens the RAMS form in a new tab. Fill it out, sign it and send it directly from there.</div>
 <a href={RAMS_URL} target="_blank" rel="noreferrer"
-style={{padding:'12px 28px',background:'#1d4ed8',borderRadius:10,color:'#fff',fontWeight:600,fontSize:14,textDecoration:'none'}}>
+style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>
 Open RAMS form →
 </a>
 </div>
@@ -820,15 +925,15 @@ Open RAMS form →
 
 if(thread.id === 'survey') {
 return (
-<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:16}}>
-<div style={{fontSize:40}}>🔍</div>
-<div style={{fontSize:16,fontWeight:600,color:'#e8e8e8'}}>Survey</div>
+<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}>
+<div style={{fontSize:40,opacity:0.7}}>🔍</div>
+<div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Quick Survey</div>
 {channel.surveyLink
 ? <a href={channel.surveyLink} target="_blank" rel="noreferrer"
-style={{padding:'12px 28px',background:'#1d4ed8',borderRadius:10,color:'#fff',fontWeight:600,fontSize:14,textDecoration:'none'}}>
+style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>
 Open Quick Survey →
 </a>
-: <div style={{fontSize:13,color:'#555'}}>No Quick Survey link set. Edit the project to add one.</div>
+: <div style={{fontSize:12,color:'var(--text-dim)'}}>No Quick Survey link set. Edit the project to add one.</div>
 }
 </div>
 );
@@ -836,10 +941,10 @@ Open Quick Survey →
 
 if(thread.id === 'timesheet') {
 return (
-<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:16}}>
-<div style={{fontSize:40}}>⏱️</div>
-<div style={{fontSize:16,fontWeight:600,color:'#e8e8e8'}}>Timesheet</div>
-<div style={{fontSize:13,color:'#555'}}>Coming soon — editable timesheet for team leaders.</div>
+<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}>
+<div style={{fontSize:40,opacity:0.7}}>⏱️</div>
+<div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Timesheet</div>
+<div style={{fontSize:12,color:'var(--text-dim)'}}>Coming soon — editable timesheet for team leaders.</div>
 </div>
 );
 }
@@ -848,7 +953,7 @@ return <NotesFeed channelId={channel.id} threadId={thread.id} notes={notes} setN
 }
 
 // ── SIDEBAR CATEGORY ────────────────────────────────────────────────────────
-function CategoryBlock({category, channels, activeId, onSelect, onAddChannel, onEditCategory, onDeleteCategory}) {
+function CategoryBlock({category, channels, activeId, onSelect, onAddChannel, onEditCategory}) {
 const [open, setOpen] = useState(!category.collapsed);
 return (
 <div style={s.catWrap}>
@@ -867,12 +972,12 @@ return (
 {open && channels.map(ch => {
 const isActive = activeId === ch.id;
 const isDone = ch.status === 'done';
-const hash = ch.type === 'plain' ? '#' : '🏗️';
+const hash = ch.type === 'plain' ? '#' : '◆';
 return (
 <div key={ch.id}
 style={{
 ...s.chanItem,
-...(isActive ? s.chanItemActive : s.chanItemInactive),
+...(isActive ? s.chanItemActive : {}),
 ...(isDone ? s.chanItemDone : {})
 }}
 onClick={() => onSelect(ch.id)}>
@@ -890,6 +995,7 @@ onClick={() => onSelect(ch.id)}>
 
 // ── MAIN APP ────────────────────────────────────────────────────────────────
 function App() {
+const [theme, setTheme] = useTheme();
 const [data, setData] = useStorage('ral-data-v3', null);
 const [notes, setNotes] = useStorage('ral-notes', {});
 const [activeId, setActiveId] = useState(null);
@@ -900,16 +1006,14 @@ const [jobTargetCategory, setJobTargetCategory] = useState('cat-run');
 const [showShare, setShowShare] = useState(false);
 const [showCategoryModal, setShowCategoryModal] = useState(false);
 const [editingCategory, setEditingCategory] = useState(null);
-const [showTypePicker, setShowTypePicker] = useState(null); // {category}
+const [showTypePicker, setShowTypePicker] = useState(null);
 const [showAddThread, setShowAddThread] = useState(false);
 const [sharedChannel, setSharedChannel] = useState(null);
 
-// Seed on first run
 useEffect(() => {
 if(data === null) setData(seedData());
 }, [data]);
 
-// Shared link detection
 useEffect(() => {
 const checkHash = () => {
 const hash = window.location.hash;
@@ -935,7 +1039,6 @@ setSharedChannel(null);
 const d = data || {categories:[],channels:[]};
 const channel = d.channels.find(c => c.id === activeId);
 
-// ── Helpers for updates
 const updateData = (fn) => setData(prev => fn(prev || {categories:[],channels:[]}));
 
 const saveJob = (job) => {
@@ -979,7 +1082,6 @@ updateData(prev => ({
 channels: prev.channels.map(c => {
 if(c.id !== id) return c;
 const newStatus = c.status === 'done' ? 'running' : 'done';
-// Auto-move between system categories if the channel is in one
 const runCat = prev.categories.find(cat => cat.system === 'running');
 const doneCat = prev.categories.find(cat => cat.system === 'done');
 let newCatId = c.categoryId;
@@ -1000,17 +1102,6 @@ return {...prev, categories};
 }
 return {...prev, categories: [...prev.categories, cat]};
 });
-};
-
-const deleteCategory = (catId) => {
-const cat = d.categories.find(c => c.id === catId);
-if(cat?.system) return alert('System categories cannot be deleted.');
-const chCount = d.channels.filter(c => c.categoryId === catId).length;
-if(chCount > 0 && !confirm(`This category has ${chCount} channel(s). Delete anyway? Channels will be lost.`)) return;
-updateData(prev => ({
-categories: prev.categories.filter(c => c.id !== catId),
-channels: prev.channels.filter(c => c.categoryId !== catId),
-}));
 };
 
 const addCustomThread = (thread) => {
@@ -1041,14 +1132,13 @@ setActiveId(id);
 setActiveThreadId('info');
 };
 
-// Thread list for current channel
 const allThreads = channel && channel.type === 'job'
 ? [...DEFAULT_THREADS, ...(channel.customThreads || [])]
 : [];
 const currentThread = allThreads.find(t => t.id === activeThreadId) || allThreads[0];
 
-// Channels grouped per category
 const channelsByCat = (catId) => d.channels.filter(c => c.categoryId === catId);
+const currentCategory = channel ? d.categories.find(c => c.id === channel.categoryId) : null;
 
 return (
 <div style={s.app}>
@@ -1057,17 +1147,20 @@ return (
 <div style={s.serverHeader}>
 <div style={s.serverIcon}>RAL</div>
 <div style={s.serverMeta}>
+<div style={s.serverSmallCap}>Server</div>
 <div style={s.serverName}>RAL</div>
-<div style={s.serverSub}>Rope Access Manager</div>
 </div>
+<button style={s.themeToggle} onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} title="Toggle theme">
+{theme === 'light' ? '🌙' : '☀️'}
+</button>
 </div>
 
 <div style={s.actionBar}>
 <button style={s.actionBtn} onClick={() => { setEditingJob(null); setJobTargetCategory('cat-run'); setShowJobWizard(true); }}>
-+ New project
++ NEW PROJECT
 </button>
 <button style={s.actionBtn} onClick={() => { setEditingCategory(null); setShowCategoryModal(true); }}>
-+ Category
++ CATEGORY
 </button>
 </div>
 
@@ -1081,7 +1174,6 @@ activeId={activeId}
 onSelect={selectChannel}
 onAddChannel={(c) => {
 if(c.system === 'running') {
-// Project on Run → straight to wizard
 setEditingJob(null);
 setJobTargetCategory(c.id);
 setShowJobWizard(true);
@@ -1090,7 +1182,6 @@ setShowTypePicker({category: c});
 }
 }}
 onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}
-onDeleteCategory={deleteCategory}
 />
 ))}
 </div>
@@ -1101,15 +1192,18 @@ onDeleteCategory={deleteCategory}
 {!channel
 ? <div style={{...s.empty,height:'100%'}}>
 <span style={s.emptyIcon}>🏗️</span>
-<span style={{fontSize:16,color:'#333'}}>Select or create a channel</span>
+<span style={s.emptyText}>Select or create a channel</span>
 <button style={s.primaryBtn} onClick={() => { setEditingJob(null); setJobTargetCategory('cat-run'); setShowJobWizard(true); }}>+ New project</button>
 </div>
 : <>
 <div style={s.header}>
-<div>
+<div style={s.headerTitleWrap}>
+<div style={s.headerKicker}>
+{currentCategory ? `${currentCategory.emoji} ${currentCategory.name}` : ''}
+{channel.status === 'done' && ' · done'}
+</div>
 <div style={s.headerTitle}>
 {channel.type === 'plain' ? '#' + channel.name : channel.name}
-{channel.status === 'done' && <span style={{marginLeft:10,fontSize:11,padding:'3px 8px',background:'#1e1e1e',color:'#666',borderRadius:12,verticalAlign:'middle'}}>DONE</span>}
 </div>
 <div style={s.headerMeta}>
 {channel.type === 'job'
@@ -1118,31 +1212,27 @@ onDeleteCategory={deleteCategory}
 }
 </div>
 </div>
-<div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+<div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
 {channel.type === 'job' && channel.whatsapp && (
 <a href={channel.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.badge,background:'#14532d',color:'#4ade80',textDecoration:'none'}}>
-💬 Open Chat
+style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>
+💬 Chat
 </a>
 )}
 {channel.type === 'job' && (
 <>
-<button style={{...s.badge,background:'#1e3a8a',color:'#93c5fd',border:'none',cursor:'pointer'}}
-onClick={() => setShowShare(true)}>
+<button style={{...s.badge,...s.badgePrimary}} onClick={() => setShowShare(true)}>
 ↗ Share
 </button>
-<button style={{...s.badge,background:'#1e1e1e',color:'#888',border:'none',cursor:'pointer'}}
-onClick={() => toggleStatus(channel.id)}>
-{channel.status === 'done' ? '↻ Re-open' : '✓ Mark done'}
+<button style={{...s.badge,...s.badgeGhost}} onClick={() => toggleStatus(channel.id)}>
+{channel.status === 'done' ? '↻ Re-open' : '✓ Done'}
 </button>
-<button style={{...s.badge,background:'#1e1e1e',color:'#888',border:'none',cursor:'pointer'}}
-onClick={() => { setEditingJob(channel); setShowJobWizard(true); }}>
-✏️ Edit
+<button style={{...s.badge,...s.badgeGhost}} onClick={() => { setEditingJob(channel); setShowJobWizard(true); }}>
+✏ Edit
 </button>
 </>
 )}
-<button style={{...s.badge,background:'#1e1e1e',color:'#444',border:'none',cursor:'pointer'}}
-onClick={() => deleteChannel(channel.id)}>
+<button style={{...s.badge,...s.badgeGhost}} onClick={() => deleteChannel(channel.id)}>
 🗑
 </button>
 </div>
