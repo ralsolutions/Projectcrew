@@ -23,6 +23,7 @@ input,textarea,select,button{font-family:'Inter',sans-serif;}
 const {useState,useEffect,useRef} = React;
 
 const THREADS = [
+{id:'info',label:'Project Info',icon:'📌'},
 {id:'toolbox',label:'Toolbox Talk',icon:'🛡️'},
 {id:'timesheet',label:'Timesheet',icon:'⏱️'},
 {id:'incidents',label:'Incidents',icon:'⚠️'},
@@ -32,57 +33,70 @@ const THREADS = [
 
 const RAMS_URL = 'https://lionelagilecoach-rgb.github.io/Ral-rams/Rams/';
 
+const INFO_FIELDS = [
+{key:'address',        emoji:'🏢', label:'Address'},
+{key:'parking',        emoji:'🚌', label:'Parking'},
+{key:'assemblingPoint',emoji:'👥', label:'Assembling Point'},
+{key:'toilet',         emoji:'🚻', label:'Toilet'},
+{key:'keyLocation',    emoji:'🔓', label:"Lock pad code / key's location"},
+{key:'firstAid',       emoji:'🩹', label:'First aid kit'},
+{key:'lunchroom',      emoji:'🍽️', label:'Lunchroom'},
+{key:'clientName',     emoji:'👤', label:'Client contact'},
+{key:'teamLeader',     emoji:'👷', label:'Team Leader on site'},
+];
+
 const s = {
-// Layout
 app: {display:'flex',height:'100vh',overflow:'hidden'},
 sidebar: {width:260,background:'#111',borderRight:'1px solid #1e1e1e',display:'flex',flexDirection:'column',flexShrink:0},
 main: {flex:1,display:'flex',flexDirection:'column',overflow:'hidden'},
 
-// Sidebar
 sidebarHeader: {padding:'20px 16px 12px',borderBottom:'1px solid #1e1e1e'},
 logo: {fontSize:18,fontWeight:700,color:'#fff',letterSpacing:1},
 logoSub: {fontSize:11,color:'#555',marginTop:2},
 newBtn: {margin:'12px 16px',padding:'8px 12px',background:'#1a1a1a',border:'1px dashed #333',borderRadius:8,color:'#888',fontSize:13,cursor:'pointer',textAlign:'left',width:'calc(100% - 32px)'},
 projList: {flex:1,overflowY:'auto',padding:'8px 8px'},
+
+catHeader: {display:'flex',alignItems:'center',gap:6,padding:'10px 10px 6px',fontSize:11,color:'#555',fontWeight:600,textTransform:'uppercase',letterSpacing:0.6,cursor:'pointer',userSelect:'none'},
+catCaret: {fontSize:9,color:'#444',transition:'transform 0.15s'},
+catCount: {marginLeft:'auto',fontSize:10,color:'#444',background:'#1a1a1a',padding:'1px 6px',borderRadius:10},
+
 projItem: {padding:'10px 12px',borderRadius:8,cursor:'pointer',marginBottom:4,transition:'all 0.1s'},
 projItemActive: {background:'#1e1e1e',borderLeft:'2px solid #3b82f6'},
 projItemInactive: {borderLeft:'2px solid transparent'},
+projItemDone: {opacity:0.55},
 projName: {fontSize:13,fontWeight:500,color:'#e8e8e8',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'},
 projMeta: {fontSize:11,color:'#555',marginTop:2},
 
-// Header
 header: {padding:'16px 24px',borderBottom:'1px solid #1e1e1e',display:'flex',alignItems:'center',justifyContent:'space-between',background:'#0f0f0f'},
 headerTitle: {fontSize:20,fontWeight:700,color:'#fff'},
 headerMeta: {fontSize:12,color:'#555',marginTop:3},
 badge: {display:'inline-flex',alignItems:'center',gap:4,padding:'4px 10px',borderRadius:20,fontSize:12,fontWeight:500},
 
-// Info panel
-infoPanel: {display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12,padding:'16px 24px',borderBottom:'1px solid #1e1e1e',background:'#0c0c0c'},
-infoCard: {background:'#141414',borderRadius:8,padding:'10px 14px',border:'1px solid #1e1e1e'},
-infoLabel: {fontSize:11,color:'#555',fontWeight:500,textTransform:'uppercase',letterSpacing:0.5,marginBottom:4},
-infoVal: {fontSize:13,color:'#e8e8e8',fontWeight:500,wordBreak:'break-word'},
-
-// Threads
 threadBar: {display:'flex',gap:4,padding:'12px 24px',borderBottom:'1px solid #1e1e1e',background:'#0f0f0f',overflowX:'auto'},
 threadBtn: {padding:'6px 14px',borderRadius:6,border:'1px solid #1e1e1e',fontSize:13,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.1s'},
 threadBtnActive: {background:'#1d4ed8',border:'1px solid #1d4ed8',color:'#fff',fontWeight:600},
 threadBtnInactive: {background:'transparent',color:'#888'},
 
-// Content area
 content: {flex:1,overflowY:'auto',padding:'20px 24px'},
 
-// Notes
+infoList: {background:'#0f0f0f',border:'1px solid #1e1e1e',borderRadius:12,padding:'22px 26px',maxWidth:820},
+infoLine: {display:'flex',gap:10,padding:'7px 0',fontSize:15,lineHeight:1.55,alignItems:'flex-start'},
+infoEmoji: {fontSize:18,flexShrink:0,width:24},
+infoLabelBold: {fontWeight:700,color:'#fff'},
+infoValText: {color:'#d8d8d8',marginLeft:4,wordBreak:'break-word'},
+infoEmpty: {color:'#555',marginLeft:4,fontStyle:'italic'},
+infoLinksRow: {display:'flex',gap:10,marginTop:20,flexWrap:'wrap',paddingTop:18,borderTop:'1px solid #1e1e1e'},
+infoLinkBtn: {padding:'10px 18px',borderRadius:10,fontSize:13,fontWeight:600,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6},
+
 noteInput: {width:'100%',background:'#141414',border:'1px solid #1e1e1e',borderRadius:10,padding:'12px 16px',color:'#e8e8e8',fontSize:14,resize:'none',outline:'none',marginBottom:12,lineHeight:1.6},
 sendBtn: {padding:'8px 20px',background:'#1d4ed8',border:'none',borderRadius:8,color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer'},
 note: {background:'#141414',border:'1px solid #1e1e1e',borderRadius:10,padding:'14px 16px',marginBottom:10},
 noteText: {fontSize:14,color:'#e8e8e8',lineHeight:1.6,whiteSpace:'pre-wrap'},
 noteMeta: {fontSize:11,color:'#444',marginTop:8},
 
-// Empty
 empty: {display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:12,color:'#333'},
 emptyIcon: {fontSize:48},
 
-// Modal
 overlay: {position:'fixed',inset:0,background:'rgba(0,0,0,0.8)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100,padding:20},
 modal: {background:'#111',border:'1px solid #222',borderRadius:16,width:'100%',maxWidth:540,maxHeight:'90vh',overflowY:'auto'},
 modalHeader: {padding:'20px 24px',borderBottom:'1px solid #1e1e1e',display:'flex',alignItems:'center',justifyContent:'space-between'},
@@ -97,25 +111,17 @@ cancelBtn: {padding:'9px 20px',background:'transparent',border:'1px solid #2a2a2
 primaryBtn: {padding:'9px 20px',background:'#1d4ed8',border:'none',borderRadius:8,color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer'},
 stepDot: {width:8,height:8,borderRadius:'50%',display:'inline-block',marginRight:4},
 
-// Share modal
 sharePreview: {background:'#0a0a0a',border:'1px solid #1e1e1e',borderRadius:10,padding:'14px 16px',fontSize:13,color:'#bbb',lineHeight:1.7,whiteSpace:'pre-wrap',fontFamily:"'JetBrains Mono',monospace",maxHeight:280,overflowY:'auto',marginBottom:12},
 copyBtn: {padding:'8px 14px',background:'#1a1a1a',border:'1px solid #2a2a2a',borderRadius:8,color:'#bbb',fontSize:12,fontWeight:500,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6},
 linkBox: {background:'#0a0a0a',border:'1px solid #1e1e1e',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#888',fontFamily:"'JetBrains Mono',monospace",wordBreak:'break-all',marginBottom:8,maxHeight:80,overflowY:'auto'},
 
-// Shared view
 sharedWrap: {minHeight:'100vh',background:'#0a0a0a',padding:'40px 20px',display:'flex',justifyContent:'center'},
 sharedCard: {width:'100%',maxWidth:680,background:'#111',border:'1px solid #1e1e1e',borderRadius:16,overflow:'hidden'},
 sharedHeader: {padding:'28px 32px 20px',borderBottom:'1px solid #1e1e1e'},
 sharedBadge: {display:'inline-block',padding:'4px 10px',background:'#1e1e1e',borderRadius:20,fontSize:11,color:'#888',fontWeight:500,letterSpacing:0.5,textTransform:'uppercase',marginBottom:12},
 sharedTitle: {fontSize:24,fontWeight:700,color:'#fff',marginBottom:6},
 sharedSub: {fontSize:13,color:'#666'},
-sharedSection: {padding:'20px 32px',borderBottom:'1px solid #1e1e1e'},
-sharedRow: {display:'flex',gap:12,padding:'10px 0',alignItems:'flex-start'},
-sharedRowIcon: {fontSize:18,width:24,flexShrink:0},
-sharedRowLabel: {fontSize:11,color:'#555',textTransform:'uppercase',letterSpacing:0.5,marginBottom:2},
-sharedRowVal: {fontSize:14,color:'#e8e8e8',wordBreak:'break-word'},
-sharedActions: {padding:'24px 32px',display:'flex',gap:10,flexWrap:'wrap'},
-sharedAction: {flex:'1 1 200px',padding:'14px 20px',borderRadius:10,fontSize:14,fontWeight:600,textDecoration:'none',textAlign:'center',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:8},
+sharedSection: {padding:'24px 32px',borderBottom:'1px solid #1e1e1e'},
 };
 
 function useStorage(key, init) {
@@ -136,19 +142,17 @@ if(!iso) return '';
 return new Date(iso).toLocaleString('en-NZ', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 }
 
-// ── ENCODE/DECODE PROJECT FOR SHARE LINKS ────────────────────────────────────
 function encodeProject(p) {
 try {
 const json = JSON.stringify(p);
-// utf8 safe base64
 const b64 = btoa(unescape(encodeURIComponent(json)));
 return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 } catch { return ''; }
 }
 
-function decodeProject(s) {
+function decodeProject(str) {
 try {
-let b64 = s.replace(/-/g,'+').replace(/_/g,'/');
+let b64 = str.replace(/-/g,'+').replace(/_/g,'/');
 while(b64.length % 4) b64 += '=';
 const json = decodeURIComponent(escape(atob(b64)));
 return JSON.parse(json);
@@ -161,16 +165,12 @@ return `${base}#p=${encodeProject(project)}`;
 }
 
 function buildWhatsAppMessage(project) {
-const lines = [
-`📋 *${project.name}*`,
-'',
-`📍 *Address:* ${project.address || '—'}`,
-];
-if(project.parking) lines.push(`🚌 *Parking:* ${project.parking}`);
-if(project.keyCollection) lines.push(`🔑 *Key collection:* ${project.keyCollection}`);
-if(project.keyCode) lines.push(`🔒 *Key code / padlock:* ${project.keyCode}`);
-if(project.teamLeader) lines.push(`👷 *Team Leader:* ${project.teamLeader}`);
-if(project.clientName) lines.push(`🤝 *Client:* ${project.clientName}${project.clientMobile ? ' — ' + project.clientMobile : ''}`);
+const lines = [`📋 *${project.name}*`, ''];
+INFO_FIELDS.forEach(f => {
+const val = project[f.key];
+if(val) lines.push(`${f.emoji} *${f.label}:* ${val}`);
+});
+if(project.clientMobile) lines.push(`📱 *Client mobile:* ${project.clientMobile}`);
 if(project.startDate) lines.push(`📅 *Start date:* ${formatDate(project.startDate)}`);
 lines.push('');
 lines.push('🔗 *Project info:* ' + buildShareUrl(project));
@@ -178,11 +178,108 @@ if(project.surveyLink) lines.push('🔍 *Quick Survey:* ' + project.surveyLink);
 return lines.join('\n');
 }
 
-// ── WIZARD ──────────────────────────────────────────────────────────────────
+function seedProjects() {
+return [
+{
+id:'seed-1', status:'running',
+name:'80 Queen Street',
+address:'80 Queen St, Auckland CBD',
+parking:'No parking on site — use Victoria St carpark',
+assemblingPoint:'Ground floor lobby',
+toilet:'Level 2 bathrooms',
+keyLocation:'Reception desk, ask for building manager',
+firstAid:'Site office level 1',
+lunchroom:'Café next door or level 1 breakroom',
+clientName:'Tony Martinez',
+clientMobile:'+64 21 555 0101',
+teamLeader:'Felipe',
+whatsapp:'https://chat.whatsapp.com/example-80queen',
+surveyLink:'https://quicksurvey.example/job/80-queen',
+startDate:'2026-04-12',
+createdAt:'2026-04-10T09:00:00Z'
+},
+{
+id:'seed-2', status:'running',
+name:'Sky Tower — Facade Clean',
+address:'Victoria St W, Auckland CBD',
+parking:'Loading bay access only — book 24h ahead',
+assemblingPoint:'Sky Tower service entrance',
+toilet:'Ground floor staff amenities',
+keyLocation:'Security desk — sign in required',
+firstAid:'Security office',
+lunchroom:'SkyCity food court',
+clientName:'Sarah Chen',
+clientMobile:'+64 27 555 0202',
+teamLeader:'Lionel',
+whatsapp:'https://chat.whatsapp.com/example-skytower',
+surveyLink:'https://quicksurvey.example/job/sky-tower',
+startDate:'2026-04-14',
+createdAt:'2026-04-11T09:00:00Z'
+},
+{
+id:'seed-3', status:'running',
+name:'2 Bond St Sydney',
+address:'2 Bond St, Sydney CBD',
+parking:'No parking. Public transport recommended — middle of CBD',
+assemblingPoint:'Basement entrance',
+toilet:'Next to site office in the basement',
+keyLocation:'RMW Site. Lockpad TBC',
+firstAid:'In site office',
+lunchroom:'In the site office',
+clientName:'Tony',
+clientMobile:'',
+teamLeader:'Felipe',
+whatsapp:'',
+surveyLink:'',
+startDate:'2026-04-16',
+createdAt:'2026-04-12T09:00:00Z'
+},
+{
+id:'seed-4', status:'done',
+name:'Hamilton Warehouse Inspection',
+address:'120 Kent St, Hamilton',
+parking:'On-site parking available',
+assemblingPoint:'Warehouse main gate',
+toilet:'Inside warehouse by office',
+keyLocation:'Padlock code 4421',
+firstAid:'Main office',
+lunchroom:'On-site canteen',
+clientName:'Mike Thompson',
+clientMobile:'+64 21 555 0303',
+teamLeader:'Lionel',
+whatsapp:'',
+surveyLink:'',
+startDate:'2026-03-02',
+createdAt:'2026-03-01T09:00:00Z'
+},
+{
+id:'seed-5', status:'done',
+name:'Wellington Harbour Tower',
+address:'15 Customhouse Quay, Wellington',
+parking:'Street parking (metered)',
+assemblingPoint:'Lobby reception',
+toilet:'Level 3 bathrooms',
+keyLocation:'Collect from concierge',
+firstAid:'Concierge desk',
+lunchroom:'Ground floor café',
+clientName:'Emma Wilson',
+clientMobile:'+64 27 555 0404',
+teamLeader:'Felipe',
+whatsapp:'',
+surveyLink:'',
+startDate:'2026-02-15',
+createdAt:'2026-02-14T09:00:00Z'
+},
+];
+}
+
 function Wizard({onClose, onSave, editing}) {
 const blank = {
-id:'', name:'', address:'', parking:'', keyCollection:'', keyCode:'',
-teamLeader:'', clientName:'', clientMobile:'', whatsapp:'', surveyLink:'',
+id:'', status:'running',
+name:'', address:'', parking:'',
+assemblingPoint:'', toilet:'', keyLocation:'', firstAid:'', lunchroom:'',
+teamLeader:'', clientName:'', clientMobile:'',
+whatsapp:'', surveyLink:'',
 startDate:'', createdAt:''
 };
 const [step, setStep] = useState(0);
@@ -212,20 +309,33 @@ fields: (
 )
 },
 {
-title: 'Access & parking',
+title: 'Site access',
 fields: (
 <>
-<label style={s.label}>Parking info</label>
+<label style={s.label}>🚌 Parking</label>
 <input style={s.input} value={data.parking} onChange={set('parking')} placeholder="e.g. Street parking on Main St"/>
-<label style={s.label}>Key collection</label>
-<input style={s.input} value={data.keyCollection} onChange={set('keyCollection')} placeholder="e.g. From site manager at reception"/>
-<label style={s.label}>Key code / padlock</label>
-<input style={s.input} value={data.keyCode} onChange={set('keyCode')} placeholder="e.g. 1234 or padlock on gate"/>
+<label style={s.label}>👥 Assembling point</label>
+<input style={s.input} value={data.assemblingPoint} onChange={set('assemblingPoint')} placeholder="e.g. Ground floor lobby"/>
+<label style={s.label}>🔓 Lock pad code / key's location</label>
+<input style={s.input} value={data.keyLocation} onChange={set('keyLocation')} placeholder="e.g. 1234 or padlock on gate"/>
 </>
 )
 },
 {
-title: 'Client & contact',
+title: 'Site amenities',
+fields: (
+<>
+<label style={s.label}>🚻 Toilet</label>
+<input style={s.input} value={data.toilet} onChange={set('toilet')} placeholder="e.g. Next to site office"/>
+<label style={s.label}>🩹 First aid kit</label>
+<input style={s.input} value={data.firstAid} onChange={set('firstAid')} placeholder="e.g. In site office"/>
+<label style={s.label}>🍽️ Lunchroom</label>
+<input style={s.input} value={data.lunchroom} onChange={set('lunchroom')} placeholder="e.g. Level 1 breakroom"/>
+</>
+)
+},
+{
+title: 'Client',
 fields: (
 <>
 <label style={s.label}>Client name</label>
@@ -260,6 +370,7 @@ const handleSave = () => {
 const project = {
 ...data,
 id: editing?.id || Date.now().toString(),
+status: data.status || 'running',
 createdAt: editing?.createdAt || new Date().toISOString()
 };
 onSave(project);
@@ -297,7 +408,6 @@ return (
 );
 }
 
-// ── SHARE MODAL ──────────────────────────────────────────────────────────────
 function ShareModal({project, onClose}) {
 const [copiedMsg, setCopiedMsg] = useState(false);
 const [copiedLink, setCopiedLink] = useState(false);
@@ -319,7 +429,6 @@ return (
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
-
 <label style={s.label}>WhatsApp message</label>
 <div style={s.sharePreview}>{message}</div>
 <div style={{display:'flex',gap:8,marginBottom:24,flexWrap:'wrap'}}>
@@ -333,17 +442,14 @@ style={{...s.copyBtn,background:'#14532d',color:'#4ade80',border:'1px solid #166
 </a>
 )}
 </div>
-
 <label style={s.label}>Shareable project link</label>
 <div style={s.linkBox}>{shareUrl}</div>
 <button style={s.copyBtn} onClick={() => copy(shareUrl, setCopiedLink)}>
 {copiedLink ? '✓ Copied' : '🔗 Copy link'}
 </button>
-
 <div style={{fontSize:11,color:'#444',marginTop:16,lineHeight:1.6}}>
 The shareable link contains the project info encoded in the URL — anyone with the link can view it without logging in. No server needed.
 </div>
-
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Close</button>
@@ -353,18 +459,58 @@ The shareable link contains the project info encoded in the URL — anyone with 
 );
 }
 
-// ── SHARED PROJECT VIEW (read-only, loaded from #p= hash) ────────────────────
-function SharedView({project, onExit}) {
-const rows = [
-{icon:'📍', label:'Address', val:project.address},
-{icon:'🚌', label:'Parking', val:project.parking},
-{icon:'🔑', label:'Key collection', val:project.keyCollection},
-{icon:'🔒', label:'Key code / padlock', val:project.keyCode},
-{icon:'👷', label:'Team Leader', val:project.teamLeader},
-{icon:'🤝', label:'Client', val:project.clientName ? `${project.clientName}${project.clientMobile ? ' — ' + project.clientMobile : ''}` : null},
-{icon:'📅', label:'Start date', val:project.startDate ? formatDate(project.startDate) : null},
-].filter(r => r.val);
+function InfoDisplay({project}) {
+return (
+<div style={s.infoList}>
+{INFO_FIELDS.map(f => {
+const val = project[f.key];
+return (
+<div key={f.key} style={s.infoLine}>
+<span style={s.infoEmoji}>{f.emoji}</span>
+<div style={{flex:1}}>
+<span style={s.infoLabelBold}>{f.label}:</span>
+{val
+? <span style={s.infoValText}>{val}</span>
+: <span style={s.infoEmpty}>—</span>
+}
+{f.key === 'clientName' && project.clientMobile && (
+<span style={s.infoValText}> · 📱 {project.clientMobile}</span>
+)}
+</div>
+</div>
+);
+})}
+{project.startDate && (
+<div style={s.infoLine}>
+<span style={s.infoEmoji}>📅</span>
+<div style={{flex:1}}>
+<span style={s.infoLabelBold}>Start date:</span>
+<span style={s.infoValText}>{formatDate(project.startDate)}</span>
+</div>
+</div>
+)}
 
+{(project.whatsapp || project.surveyLink) && (
+<div style={s.infoLinksRow}>
+{project.whatsapp && (
+<a href={project.whatsapp} target="_blank" rel="noreferrer"
+style={{...s.infoLinkBtn,background:'#14532d',color:'#4ade80'}}>
+💬 Join WhatsApp group
+</a>
+)}
+{project.surveyLink && (
+<a href={project.surveyLink} target="_blank" rel="noreferrer"
+style={{...s.infoLinkBtn,background:'#1d4ed8',color:'#fff'}}>
+🔍 Open Quick Survey
+</a>
+)}
+</div>
+)}
+</div>
+);
+}
+
+function SharedView({project, onExit}) {
 return (
 <div style={s.sharedWrap}>
 <div style={s.sharedCard}>
@@ -374,29 +520,7 @@ return (
 {project.address && <div style={s.sharedSub}>{project.address}</div>}
 </div>
 <div style={s.sharedSection}>
-{rows.map(r => (
-<div key={r.label} style={s.sharedRow}>
-<div style={s.sharedRowIcon}>{r.icon}</div>
-<div style={{flex:1}}>
-<div style={s.sharedRowLabel}>{r.label}</div>
-<div style={s.sharedRowVal}>{r.val}</div>
-</div>
-</div>
-))}
-</div>
-<div style={s.sharedActions}>
-{project.whatsapp && (
-<a href={project.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.sharedAction,background:'#14532d',color:'#4ade80'}}>
-💬 Join WhatsApp group
-</a>
-)}
-{project.surveyLink && (
-<a href={project.surveyLink} target="_blank" rel="noreferrer"
-style={{...s.sharedAction,background:'#1d4ed8',color:'#fff'}}>
-🔍 Open Quick Survey
-</a>
-)}
+<InfoDisplay project={project}/>
 </div>
 <div style={{padding:'16px 32px 28px',textAlign:'center'}}>
 <button onClick={onExit} style={{background:'none',border:'none',color:'#444',fontSize:12,cursor:'pointer'}}>
@@ -408,7 +532,6 @@ style={{...s.sharedAction,background:'#1d4ed8',color:'#fff'}}>
 );
 }
 
-// ── THREAD CONTENT ───────────────────────────────────────────────────────────
 function ThreadView({project, thread, notes, setNotes}) {
 const [text, setText] = useState('');
 const threadNotes = (notes[project.id]?.[thread] || []).slice().reverse();
@@ -438,6 +561,8 @@ setNotes(prev => ({
 }
 }));
 };
+
+if(thread === 'info') return <InfoDisplay project={project}/>;
 
 if(thread === 'rams') {
 return (
@@ -516,19 +641,48 @@ onKeyDown={e => { if(e.key==='Enter' && e.metaKey) addNote(); }}
 );
 }
 
-// ── MAIN APP ─────────────────────────────────────────────────────────────────
+function Category({title, projects, activeId, onSelect, defaultOpen=true}) {
+const [open, setOpen] = useState(defaultOpen);
+return (
+<div style={{marginBottom:8}}>
+<div style={s.catHeader} onClick={() => setOpen(o => !o)}>
+<span style={{...s.catCaret, transform: open?'rotate(90deg)':'rotate(0deg)',display:'inline-block'}}>▶</span>
+<span>{title}</span>
+<span style={s.catCount}>{projects.length}</span>
+</div>
+{open && projects.map(p => (
+<div key={p.id}
+style={{
+...s.projItem,
+...(activeId===p.id ? s.projItemActive : s.projItemInactive),
+...(p.status==='done' ? s.projItemDone : {})
+}}
+onClick={() => onSelect(p.id)}>
+<div style={s.projName}>{p.name}</div>
+<div style={s.projMeta}>{formatDate(p.startDate)} · {p.teamLeader || 'No leader'}</div>
+</div>
+))}
+{open && projects.length === 0 && (
+<div style={{fontSize:11,color:'#333',padding:'6px 14px',fontStyle:'italic'}}>Empty</div>
+)}
+</div>
+);
+}
+
 function App() {
-const [projects, setProjects] = useStorage('ral-projects', []);
+const [projects, setProjects] = useStorage('ral-projects-v2', null);
 const [notes, setNotes] = useStorage('ral-notes', {});
 const [activeId, setActiveId] = useState(null);
-const [activeThread, setActiveThread] = useState('toolbox');
+const [activeThread, setActiveThread] = useState('info');
 const [showWizard, setShowWizard] = useState(false);
 const [editing, setEditing] = useState(null);
-const [showInfo, setShowInfo] = useState(false);
 const [showShare, setShowShare] = useState(false);
 const [sharedProject, setSharedProject] = useState(null);
 
-// Detect shared link on load
+useEffect(() => {
+if(projects === null) setProjects(seedProjects());
+}, [projects]);
+
 useEffect(() => {
 const checkHash = () => {
 const hash = window.location.hash;
@@ -551,26 +705,40 @@ setSharedProject(null);
 }}/>;
 }
 
-const project = projects.find(p => p.id === activeId);
+const allProjects = projects || [];
+const running = allProjects.filter(p => (p.status || 'running') === 'running');
+const done = allProjects.filter(p => p.status === 'done');
+const project = allProjects.find(p => p.id === activeId);
 
 const saveProject = (proj) => {
 setProjects(prev => {
-const idx = prev.findIndex(p => p.id === proj.id);
-if(idx >= 0) { const n = [...prev]; n[idx] = proj; return n; }
-return [proj, ...prev];
+const list = prev || [];
+const idx = list.findIndex(p => p.id === proj.id);
+if(idx >= 0) { const n = [...list]; n[idx] = proj; return n; }
+return [proj, ...list];
 });
 setActiveId(proj.id);
 };
 
 const deleteProject = (id) => {
 if(!confirm('Delete this project?')) return;
-setProjects(prev => prev.filter(p => p.id !== id));
+setProjects(prev => (prev || []).filter(p => p.id !== id));
 if(activeId === id) setActiveId(null);
+};
+
+const toggleStatus = (id) => {
+setProjects(prev => (prev || []).map(p =>
+p.id === id ? {...p, status: p.status === 'done' ? 'running' : 'done'} : p
+));
+};
+
+const selectProject = (id) => {
+setActiveId(id);
+setActiveThread('info');
 };
 
 return (
 <div style={s.app}>
-{/* SIDEBAR */}
 <div style={s.sidebar}>
 <div style={s.sidebarHeader}>
 <div style={s.logo}>RAL</div>
@@ -580,21 +748,11 @@ return (
 + New project
 </button>
 <div style={s.projList}>
-{projects.length === 0
-? <div style={{fontSize:12,color:'#333',padding:'8px 12px'}}>No projects yet</div>
-: projects.map(p => (
-<div key={p.id}
-style={{...s.projItem, ...(activeId===p.id ? s.projItemActive : s.projItemInactive)}}
-onClick={() => { setActiveId(p.id); setActiveThread('toolbox'); setShowInfo(false); }}>
-<div style={s.projName}>{p.name}</div>
-<div style={s.projMeta}>{formatDate(p.startDate)} · {p.teamLeader || 'No leader'}</div>
-</div>
-))
-}
+<Category title="Projects on Run" projects={running} activeId={activeId} onSelect={selectProject} defaultOpen={true}/>
+<Category title="Done" projects={done} activeId={activeId} onSelect={selectProject} defaultOpen={false}/>
 </div>
 </div>
 
-{/* MAIN */}
 <div style={s.main}>
 {!project
 ? <div style={{...s.empty,height:'100%'}}>
@@ -603,10 +761,12 @@ onClick={() => { setActiveId(p.id); setActiveThread('toolbox'); setShowInfo(fals
 <button style={s.primaryBtn} onClick={() => { setEditing(null); setShowWizard(true); }}>+ New project</button>
 </div>
 : <>
-{/* HEADER */}
 <div style={s.header}>
 <div>
-<div style={s.headerTitle}>{project.name}</div>
+<div style={s.headerTitle}>
+{project.name}
+{project.status === 'done' && <span style={{marginLeft:10,fontSize:11,padding:'3px 8px',background:'#1e1e1e',color:'#666',borderRadius:12,verticalAlign:'middle'}}>DONE</span>}
+</div>
 <div style={s.headerMeta}>{project.address || 'No address'} · Started {formatDate(project.startDate)}</div>
 </div>
 <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
@@ -621,8 +781,8 @@ onClick={() => setShowShare(true)}>
 ↗ Share
 </button>
 <button style={{...s.badge,background:'#1e1e1e',color:'#888',border:'none',cursor:'pointer'}}
-onClick={() => setShowInfo(v => !v)}>
-{showInfo ? '▲ Hide info' : '▼ Project info'}
+onClick={() => toggleStatus(project.id)}>
+{project.status === 'done' ? '↻ Re-open' : '✓ Mark done'}
 </button>
 <button style={{...s.badge,background:'#1e1e1e',color:'#888',border:'none',cursor:'pointer'}}
 onClick={() => { setEditing(project); setShowWizard(true); }}>
@@ -635,28 +795,6 @@ onClick={() => deleteProject(project.id)}>
 </div>
 </div>
 
-{/* INFO PANEL */}
-{showInfo && (
-<div style={s.infoPanel}>
-{[
-{label:'Team leader', val:project.teamLeader},
-{label:'Client', val:project.clientName},
-{label:'Client mobile', val:project.clientMobile},
-{label:'Parking', val:project.parking},
-{label:'Key collection', val:project.keyCollection},
-{label:'Key code / padlock', val:project.keyCode},
-{label:'WhatsApp group', val:project.whatsapp},
-{label:'Quick Survey', val:project.surveyLink},
-].map(({label,val}) => (
-<div key={label} style={s.infoCard}>
-<div style={s.infoLabel}>{label}</div>
-<div style={s.infoVal}>{val || '—'}</div>
-</div>
-))}
-</div>
-)}
-
-{/* THREADS */}
 <div style={s.threadBar}>
 {THREADS.map(t => (
 <button key={t.id}
@@ -667,7 +805,6 @@ onClick={() => setActiveThread(t.id)}>
 ))}
 </div>
 
-{/* CONTENT */}
 <div style={s.content}>
 <ThreadView
 project={project}
