@@ -9,9 +9,8 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 :root[data-theme="light"] {
-  --bg: #f6f8fa; --bg-panel:#fff; --bg-raised:#f1f4f7; --bg-sunken:#eef1f5; --bg-input:#fff;
+  --bg:#f6f8fa; --bg-panel:#fff; --bg-raised:#f1f4f7; --bg-sunken:#eef1f5; --bg-input:#fff;
   --border:#e3e8ef; --border-strong:#d0d7de;
   --text:#0f1e2e; --text-muted:#5a6573; --text-dim:#8b95a3; --text-faint:#b4bcc7;
   --accent:#0891b2; --accent-hover:#0e7490; --accent-bg:#cffafe; --accent-text:#0e7490;
@@ -53,169 +52,176 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;}
 <script type="text/babel">
 const {useState,useEffect,useRef,useMemo} = React;
 
-// ── CONSTANTS ────────────────────────────────────────────────────────────────
 const DEFAULT_THREADS = [
-{id:'info',      label:'Project Info', icon:'📌', fixed:true},
-{id:'toolbox',   label:'Toolbox Talk', icon:'🛡️', fixed:true},
-{id:'timesheet', label:'Timesheet',    icon:'⏱️', fixed:true},
-{id:'incidents', label:'Incidents',    icon:'⚠️', fixed:true},
-{id:'rams',      label:'RAMS',         icon:'📋', fixed:true},
-{id:'survey',    label:'Survey',       icon:'🔍', fixed:true},
+{id:'info',label:'Project Info',icon:'📌',fixed:true},
+{id:'toolbox',label:'Toolbox Talk',icon:'🛡️',fixed:true},
+{id:'timesheet',label:'Timesheet',icon:'⏱️',fixed:true},
+{id:'incidents',label:'Incidents',icon:'⚠️',fixed:true},
+{id:'rams',label:'RAMS',icon:'📋',fixed:true},
+{id:'survey',label:'Survey',icon:'🔍',fixed:true},
 ];
-
 const RAMS_URL = 'https://lionelagilecoach-rgb.github.io/Ral-rams/Rams/';
 const SURVEY_URL = 'https://ralsolutions.github.io/Survey/';
 const FAKE_WA = 'https://chat.whatsapp.com/example-';
 
 const INFO_FIELDS = [
-{key:'address',        emoji:'🏢', label:'Address'},
-{key:'parking',        emoji:'🚌', label:'Parking'},
-{key:'assemblingPoint',emoji:'👥', label:'Assembling Point'},
-{key:'toilet',         emoji:'🚻', label:'Toilet'},
-{key:'keyLocation',    emoji:'🔓', label:"Lock pad code / key's location"},
-{key:'firstAid',       emoji:'🩹', label:'First aid kit'},
-{key:'lunchroom',      emoji:'🍽️', label:'Lunchroom'},
-{key:'clientName',     emoji:'👤', label:'Client contact'},
-{key:'teamLeader',     emoji:'👷', label:'Team Leader on site'},
+{key:'address',emoji:'🏢',label:'Address'},
+{key:'parking',emoji:'🚌',label:'Parking'},
+{key:'assemblingPoint',emoji:'👥',label:'Assembling Point'},
+{key:'toilet',emoji:'🚻',label:'Toilet'},
+{key:'keyLocation',emoji:'🔓',label:"Lock pad code / key's location"},
+{key:'firstAid',emoji:'🩹',label:'First aid kit'},
+{key:'lunchroom',emoji:'🍽️',label:'Lunchroom'},
+{key:'clientName',emoji:'👤',label:'Client contact'},
+{key:'teamLeader',emoji:'👷',label:'Team Leader on site'},
 ];
-
 const EMOJI_GRID = ['📁','📂','🏗️','🏢','🏙️','🛠️','🔧','🧰','⚙️','🦺','🪢','🧗','🚧','⚠️','🛡️','📋','📌','🗂️','📊','📈','💼','💬','📣','🗣️','🎯','⭐','🔥','✅','❌','🔒','🔓','🔑','🌏','🌐','🇳🇿','🇦🇺','⏰','📅','🧪','🔬'];
-
 const INCIDENT_TYPES = [
-{id:'near-miss', label:'Near miss', emoji:'⚡', color:'var(--warn)', bg:'var(--warn-bg)'},
-{id:'incident',  label:'Incident',  emoji:'⚠️', color:'var(--accent)', bg:'var(--accent-bg)'},
-{id:'accident',  label:'Accident',  emoji:'🚨', color:'var(--danger)', bg:'var(--danger-bg)'},
+{id:'near-miss',label:'Near miss',emoji:'⚡',color:'var(--warn)',bg:'var(--warn-bg)'},
+{id:'incident',label:'Incident',emoji:'⚠️',color:'var(--accent)',bg:'var(--accent-bg)'},
+{id:'accident',label:'Accident',emoji:'🚨',color:'var(--danger)',bg:'var(--danger-bg)'},
 ];
 
-// ── STYLES ──────────────────────────────────────────────────────────────────
+// Project colour palette — each entry: {bar, text, text-on-light}
+// Designed to be readable in both themes. Bar colours are mid-saturation so white text works on them.
+const PROJECT_COLORS = [
+{id:'teal',    bar:'#0891b2', label:'#0891b2', bgLight:'#cffafe', bgDark:'#083344'},
+{id:'amber',   bar:'#d97706', label:'#d97706', bgLight:'#fef3c7', bgDark:'#451a03'},
+{id:'violet',  bar:'#7c3aed', label:'#7c3aed', bgLight:'#ede9fe', bgDark:'#2e1065'},
+{id:'rose',    bar:'#e11d48', label:'#e11d48', bgLight:'#ffe4e6', bgDark:'#4c0519'},
+{id:'emerald', bar:'#059669', label:'#059669', bgLight:'#d1fae5', bgDark:'#064e3b'},
+{id:'sky',     bar:'#0284c7', label:'#0284c7', bgLight:'#e0f2fe', bgDark:'#0c4a6e'},
+{id:'fuchsia', bar:'#c026d3', label:'#c026d3', bgLight:'#fae8ff', bgDark:'#4a044e'},
+{id:'lime',    bar:'#65a30d', label:'#65a30d', bgLight:'#ecfccb', bgDark:'#1a2e05'},
+];
+
 const s = {
-app: {display:'flex',height:'100vh',overflow:'hidden',background:'var(--bg)'},
-sidebar: {width:264,background:'var(--bg-panel)',borderRight:'1px solid var(--border)',display:'flex',flexDirection:'column',flexShrink:0},
-main: {flex:1,display:'flex',flexDirection:'column',overflow:'hidden',background:'var(--bg)'},
+app:{display:'flex',height:'100vh',overflow:'hidden',background:'var(--bg)'},
+sidebar:{width:264,background:'var(--bg-panel)',borderRight:'1px solid var(--border)',display:'flex',flexDirection:'column',flexShrink:0},
+main:{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',background:'var(--bg)'},
 
-serverHeader: {padding:'14px 14px 12px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:10},
-serverIcon: {width:36,height:36,borderRadius:8,background:'linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',letterSpacing:0.5,flexShrink:0,boxShadow:'var(--shadow-sm)'},
-serverMeta: {flex:1,minWidth:0},
-serverSmallCap: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14},
-serverName: {fontSize:14,fontWeight:700,color:'var(--text)',letterSpacing:0.2,marginTop:1},
-themeToggle: {width:28,height:28,borderRadius:6,border:'1px solid var(--border)',background:'var(--bg-raised)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0,color:'var(--text-muted)'},
+serverHeader:{padding:'14px 14px 12px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:10},
+serverIcon:{width:36,height:36,borderRadius:8,background:'linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',letterSpacing:0.5,flexShrink:0,boxShadow:'var(--shadow-sm)'},
+serverMeta:{flex:1,minWidth:0},
+serverSmallCap:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14},
+serverName:{fontSize:14,fontWeight:700,color:'var(--text)',letterSpacing:0.2,marginTop:1},
+themeToggle:{width:28,height:28,borderRadius:6,border:'1px solid var(--border)',background:'var(--bg-raised)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0,color:'var(--text-muted)'},
 
-actionBar: {padding:'10px 12px 8px',display:'flex',gap:6},
-actionBtn: {flex:1,padding:'8px 8px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',letterSpacing:0.2,transition:'all 0.12s'},
+actionBar:{padding:'10px 12px 8px',display:'flex',gap:6},
+actionBtn:{flex:1,padding:'8px 8px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',letterSpacing:0.2,transition:'all 0.12s'},
 
-projList: {flex:1,overflowY:'auto',padding:'4px 8px 12px'},
+projList:{flex:1,overflowY:'auto',padding:'4px 8px 12px'},
 
-catWrap: {marginBottom:6},
-catHeader: {display:'flex',alignItems:'center',gap:6,padding:'9px 8px 6px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.12,cursor:'pointer',userSelect:'none',borderRadius:4},
-catCaret: {fontSize:8,color:'var(--text-faint)',transition:'transform 0.15s',display:'inline-block',width:8},
-catEmoji: {fontSize:13},
-catLabel: {flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'},
-catCount: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',background:'var(--bg-raised)',padding:'2px 6px',borderRadius:10,fontWeight:600},
-catAddBtn: {background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:13,padding:'0 4px',opacity:0.8,fontWeight:600},
+catWrap:{marginBottom:6},
+catHeader:{display:'flex',alignItems:'center',gap:6,padding:'9px 8px 6px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.12,cursor:'pointer',userSelect:'none',borderRadius:4},
+catCaret:{fontSize:8,color:'var(--text-faint)',transition:'transform 0.15s',display:'inline-block',width:8},
+catEmoji:{fontSize:13},
+catLabel:{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'},
+catCount:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',background:'var(--bg-raised)',padding:'2px 6px',borderRadius:10,fontWeight:600},
+catAddBtn:{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:13,padding:'0 4px',opacity:0.8,fontWeight:600},
 
-chanItem: {display:'flex',alignItems:'center',gap:8,padding:'7px 10px 7px 18px',borderRadius:6,cursor:'pointer',marginBottom:2,transition:'all 0.1s'},
-chanItemActive: {background:'var(--accent-bg)',boxShadow:'inset 2px 0 0 var(--accent)'},
-chanItemDone: {opacity:0.5},
-chanHash: {fontSize:13,color:'var(--text-faint)',flexShrink:0,fontFamily:"'JetBrains Mono',monospace",fontWeight:500},
-chanName: {fontSize:13,color:'var(--text-muted)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flex:1},
-chanNameActive: {color:'var(--accent-text)',fontWeight:600},
+chanItem:{display:'flex',alignItems:'center',gap:8,padding:'7px 10px 7px 18px',borderRadius:6,cursor:'pointer',marginBottom:2,transition:'all 0.1s'},
+chanItemActive:{background:'var(--accent-bg)',boxShadow:'inset 2px 0 0 var(--accent)'},
+chanItemDone:{opacity:0.5},
+chanHash:{fontSize:13,color:'var(--text-faint)',flexShrink:0,fontFamily:"'JetBrains Mono',monospace",fontWeight:500},
+chanName:{fontSize:13,color:'var(--text-muted)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flex:1},
+chanNameActive:{color:'var(--accent-text)',fontWeight:600},
+chanDot:{width:8,height:8,borderRadius:'50%',flexShrink:0,marginLeft:4},
 
-emptyCat: {fontSize:10,color:'var(--text-faint)',padding:'4px 18px',fontStyle:'italic'},
+emptyCat:{fontSize:10,color:'var(--text-faint)',padding:'4px 18px',fontStyle:'italic'},
 
-header: {padding:'14px 24px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'var(--bg-panel)',gap:12,flexWrap:'wrap'},
+header:{padding:'14px 24px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'var(--bg-panel)',gap:12,flexWrap:'wrap'},
 headerTitleWrap:{minWidth:0,flex:1},
-headerKicker: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
-headerTitle: {fontSize:20,fontWeight:700,color:'var(--text)',letterSpacing:-0.2},
-headerMeta: {fontSize:12,color:'var(--text-dim)',marginTop:3},
+headerKicker:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
+headerTitle:{fontSize:20,fontWeight:700,color:'var(--text)',letterSpacing:-0.2,display:'flex',alignItems:'center',gap:10},
+headerMeta:{fontSize:12,color:'var(--text-dim)',marginTop:3},
+headerColorDot:{width:12,height:12,borderRadius:3,flexShrink:0},
 
-badge: {display:'inline-flex',alignItems:'center',gap:5,padding:'5px 11px',borderRadius:6,fontSize:11,fontWeight:600,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.2,textTransform:'uppercase',border:'1px solid transparent'},
+badge:{display:'inline-flex',alignItems:'center',gap:5,padding:'5px 11px',borderRadius:6,fontSize:11,fontWeight:600,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.2,textTransform:'uppercase',border:'1px solid transparent'},
 badgeGhost:{background:'var(--bg-raised)',color:'var(--text-muted)',border:'1px solid var(--border)',cursor:'pointer'},
 badgePrimary:{background:'var(--accent-bg)',color:'var(--accent-text)',border:'1px solid var(--accent)',cursor:'pointer'},
 badgeSuccess:{background:'var(--success-bg)',color:'var(--success)',border:'1px solid var(--success)'},
 
-threadBar: {display:'flex',gap:4,padding:'10px 24px',borderBottom:'1px solid var(--border)',background:'var(--bg-panel)',overflowX:'auto',alignItems:'center'},
-threadBtn: {padding:'7px 13px',borderRadius:6,border:'1px solid var(--border)',fontSize:12,fontWeight:500,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.12s',background:'transparent',color:'var(--text-muted)',display:'inline-flex',alignItems:'center',gap:6},
-threadBtnActive: {background:'var(--accent)',border:'1px solid var(--accent)',color:'#fff',fontWeight:600,boxShadow:'var(--shadow-sm)'},
-threadAdd: {padding:'7px 11px',borderRadius:6,border:'1px dashed var(--border-strong)',background:'transparent',color:'var(--text-dim)',fontSize:13,cursor:'pointer',fontWeight:700,flexShrink:0,marginRight:6},
-threadDivider: {width:1,height:18,background:'var(--border)',margin:'0 4px',flexShrink:0},
-threadRemove: {marginLeft:3,background:'none',border:'none',color:'currentColor',cursor:'pointer',fontSize:14,padding:0,opacity:0.8,lineHeight:1},
+threadBar:{display:'flex',gap:4,padding:'10px 24px',borderBottom:'1px solid var(--border)',background:'var(--bg-panel)',overflowX:'auto',alignItems:'center'},
+threadBtn:{padding:'7px 13px',borderRadius:6,border:'1px solid var(--border)',fontSize:12,fontWeight:500,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.12s',background:'transparent',color:'var(--text-muted)',display:'inline-flex',alignItems:'center',gap:6},
+threadBtnActive:{background:'var(--accent)',border:'1px solid var(--accent)',color:'#fff',fontWeight:600,boxShadow:'var(--shadow-sm)'},
+threadAdd:{padding:'7px 11px',borderRadius:6,border:'1px dashed var(--border-strong)',background:'transparent',color:'var(--text-dim)',fontSize:13,cursor:'pointer',fontWeight:700,flexShrink:0,marginRight:6},
+threadDivider:{width:1,height:18,background:'var(--border)',margin:'0 4px',flexShrink:0},
+threadRemove:{marginLeft:3,background:'none',border:'none',color:'currentColor',cursor:'pointer',fontSize:14,padding:0,opacity:0.8,lineHeight:1},
 
-content: {flex:1,overflowY:'auto',padding:'24px'},
+content:{flex:1,overflowY:'auto',padding:'24px'},
 
-infoList: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'22px 26px',maxWidth:820,boxShadow:'var(--shadow-sm)'},
-infoLine: {display:'flex',gap:10,padding:'8px 0',fontSize:14,lineHeight:1.55,alignItems:'flex-start'},
-infoEmoji: {fontSize:17,flexShrink:0,width:24},
-infoLabelBold: {fontWeight:700,color:'var(--text)'},
-infoValText: {color:'var(--text-muted)',marginLeft:4,wordBreak:'break-word'},
-infoEmpty: {color:'var(--text-faint)',marginLeft:4,fontStyle:'italic'},
-infoLinksRow: {display:'flex',gap:10,marginTop:20,flexWrap:'wrap',paddingTop:18,borderTop:'1px solid var(--border)'},
-infoLinkBtn: {padding:'10px 16px',borderRadius:8,fontSize:12,fontWeight:700,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3,border:'1px solid'},
+infoList:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'22px 26px',maxWidth:820,boxShadow:'var(--shadow-sm)'},
+infoLine:{display:'flex',gap:10,padding:'8px 0',fontSize:14,lineHeight:1.55,alignItems:'flex-start'},
+infoEmoji:{fontSize:17,flexShrink:0,width:24},
+infoLabelBold:{fontWeight:700,color:'var(--text)'},
+infoValText:{color:'var(--text-muted)',marginLeft:4,wordBreak:'break-word'},
+infoEmpty:{color:'var(--text-faint)',marginLeft:4,fontStyle:'italic'},
+infoLinksRow:{display:'flex',gap:10,marginTop:20,flexWrap:'wrap',paddingTop:18,borderTop:'1px solid var(--border)'},
+infoLinkBtn:{padding:'10px 16px',borderRadius:8,fontSize:12,fontWeight:700,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3,border:'1px solid'},
 
 noteInputWrap:{position:'relative'},
-noteInput: {width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:8,padding:'12px 14px',color:'var(--text)',fontSize:14,resize:'none',outline:'none',marginBottom:10,lineHeight:1.6},
-sendBtn: {padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
-note: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,padding:'13px 16px',marginBottom:8,boxShadow:'var(--shadow-sm)'},
-noteText: {fontSize:14,color:'var(--text)',lineHeight:1.55,whiteSpace:'pre-wrap'},
-noteMeta: {fontSize:10,color:'var(--text-dim)',marginTop:8,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.1},
+noteInput:{width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:8,padding:'12px 14px',color:'var(--text)',fontSize:14,resize:'none',outline:'none',marginBottom:10,lineHeight:1.6},
+sendBtn:{padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
+note:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,padding:'13px 16px',marginBottom:8,boxShadow:'var(--shadow-sm)'},
+noteText:{fontSize:14,color:'var(--text)',lineHeight:1.55,whiteSpace:'pre-wrap'},
+noteMeta:{fontSize:10,color:'var(--text-dim)',marginTop:8,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.1},
 
-// Mention dropdown
 mentionDrop:{position:'absolute',background:'var(--bg-panel)',border:'1px solid var(--border-strong)',borderRadius:8,boxShadow:'var(--shadow-lg)',padding:4,maxHeight:240,overflowY:'auto',width:280,zIndex:50},
 mentionItem:{padding:'8px 10px',borderRadius:6,cursor:'pointer',display:'flex',alignItems:'center',gap:8,fontSize:13,color:'var(--text)'},
 mentionItemActive:{background:'var(--accent-bg)',color:'var(--accent-text)'},
 mentionItemHash:{fontFamily:"'JetBrains Mono',monospace",color:'var(--text-faint)',fontSize:12},
 mentionItemMeta:{marginLeft:'auto',fontSize:9,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14},
 
-empty: {display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:12,color:'var(--text-faint)'},
-emptyIcon: {fontSize:44,opacity:0.5},
-emptyText: {fontSize:13,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14},
+empty:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:12,color:'var(--text-faint)'},
+emptyIcon:{fontSize:44,opacity:0.5},
+emptyText:{fontSize:13,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14},
 
-overlay: {position:'fixed',inset:0,background:'rgba(10,21,32,0.72)',backdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100,padding:20},
-modal: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:12,width:'100%',maxWidth:540,maxHeight:'90vh',overflowY:'auto',boxShadow:'var(--shadow-lg)'},
-modalSm: {maxWidth:420},
-modalHeader: {padding:'18px 22px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between'},
+overlay:{position:'fixed',inset:0,background:'rgba(10,21,32,0.72)',backdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100,padding:20},
+modal:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:12,width:'100%',maxWidth:540,maxHeight:'90vh',overflowY:'auto',boxShadow:'var(--shadow-lg)'},
+modalSm:{maxWidth:420},
+modalHeader:{padding:'18px 22px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between'},
 modalKicker:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:2},
-modalTitle: {fontSize:17,fontWeight:700,color:'var(--text)'},
-modalBody: {padding:'20px 22px'},
-modalFooter: {padding:'14px 22px',borderTop:'1px solid var(--border)',display:'flex',justifyContent:'flex-end',gap:8},
-closeBtn: {background:'none',border:'none',color:'var(--text-dim)',fontSize:22,cursor:'pointer',lineHeight:1},
-label: {fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.14},
-input: {width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',color:'var(--text)',fontSize:14,outline:'none',marginBottom:16,transition:'border-color 0.15s'},
+modalTitle:{fontSize:17,fontWeight:700,color:'var(--text)'},
+modalBody:{padding:'20px 22px'},
+modalFooter:{padding:'14px 22px',borderTop:'1px solid var(--border)',display:'flex',justifyContent:'flex-end',gap:8},
+closeBtn:{background:'none',border:'none',color:'var(--text-dim)',fontSize:22,cursor:'pointer',lineHeight:1},
+label:{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.14},
+input:{width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',color:'var(--text)',fontSize:14,outline:'none',marginBottom:16,transition:'border-color 0.15s'},
 textarea:{width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',color:'var(--text)',fontSize:14,outline:'none',marginBottom:16,resize:'vertical',minHeight:80,lineHeight:1.55,fontFamily:"'Inter',sans-serif"},
-row2: {display:'grid',gridTemplateColumns:'1fr 1fr',gap:12},
-cancelBtn: {padding:'9px 18px',background:'transparent',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:12,cursor:'pointer',fontWeight:600,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
-primaryBtn: {padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
-stepDot: {width:8,height:8,borderRadius:'50%',display:'inline-block',marginRight:4},
+row2:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12},
+cancelBtn:{padding:'9px 18px',background:'transparent',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:12,cursor:'pointer',fontWeight:600,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
+primaryBtn:{padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
+stepDot:{width:8,height:8,borderRadius:'50%',display:'inline-block',marginRight:4},
 
-emojiGrid: {display:'grid',gridTemplateColumns:'repeat(10,1fr)',gap:4,marginBottom:12},
-emojiCell: {aspectRatio:'1',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,fontSize:17,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.1s'},
-emojiCellActive: {background:'var(--accent-bg)',border:'1px solid var(--accent)'},
+emojiGrid:{display:'grid',gridTemplateColumns:'repeat(10,1fr)',gap:4,marginBottom:12},
+emojiCell:{aspectRatio:'1',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,fontSize:17,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.1s'},
+emojiCellActive:{background:'var(--accent-bg)',border:'1px solid var(--accent)'},
 
-typeRow: {display:'flex',gap:10,marginBottom:8,flexWrap:'wrap'},
-typeCard: {flex:'1 1 130px',padding:'14px',border:'1px solid var(--border)',borderRadius:10,cursor:'pointer',background:'var(--bg-raised)',transition:'all 0.1s'},
-typeIcon: {fontSize:22,marginBottom:6},
-typeTitle: {fontSize:13,fontWeight:700,color:'var(--text)',marginBottom:3},
-typeDesc: {fontSize:11,color:'var(--text-dim)',lineHeight:1.4},
+typeRow:{display:'flex',gap:10,marginBottom:8,flexWrap:'wrap'},
+typeCard:{flex:'1 1 130px',padding:'14px',border:'1px solid var(--border)',borderRadius:10,cursor:'pointer',background:'var(--bg-raised)',transition:'all 0.1s'},
+typeIcon:{fontSize:22,marginBottom:6},
+typeTitle:{fontSize:13,fontWeight:700,color:'var(--text)',marginBottom:3},
+typeDesc:{fontSize:11,color:'var(--text-dim)',lineHeight:1.4},
 
-sharePreview: {background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:8,padding:'14px 16px',fontSize:12,color:'var(--text)',lineHeight:1.7,whiteSpace:'pre-wrap',fontFamily:"'JetBrains Mono',monospace",maxHeight:280,overflowY:'auto',marginBottom:12},
-copyBtn: {padding:'8px 13px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2},
-linkBox: {background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',fontSize:10,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace",wordBreak:'break-all',marginBottom:8,maxHeight:80,overflowY:'auto'},
+sharePreview:{background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:8,padding:'14px 16px',fontSize:12,color:'var(--text)',lineHeight:1.7,whiteSpace:'pre-wrap',fontFamily:"'JetBrains Mono',monospace",maxHeight:280,overflowY:'auto',marginBottom:12},
+copyBtn:{padding:'8px 13px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2},
+linkBox:{background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',fontSize:10,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace",wordBreak:'break-all',marginBottom:8,maxHeight:80,overflowY:'auto'},
 
-sharedWrap: {minHeight:'100vh',background:'var(--bg)',padding:'40px 20px',display:'flex',justifyContent:'center'},
-sharedCard: {width:'100%',maxWidth:680,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:14,overflow:'hidden',boxShadow:'var(--shadow-lg)'},
-sharedHeader: {padding:'28px 32px 22px',borderBottom:'1px solid var(--border)'},
-sharedBadge: {display:'inline-block',padding:'4px 10px',background:'var(--accent-bg)',color:'var(--accent-text)',borderRadius:6,fontSize:10,fontWeight:700,letterSpacing:0.18,textTransform:'uppercase',marginBottom:12,fontFamily:"'JetBrains Mono',monospace",border:'1px solid var(--accent)'},
-sharedTitle: {fontSize:24,fontWeight:700,color:'var(--text)',marginBottom:6,letterSpacing:-0.3},
-sharedSub: {fontSize:13,color:'var(--text-dim)'},
-sharedSection: {padding:'24px 32px',borderBottom:'1px solid var(--border)'},
+sharedWrap:{minHeight:'100vh',background:'var(--bg)',padding:'40px 20px',display:'flex',justifyContent:'center'},
+sharedCard:{width:'100%',maxWidth:680,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:14,overflow:'hidden',boxShadow:'var(--shadow-lg)'},
+sharedHeader:{padding:'28px 32px 22px',borderBottom:'1px solid var(--border)'},
+sharedBadge:{display:'inline-block',padding:'4px 10px',background:'var(--accent-bg)',color:'var(--accent-text)',borderRadius:6,fontSize:10,fontWeight:700,letterSpacing:0.18,textTransform:'uppercase',marginBottom:12,fontFamily:"'JetBrains Mono',monospace",border:'1px solid var(--accent)'},
+sharedTitle:{fontSize:24,fontWeight:700,color:'var(--text)',marginBottom:6,letterSpacing:-0.3},
+sharedSub:{fontSize:13,color:'var(--text-dim)'},
+sharedSection:{padding:'24px 32px',borderBottom:'1px solid var(--border)'},
 
-// Incident form
 incidentTypePicker:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:16},
 incidentTypeBtn:{padding:'14px 10px',border:'1px solid var(--border)',borderRadius:8,background:'var(--bg-raised)',cursor:'pointer',textAlign:'center',transition:'all 0.12s'},
 incidentTypeBtnActive:{borderWidth:2,padding:'13px 9px'},
 incidentTypeEmoji:{fontSize:22,marginBottom:4},
 incidentTypeLabel:{fontSize:11,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2,color:'var(--text)'},
 
-// Incident card
 incidentCard:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'16px 18px',marginBottom:10,boxShadow:'var(--shadow-sm)'},
 incidentHead:{display:'flex',alignItems:'center',gap:8,marginBottom:10,flexWrap:'wrap'},
 incidentBadge:{display:'inline-flex',alignItems:'center',gap:5,padding:'3px 9px',borderRadius:5,fontSize:10,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2,border:'1px solid'},
@@ -225,7 +231,6 @@ incidentSection:{marginTop:8},
 incidentSectionLabel:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
 incidentSectionText:{fontSize:13,color:'var(--text)',lineHeight:1.5,whiteSpace:'pre-wrap'},
 
-// Materials
 matRow:{display:'flex',gap:10,padding:'10px 14px',background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,marginBottom:6,alignItems:'center',boxShadow:'var(--shadow-sm)'},
 matCheck:{width:18,height:18,flexShrink:0,cursor:'pointer',accentColor:'var(--accent)'},
 matName:{flex:1,fontSize:14,color:'var(--text)'},
@@ -233,19 +238,35 @@ matNameDone:{textDecoration:'line-through',color:'var(--text-dim)'},
 matQty:{fontSize:11,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",padding:'2px 8px',background:'var(--bg-raised)',borderRadius:10},
 
 // Calendar
-calGrid:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:4,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:8},
-calHeadCell:{padding:'8px 6px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,borderBottom:'1px solid var(--border)'},
-calCell:{minHeight:96,padding:8,background:'var(--bg-raised)',borderRadius:6,cursor:'pointer',display:'flex',flexDirection:'column',gap:4,transition:'all 0.1s',border:'1px solid transparent'},
-calCellToday:{borderColor:'var(--accent)'},
-calCellOther:{opacity:0.4},
-calDay:{fontSize:12,fontWeight:600,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace"},
-calEntry:{fontSize:10,padding:'2px 5px',background:'var(--accent-bg)',color:'var(--accent-text)',borderRadius:3,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',cursor:'pointer'},
 calNav:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12},
 calMonth:{fontSize:16,fontWeight:700,color:'var(--text)'},
 calNavBtn:{padding:'6px 12px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text-muted)',cursor:'pointer',fontSize:14,fontWeight:600},
+calGrid:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:4,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:8},
+calHeadCell:{padding:'8px 6px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,borderBottom:'1px solid var(--border)'},
+calCell:{minHeight:100,padding:'8px 6px',background:'var(--bg-raised)',borderRadius:6,cursor:'pointer',display:'flex',flexDirection:'column',transition:'all 0.1s',border:'1px solid transparent',overflow:'hidden'},
+calCellToday:{borderColor:'var(--accent)'},
+calCellOther:{opacity:0.4},
+calDay:{fontSize:12,fontWeight:600,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace",marginBottom:4,flexShrink:0},
+calBarsRow:{display:'flex',gap:2,flex:1,minHeight:0},
+calBar:{flex:1,minWidth:0,padding:'4px 5px',color:'#fff',fontSize:10,fontWeight:600,borderRadius:3,cursor:'pointer',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3},
+calNewBtn:{padding:'12px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:8,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
+
+// Entry detail panel
+entryDetail:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'18px 20px',marginTop:20,boxShadow:'var(--shadow-sm)'},
+entryHead:{display:'flex',alignItems:'center',gap:10,marginBottom:10,flexWrap:'wrap'},
+entryColorBar:{width:4,alignSelf:'stretch',borderRadius:2,flexShrink:0},
+entryProjectName:{fontSize:16,fontWeight:700,color:'var(--text)',cursor:'pointer'},
+entryDates:{fontSize:11,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",padding:'3px 8px',background:'var(--bg-raised)',borderRadius:4},
+entryField:{marginTop:10},
+entryFieldLabel:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
+entryFieldText:{fontSize:13,color:'var(--text)',lineHeight:1.55,whiteSpace:'pre-wrap'},
+
+// Legend
+legend:{display:'flex',gap:8,flexWrap:'wrap',padding:'12px 0 16px',alignItems:'center'},
+legendItem:{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 10px',background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:16,fontSize:11,color:'var(--text-muted)',fontWeight:500},
+legendDot:{width:10,height:10,borderRadius:2,flexShrink:0},
 };
 
-// ── HOOKS ───────────────────────────────────────────────────────────────────
 function useStorage(key, init) {
 const [val, setVal] = useState(() => {
 try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : init; } catch { return init; }
@@ -253,39 +274,37 @@ try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : init; } ca
 useEffect(() => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }, [key, val]);
 return [val, setVal];
 }
-
 function useTheme() {
-const [theme, setTheme] = useState(() => {
-try { return localStorage.getItem('ral-theme') || 'light'; } catch { return 'light'; }
-});
-useEffect(() => {
-document.documentElement.setAttribute('data-theme', theme);
-try { localStorage.setItem('ral-theme', theme); } catch {}
-}, [theme]);
+const [theme, setTheme] = useState(() => { try { return localStorage.getItem('ral-theme') || 'light'; } catch { return 'light'; } });
+useEffect(() => { document.documentElement.setAttribute('data-theme', theme); try { localStorage.setItem('ral-theme', theme); } catch {} }, [theme]);
 return [theme, setTheme];
 }
-
-function formatDate(iso) {
-if(!iso) return '—';
-return new Date(iso).toLocaleDateString('en-NZ', {day:'numeric',month:'short',year:'numeric'});
-}
-function formatTime(iso) {
-if(!iso) return '';
-return new Date(iso).toLocaleString('en-NZ', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-}
+function formatDate(iso) { if(!iso) return '—'; return new Date(iso+'T00:00:00').toLocaleDateString('en-NZ', {day:'numeric',month:'short',year:'numeric'}); }
+function formatShortDate(iso) { if(!iso) return '—'; return new Date(iso+'T00:00:00').toLocaleDateString('en-NZ', {day:'numeric',month:'short'}); }
+function formatTime(iso) { if(!iso) return ''; return new Date(iso).toLocaleString('en-NZ', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function todayISO(){ const d = new Date(); return d.toISOString().slice(0,10); }
 
-// ── ENCODE/DECODE ───────────────────────────────────────────────────────────
-function encodeObj(p) {
-try { const json = JSON.stringify(p); const b64 = btoa(unescape(encodeURIComponent(json))); return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); } catch { return ''; }
+// Date math helpers
+function addDays(iso, n) {
+const d = new Date(iso+'T00:00:00');
+d.setDate(d.getDate() + n);
+return d.toISOString().slice(0,10);
 }
-function decodeObj(str) {
-try { let b64 = str.replace(/-/g,'+').replace(/_/g,'/'); while(b64.length % 4) b64 += '='; const json = decodeURIComponent(escape(atob(b64))); return JSON.parse(json); } catch { return null; }
+function daysBetween(a, b) {
+const d1 = new Date(a+'T00:00:00');
+const d2 = new Date(b+'T00:00:00');
+return Math.round((d2-d1)/(1000*60*60*24));
 }
-function buildShareUrl(channel) {
-const base = window.location.origin + window.location.pathname;
-return `${base}#p=${encodeObj(channel)}`;
+// Generate array of ISO dates from start for `days` days
+function datesFor(start, days) {
+const arr = [];
+for(let i = 0; i < days; i++) arr.push(addDays(start, i));
+return arr;
 }
+
+function encodeObj(p) { try { const json = JSON.stringify(p); const b64 = btoa(unescape(encodeURIComponent(json))); return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); } catch { return ''; } }
+function decodeObj(str) { try { let b64 = str.replace(/-/g,'+').replace(/_/g,'/'); while(b64.length % 4) b64 += '='; const json = decodeURIComponent(escape(atob(b64))); return JSON.parse(json); } catch { return null; } }
+function buildShareUrl(channel) { const base = window.location.origin + window.location.pathname; return `${base}#p=${encodeObj(channel)}`; }
 function buildWhatsAppMessage(ch) {
 const lines = [`📋 *${ch.name}*`, ''];
 INFO_FIELDS.forEach(f => { const val = ch[f.key]; if(val) lines.push(`${f.emoji} *${f.label}:* ${val}`); });
@@ -296,11 +315,7 @@ lines.push('🔗 *Project info:* ' + buildShareUrl(ch));
 if(ch.surveyLink) lines.push('🔍 *Quick Survey:* ' + ch.surveyLink);
 return lines.join('\n');
 }
-
-// Mention slug from a channel name
 function slugify(name){ return name.toLowerCase().replace(/[^\w]+/g,'-').replace(/^-|-$/g,''); }
-
-// Render text with #mentions converted to clickable spans
 function renderWithMentions(text, channels, onMentionClick) {
 if(!text) return null;
 const parts = text.split(/(#[\w-]+)/g);
@@ -308,19 +323,28 @@ return parts.map((part, i) => {
 if(part.startsWith('#')) {
 const slug = part.slice(1).toLowerCase();
 const ch = channels.find(c => slugify(c.name) === slug);
-if(ch) {
-return <a key={i} className="mention" onClick={(e) => { e.preventDefault(); onMentionClick(ch.id); }}>{part}</a>;
-}
+if(ch) return <a key={i} className="mention" onClick={(e) => { e.preventDefault(); onMentionClick(ch.id); }}>{part}</a>;
 }
 return part;
 });
 }
 
+// Pick a colour for a new project — first unused by any running project
+function pickProjectColor(allProjects) {
+const usedByRunning = new Set(allProjects.filter(p => p.status !== 'done' && p.colorId).map(p => p.colorId));
+const available = PROJECT_COLORS.find(c => !usedByRunning.has(c.id));
+if(available) return available.id;
+// All taken — reuse the first one. Not ideal but simple.
+return PROJECT_COLORS[0].id;
+}
+function getColor(colorId) { return PROJECT_COLORS.find(c => c.id === colorId) || PROJECT_COLORS[0]; }
+
 // ── SEED DATA ───────────────────────────────────────────────────────────────
 function seedData() {
 const now = Date.now();
-const job = (slug, extra) => ({
-id:'seed-'+slug, type:'job', status:'running',
+const colors = PROJECT_COLORS.map(c => c.id);
+const job = (slug, colorId, extra) => ({
+id:'seed-'+slug, type:'job', status:'running', colorId,
 customThreads:[], createdAt: new Date(now).toISOString(),
 whatsapp: FAKE_WA + slug, surveyLink: SURVEY_URL,
 ...extra
@@ -328,49 +352,44 @@ whatsapp: FAKE_WA + slug, surveyLink: SURVEY_URL,
 
 return {
 categories: [
-{id:'cat-run',     name:'Projects on Run',  emoji:'🚧', system:'running',  collapsed:false},
-{id:'cat-done',    name:'Done',             emoji:'✅', system:'done',     collapsed:true},
-{id:'cat-incidents',name:'Incident Reports',emoji:'⚠️', system:'incidents',collapsed:false},
-{id:'cat-tools',   name:'Tools & Materials',emoji:'🧰', system:null,       collapsed:false},
-{id:'cat-crew',    name:'Crew',             emoji:'👥', system:null,       collapsed:false},
+{id:'cat-run',name:'Projects on Run',emoji:'🚧',system:'running',collapsed:false},
+{id:'cat-done',name:'Done',emoji:'✅',system:'done',collapsed:true},
+{id:'cat-incidents',name:'Incident Reports',emoji:'⚠️',system:'incidents',collapsed:false},
+{id:'cat-tools',name:'Tools & Materials',emoji:'🧰',system:null,collapsed:false},
+{id:'cat-crew',name:'Crew',emoji:'👥',system:null,collapsed:false},
 ],
 channels: [
-// Job channels
-{...job('80-queen-street', {
+{...job('80-queen-street', colors[0], {
 name:'80 Queen Street', categoryId:'cat-run',
 address:'80 Queen St, Auckland CBD',
 parking:'No parking on site — use Victoria St carpark',
-assemblingPoint:'Ground floor lobby',
-toilet:'Level 2 bathrooms',
+assemblingPoint:'Ground floor lobby', toilet:'Level 2 bathrooms',
 keyLocation:'Reception desk, ask for building manager',
-firstAid:'Site office level 1',
-lunchroom:'Café next door or level 1 breakroom',
+firstAid:'Site office level 1', lunchroom:'Café next door or level 1 breakroom',
 clientName:'Tony Martinez', clientMobile:'+64 21 555 0101',
 teamLeader:'Felipe', startDate:'2026-04-12',
 })},
-{...job('sky-tower-facade-clean', {
+{...job('sky-tower-facade-clean', colors[1], {
 name:'Sky Tower — Facade Clean', categoryId:'cat-run',
 address:'Victoria St W, Auckland CBD',
 parking:'Loading bay access only — book 24h ahead',
-assemblingPoint:'Sky Tower service entrance',
-toilet:'Ground floor staff amenities',
+assemblingPoint:'Sky Tower service entrance', toilet:'Ground floor staff amenities',
 keyLocation:'Security desk — sign in required',
 firstAid:'Security office', lunchroom:'SkyCity food court',
 clientName:'Sarah Chen', clientMobile:'+64 27 555 0202',
 teamLeader:'Lionel', startDate:'2026-04-14',
 })},
-{...job('2-bond-st-sydney', {
+{...job('2-bond-st-sydney', colors[2], {
 name:'2 Bond St Sydney', categoryId:'cat-run',
 address:'2 Bond St, Sydney CBD',
 parking:'No parking. Public transport recommended — middle of CBD',
-assemblingPoint:'Basement entrance',
-toilet:'Next to site office in the basement',
+assemblingPoint:'Basement entrance', toilet:'Next to site office in the basement',
 keyLocation:'RMW Site. Lockpad TBC',
 firstAid:'In site office', lunchroom:'In the site office',
 clientName:'Tony', clientMobile:'+61 4 555 0303',
 teamLeader:'Felipe', startDate:'2026-04-16',
 })},
-{...job('hamilton-warehouse', {
+{...job('hamilton-warehouse', colors[3], {
 name:'Hamilton Warehouse Inspection', categoryId:'cat-done', status:'done',
 address:'120 Kent St, Hamilton', parking:'On-site parking available',
 assemblingPoint:'Warehouse main gate', toilet:'Inside warehouse by office',
@@ -378,7 +397,7 @@ keyLocation:'Padlock code 4421', firstAid:'Main office', lunchroom:'On-site cant
 clientName:'Mike Thompson', clientMobile:'+64 21 555 0404',
 teamLeader:'Lionel', startDate:'2026-03-02',
 })},
-{...job('wellington-harbour-tower', {
+{...job('wellington-harbour-tower', colors[4], {
 name:'Wellington Harbour Tower', categoryId:'cat-done', status:'done',
 address:'15 Customhouse Quay, Wellington', parking:'Street parking (metered)',
 assemblingPoint:'Lobby reception', toilet:'Level 3 bathrooms',
@@ -386,90 +405,81 @@ keyLocation:'Collect from concierge', firstAid:'Concierge desk', lunchroom:'Grou
 clientName:'Emma Wilson', clientMobile:'+64 27 555 0505',
 teamLeader:'Felipe', startDate:'2026-02-15',
 })},
-
-// Incident report system channels (auto-created)
-{id:'inc-near-miss', type:'incidents-bin', incidentType:'near-miss', name:'near-miss', categoryId:'cat-incidents', createdAt:new Date(now).toISOString()},
-{id:'inc-incident',  type:'incidents-bin', incidentType:'incident',  name:'incident',  categoryId:'cat-incidents', createdAt:new Date(now).toISOString()},
-{id:'inc-accident',  type:'incidents-bin', incidentType:'accident',  name:'accident',  categoryId:'cat-incidents', createdAt:new Date(now).toISOString()},
-
-// Materials channels
-{id:'mat-paint', type:'materials', name:'paint', categoryId:'cat-tools', createdAt:new Date(now).toISOString(),
+{id:'inc-near-miss',type:'incidents-bin',incidentType:'near-miss',name:'near-miss',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
+{id:'inc-incident',type:'incidents-bin',incidentType:'incident',name:'incident',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
+{id:'inc-accident',type:'incidents-bin',incidentType:'accident',name:'accident',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
+{id:'mat-paint',type:'materials',name:'paint',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
 materials:[
-{id:'m1', name:'Resene Lumbersider — white', qty:'4 × 10L', done:false},
-{id:'m2', name:'Sash brushes (50mm)', qty:'6', done:false},
-{id:'m3', name:'Roller sleeves — short nap', qty:'12', done:true},
-{id:'m4', name:'Drop sheets (4x5m)', qty:'3', done:false},
+{id:'m1',name:'Resene Lumbersider — white',qty:'4 × 10L',done:false},
+{id:'m2',name:'Sash brushes (50mm)',qty:'6',done:false},
+{id:'m3',name:'Roller sleeves — short nap',qty:'12',done:true},
+{id:'m4',name:'Drop sheets (4x5m)',qty:'3',done:false},
 ]},
-{id:'mat-netting', type:'materials', name:'netting', categoryId:'cat-tools', createdAt:new Date(now).toISOString(),
+{id:'mat-netting',type:'materials',name:'netting',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
 materials:[
-{id:'m1', name:'Bird netting (50m roll)', qty:'2', done:false},
-{id:'m2', name:'Stainless steel clips', qty:'200', done:false},
-{id:'m3', name:'Tensioning wire', qty:'100m', done:false},
+{id:'m1',name:'Bird netting (50m roll)',qty:'2',done:false},
+{id:'m2',name:'Stainless steel clips',qty:'200',done:false},
+{id:'m3',name:'Tensioning wire',qty:'100m',done:false},
 ]},
-{id:'mat-sealant', type:'materials', name:'sealant', categoryId:'cat-tools', createdAt:new Date(now).toISOString(),
+{id:'mat-sealant',type:'materials',name:'sealant',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
 materials:[
-{id:'m1', name:'Sika Liquid Membrane (15L)', qty:'2', done:false},
-{id:'m2', name:'Caulking gun', qty:'2', done:true},
-{id:'m3', name:'Sikaflex 11FC sausages', qty:'24', done:false},
+{id:'m1',name:'Sika Liquid Membrane (15L)',qty:'2',done:false},
+{id:'m2',name:'Caulking gun',qty:'2',done:true},
+{id:'m3',name:'Sikaflex 11FC sausages',qty:'24',done:false},
 ]},
-
-// Crew channels
-{id:'crew-calendar', type:'calendar', name:'work-calendar', categoryId:'cat-crew', createdAt:new Date(now).toISOString()},
-{id:'crew-general', type:'plain', name:'general', categoryId:'cat-crew', createdAt:new Date(now).toISOString()},
+{id:'crew-calendar',type:'calendar',name:'work-calendar',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
+{id:'crew-general',type:'plain',name:'general',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
 ]
 };
 }
 
-// ── MENTION DROPDOWN HOOK ───────────────────────────────────────────────────
+// Seed calendar entries for demo
+function seedCalendarEntries() {
+const today = new Date();
+const y = today.getFullYear();
+const m = today.getMonth();
+const iso = (day) => new Date(y, m, day).toISOString().slice(0,10);
+return [
+{id:'cal-seed-1', projectId:'seed-80-queen-street', projectName:'80 Queen Street',
+startDate: iso(16), days:3, dates: datesFor(iso(16), 3),
+technicians:'Felipe, Lionel', tools:'#paint #netting', comment:'North elevation — start with windows, then caulking around balconies.',
+createdAt: new Date().toISOString()},
+{id:'cal-seed-2', projectId:'seed-sky-tower-facade-clean', projectName:'Sky Tower — Facade Clean',
+startDate: iso(17), days:2, dates: datesFor(iso(17), 2),
+technicians:'Mike, Dave', tools:'#sealant',
+comment:'High-level wash. Confirm access window with building security morning of.',
+createdAt: new Date().toISOString()},
+];
+}
+
+// ── MENTION SYSTEM ──────────────────────────────────────────────────────────
 function useMentions(text, setText, allChannels, currentChannelId) {
 const [open, setOpen] = useState(false);
 const [query, setQuery] = useState('');
-const [pos, setPos] = useState(0); // start index of #
+const [pos, setPos] = useState(0);
 const [activeIdx, setActiveIdx] = useState(0);
-
 const matches = useMemo(() => {
 if(!open) return [];
 const q = query.toLowerCase();
-return allChannels
-.filter(c => c.id !== currentChannelId)
-.filter(c => slugify(c.name).includes(q) || c.name.toLowerCase().includes(q))
-.slice(0, 8);
+return allChannels.filter(c => c.id !== currentChannelId).filter(c => slugify(c.name).includes(q) || c.name.toLowerCase().includes(q)).slice(0,8);
 }, [open, query, allChannels, currentChannelId]);
-
 useEffect(() => { setActiveIdx(0); }, [query]);
-
-const handleChange = (e, ref) => {
-const v = e.target.value;
-setText(v);
+const handleChange = (e) => {
+const v = e.target.value; setText(v);
 const cursor = e.target.selectionStart;
-// Find last '#' before cursor with no space after it
 const before = v.slice(0, cursor);
 const m = before.match(/#([\w-]*)$/);
-if(m) {
-setOpen(true);
-setQuery(m[1]);
-setPos(cursor - m[0].length);
-} else {
-setOpen(false);
-}
+if(m) { setOpen(true); setQuery(m[1]); setPos(cursor - m[0].length); }
+else { setOpen(false); }
 };
-
 const insert = (channel, ref) => {
 const slug = slugify(channel.name);
 const before = text.slice(0, pos);
 const after = text.slice(pos + 1 + query.length);
 const newText = before + '#' + slug + ' ' + after;
-setText(newText);
-setOpen(false);
-setTimeout(() => {
-if(ref?.current) {
-const newCursor = (before + '#' + slug + ' ').length;
-ref.current.focus();
-ref.current.setSelectionRange(newCursor, newCursor);
-}
-}, 0);
+setText(newText); setOpen(false);
+setTimeout(() => { if(ref?.current) { const nc = (before + '#' + slug + ' ').length; ref.current.focus(); ref.current.setSelectionRange(nc, nc); } }, 0);
 };
-
 const handleKeyDown = (e, ref) => {
 if(!open || matches.length === 0) return false;
 if(e.key === 'ArrowDown'){ e.preventDefault(); setActiveIdx(i => (i+1) % matches.length); return true; }
@@ -478,24 +488,20 @@ if(e.key === 'Enter' || e.key === 'Tab'){ e.preventDefault(); insert(matches[act
 if(e.key === 'Escape'){ e.preventDefault(); setOpen(false); return true; }
 return false;
 };
-
 return {open, matches, activeIdx, setActiveIdx, insert, handleChange, handleKeyDown, close:()=>setOpen(false)};
 }
-
-// ── MENTION DROPDOWN UI ─────────────────────────────────────────────────────
-function MentionDropdown({mentions, inputRef, getCategory}) {
+function MentionDropdown({mentions, inputRef, getCategory, dropUp=true}) {
 if(!mentions.open || mentions.matches.length === 0) return null;
+const pos = dropUp ? {bottom:'100%', marginBottom:6} : {top:'100%', marginTop:6};
 return (
-<div style={{...s.mentionDrop, bottom:'100%', left:0, marginBottom:6}}>
+<div style={{...s.mentionDrop, ...pos, left:0}}>
 {mentions.matches.map((c, i) => {
 const cat = getCategory(c.categoryId);
 const isActive = i === mentions.activeIdx;
 const hash = c.type === 'job' ? '◆' : '#';
 return (
-<div key={c.id}
-style={{...s.mentionItem, ...(isActive ? s.mentionItemActive : {})}}
-onMouseEnter={() => mentions.setActiveIdx(i)}
-onClick={() => mentions.insert(c, inputRef)}>
+<div key={c.id} style={{...s.mentionItem, ...(isActive ? s.mentionItemActive : {})}}
+onMouseEnter={() => mentions.setActiveIdx(i)} onClick={() => mentions.insert(c, inputRef)}>
 <span style={s.mentionItemHash}>{hash}</span>
 <span>{c.name}</span>
 <span style={s.mentionItemMeta}>{cat?.name || ''}</span>
@@ -506,88 +512,62 @@ onClick={() => mentions.insert(c, inputRef)}>
 );
 }
 
-// ── JOB WIZARD (unchanged from prev pass, with all fields populated for seeds) ──
+// ── JOB WIZARD ──────────────────────────────────────────────────────────────
 function JobWizard({onClose, onSave, editing}) {
-const blank = {
-id:'', type:'job', status:'running', categoryId:'cat-run', customThreads:[],
-name:'', address:'', parking:'',
-assemblingPoint:'', toilet:'', keyLocation:'', firstAid:'', lunchroom:'',
-teamLeader:'', clientName:'', clientMobile:'',
-whatsapp:'', surveyLink:'',
-startDate:'', createdAt:''
-};
+const blank = {id:'',type:'job',status:'running',categoryId:'cat-run',customThreads:[],
+name:'',address:'',parking:'',assemblingPoint:'',toilet:'',keyLocation:'',firstAid:'',lunchroom:'',
+teamLeader:'',clientName:'',clientMobile:'',whatsapp:'',surveyLink:'',startDate:'',createdAt:''};
 const [step, setStep] = useState(0);
 const [data, setData] = useState(editing || blank);
 const set = k => e => setData(p => ({...p, [k]: e.target.value}));
-
 const steps = [
 {title:'Project info', fields:(<>
 <label style={s.label}>Project name *</label>
 <input style={s.input} value={data.name} onChange={set('name')} placeholder="e.g. 80 Queen Street" autoFocus/>
 <div style={s.row2}>
-<div><label style={s.label}>Start date</label>
-<input style={s.input} type="date" value={data.startDate} onChange={set('startDate')}/></div>
-<div><label style={s.label}>Team leader</label>
-<input style={s.input} value={data.teamLeader} onChange={set('teamLeader')} placeholder="Name"/></div>
+<div><label style={s.label}>Start date</label><input style={s.input} type="date" value={data.startDate} onChange={set('startDate')}/></div>
+<div><label style={s.label}>Team leader</label><input style={s.input} value={data.teamLeader} onChange={set('teamLeader')} placeholder="Name"/></div>
 </div>
 <label style={s.label}>Address / location</label>
 <input style={s.input} value={data.address} onChange={set('address')} placeholder="Full address"/>
 </>)},
 {title:'Site access', fields:(<>
-<label style={s.label}>🚌 Parking</label>
-<input style={s.input} value={data.parking} onChange={set('parking')} placeholder="e.g. Street parking on Main St"/>
-<label style={s.label}>👥 Assembling point</label>
-<input style={s.input} value={data.assemblingPoint} onChange={set('assemblingPoint')} placeholder="e.g. Ground floor lobby"/>
-<label style={s.label}>🔓 Lock pad code / key's location</label>
-<input style={s.input} value={data.keyLocation} onChange={set('keyLocation')} placeholder="e.g. 1234 or padlock on gate"/>
+<label style={s.label}>🚌 Parking</label><input style={s.input} value={data.parking} onChange={set('parking')}/>
+<label style={s.label}>👥 Assembling point</label><input style={s.input} value={data.assemblingPoint} onChange={set('assemblingPoint')}/>
+<label style={s.label}>🔓 Lock pad code / key's location</label><input style={s.input} value={data.keyLocation} onChange={set('keyLocation')}/>
 </>)},
 {title:'Site amenities', fields:(<>
-<label style={s.label}>🚻 Toilet</label>
-<input style={s.input} value={data.toilet} onChange={set('toilet')} placeholder="e.g. Next to site office"/>
-<label style={s.label}>🩹 First aid kit</label>
-<input style={s.input} value={data.firstAid} onChange={set('firstAid')} placeholder="e.g. In site office"/>
-<label style={s.label}>🍽️ Lunchroom</label>
-<input style={s.input} value={data.lunchroom} onChange={set('lunchroom')} placeholder="e.g. Level 1 breakroom"/>
+<label style={s.label}>🚻 Toilet</label><input style={s.input} value={data.toilet} onChange={set('toilet')}/>
+<label style={s.label}>🩹 First aid kit</label><input style={s.input} value={data.firstAid} onChange={set('firstAid')}/>
+<label style={s.label}>🍽️ Lunchroom</label><input style={s.input} value={data.lunchroom} onChange={set('lunchroom')}/>
 </>)},
 {title:'Client', fields:(<>
-<label style={s.label}>Client name</label>
-<input style={s.input} value={data.clientName} onChange={set('clientName')} placeholder="Full name"/>
-<label style={s.label}>Client mobile</label>
-<input style={s.input} value={data.clientMobile} onChange={set('clientMobile')} placeholder="+64 21 000 0000"/>
+<label style={s.label}>Client name</label><input style={s.input} value={data.clientName} onChange={set('clientName')}/>
+<label style={s.label}>Client mobile</label><input style={s.input} value={data.clientMobile} onChange={set('clientMobile')}/>
 </>)},
 {title:'Links', fields:(<>
 <label style={s.label}>WhatsApp group invite link</label>
 <input style={s.input} value={data.whatsapp} onChange={set('whatsapp')} placeholder="https://chat.whatsapp.com/..."/>
-<div style={{fontSize:11,color:'var(--text-dim)',marginTop:-10,marginBottom:16,lineHeight:1.5}}>
-Create the group manually in WhatsApp first, then paste the invite link here.
-</div>
 <label style={s.label}>Quick Survey link</label>
 <input style={s.input} value={data.surveyLink} onChange={set('surveyLink')} placeholder="https://ralsolutions.github.io/Survey/"/>
 </>)}
 ];
-
 const canNext = step === 0 ? data.name.trim() : true;
 const handleSave = () => {
-const channel = {
-...data, id: editing?.id || 'ch-' + Date.now().toString(36),
-type:'job', status: data.status || 'running',
-customThreads: data.customThreads || [],
-createdAt: editing?.createdAt || new Date().toISOString()
-};
+const channel = {...data, id: editing?.id || 'ch-'+Date.now().toString(36),
+type:'job', status:data.status || 'running',
+customThreads:data.customThreads || [], createdAt:editing?.createdAt || new Date().toISOString()};
 onSave(channel); onClose();
 };
-
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={s.modal} onClick={e => e.stopPropagation()}>
+<div style={s.modal} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
 <div>
 <div style={s.modalKicker}>{editing ? 'Edit' : 'New'} · Job Channel</div>
 <div style={s.modalTitle}>{editing ? 'Edit project' : 'New project'}</div>
 <div style={{display:'flex',gap:6,marginTop:10,alignItems:'center'}}>
-{steps.map((st,i) => (
-<span key={i} style={{...s.stepDot, background: i <= step ? 'var(--accent)' : 'var(--border-strong)', width: i===step?22:8, borderRadius: i===step?4:'50%', transition:'all 0.2s'}}/>
-))}
+{steps.map((st,i) => (<span key={i} style={{...s.stepDot, background: i <= step ? 'var(--accent)' : 'var(--border-strong)', width: i===step?22:8, borderRadius: i===step?4:'50%', transition:'all 0.2s'}}/>))}
 <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',marginLeft:6,textTransform:'uppercase',letterSpacing:0.14}}>{steps[step].title}</span>
 </div>
 </div>
@@ -595,10 +575,9 @@ return (
 </div>
 <div style={s.modalBody}>{steps[step].fields}</div>
 <div style={s.modalFooter}>
-{step > 0 ? <button style={s.cancelBtn} onClick={() => setStep(p => p-1)}>← Back</button>
-: <button style={s.cancelBtn} onClick={onClose}>Cancel</button>}
-{step < steps.length - 1
-? <button style={{...s.primaryBtn, opacity: canNext?1:0.5}} disabled={!canNext} onClick={() => setStep(p => p+1)}>Next →</button>
+{step > 0 ? <button style={s.cancelBtn} onClick={()=>setStep(p=>p-1)}>← Back</button> : <button style={s.cancelBtn} onClick={onClose}>Cancel</button>}
+{step < steps.length-1
+? <button style={{...s.primaryBtn, opacity:canNext?1:0.5}} disabled={!canNext} onClick={()=>setStep(p=>p+1)}>Next →</button>
 : <button style={s.primaryBtn} onClick={handleSave}>{editing ? 'Save' : 'Create'}</button>}
 </div>
 </div>
@@ -606,251 +585,148 @@ return (
 );
 }
 
-// ── CATEGORY MODAL ──────────────────────────────────────────────────────────
 function CategoryModal({onClose, onSave, editing}) {
 const [name, setName] = useState(editing?.name || '');
 const [emoji, setEmoji] = useState(editing?.emoji || '📁');
 const [customEmoji, setCustomEmoji] = useState('');
-
-const save = () => {
-if(!name.trim()) return;
-onSave({
-id: editing?.id || 'cat-' + Date.now().toString(36),
-name: name.trim(),
-emoji: (customEmoji || emoji).trim() || '📁',
-system: editing?.system || null,
-collapsed: editing?.collapsed ?? false
-});
-onClose();
-};
+const save = () => { if(!name.trim()) return; onSave({id:editing?.id || 'cat-'+Date.now().toString(36), name:name.trim(), emoji:(customEmoji||emoji).trim()||'📁', system:editing?.system||null, collapsed:editing?.collapsed??false}); onClose(); };
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={{...s.modal,...s.modalSm}} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div>
-<div style={s.modalKicker}>{editing ? 'Edit' : 'New'} · Category</div>
-<div style={s.modalTitle}>{editing ? 'Edit category' : 'New category'}</div>
-</div>
+<div><div style={s.modalKicker}>{editing?'Edit':'New'} · Category</div><div style={s.modalTitle}>{editing?'Edit category':'New category'}</div></div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
 <label style={s.label}>Name *</label>
-<input style={s.input} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Sydney Jobs, Admin..." autoFocus/>
+<input style={s.input} value={name} onChange={e=>setName(e.target.value)} autoFocus/>
 <label style={s.label}>Emoji — pick one</label>
-<div style={s.emojiGrid}>
-{EMOJI_GRID.map(em => (
-<div key={em} style={{...s.emojiCell, ...(emoji===em && !customEmoji ? s.emojiCellActive : {})}}
-onClick={() => { setEmoji(em); setCustomEmoji(''); }}>{em}</div>
-))}
-</div>
+<div style={s.emojiGrid}>{EMOJI_GRID.map(em => (<div key={em} style={{...s.emojiCell, ...(emoji===em&&!customEmoji?s.emojiCellActive:{})}} onClick={()=>{setEmoji(em);setCustomEmoji('');}}>{em}</div>))}</div>
 <label style={s.label}>Or paste any emoji</label>
-<input style={s.input} value={customEmoji} onChange={e => setCustomEmoji(e.target.value)} placeholder="Paste any emoji" maxLength={4}/>
+<input style={s.input} value={customEmoji} onChange={e=>setCustomEmoji(e.target.value)} maxLength={4}/>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>{editing ? 'Save' : 'Create'}</button>
+<button style={{...s.primaryBtn, opacity:name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>{editing?'Save':'Create'}</button>
 </div>
 </div>
 </div>
 );
 }
 
-// ── CHANNEL TYPE PICKER ─────────────────────────────────────────────────────
 function ChannelTypePicker({onClose, onPickJob, onPickPlain, onPickMaterials, onPickCalendar, categoryName}) {
-const [step, setStep] = useState('pick'); // pick | name
+const [step, setStep] = useState('pick');
 const [pickedType, setPickedType] = useState(null);
 const [chanName, setChanName] = useState('');
-
 const submit = () => {
 if(!chanName.trim()) return;
 if(pickedType === 'plain') onPickPlain(chanName.trim());
 if(pickedType === 'materials') onPickMaterials(chanName.trim());
 if(pickedType === 'calendar') onPickCalendar(chanName.trim());
 };
-
 if(step === 'name') {
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={{...s.modal,...s.modalSm}} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div>
-<div style={s.modalKicker}>New · {pickedType} channel</div>
-<div style={s.modalTitle}>Channel name</div>
-</div>
+<div><div style={s.modalKicker}>New · {pickedType} channel</div><div style={s.modalTitle}>Channel name</div></div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
 <label style={s.label}>Channel name *</label>
-<input style={s.input} value={chanName} onChange={e => setChanName(e.target.value)}
-placeholder={pickedType === 'materials' ? 'e.g. paint, netting, sealant' : 'e.g. general, announcements'} autoFocus
-onKeyDown={e => { if(e.key==='Enter' && chanName.trim()) submit(); }}/>
+<input style={s.input} value={chanName} onChange={e=>setChanName(e.target.value)} autoFocus onKeyDown={e=>{if(e.key==='Enter'&&chanName.trim())submit();}}/>
 </div>
 <div style={s.modalFooter}>
-<button style={s.cancelBtn} onClick={() => setStep('pick')}>← Back</button>
-<button style={{...s.primaryBtn, opacity: chanName.trim()?1:0.5}} disabled={!chanName.trim()} onClick={submit}>Create</button>
+<button style={s.cancelBtn} onClick={()=>setStep('pick')}>← Back</button>
+<button style={{...s.primaryBtn, opacity:chanName.trim()?1:0.5}} disabled={!chanName.trim()} onClick={submit}>Create</button>
 </div>
 </div>
 </div>
 );
 }
-
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={s.modal} onClick={e => e.stopPropagation()}>
+<div style={s.modal} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div>
-<div style={s.modalKicker}>New Channel · in {categoryName}</div>
-<div style={s.modalTitle}>Pick channel type</div>
-</div>
+<div><div style={s.modalKicker}>New Channel · in {categoryName}</div><div style={s.modalTitle}>Pick channel type</div></div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
 <div style={s.typeRow}>
-<div style={s.typeCard} onClick={onPickJob}>
-<div style={s.typeIcon}>🏗️</div>
-<div style={s.typeTitle}>Job channel</div>
-<div style={s.typeDesc}>Full rope access job — wizard, info, toolbox, RAMS, surveys.</div>
-</div>
-<div style={s.typeCard} onClick={() => { setPickedType('plain'); setStep('name'); }}>
-<div style={s.typeIcon}>💬</div>
-<div style={s.typeTitle}>Plain channel</div>
-<div style={s.typeDesc}>Notes feed for chat, announcements, reference.</div>
-</div>
+<div style={s.typeCard} onClick={onPickJob}><div style={s.typeIcon}>🏗️</div><div style={s.typeTitle}>Job channel</div><div style={s.typeDesc}>Full rope access job — wizard, info, toolbox, RAMS, surveys.</div></div>
+<div style={s.typeCard} onClick={()=>{setPickedType('plain');setStep('name');}}><div style={s.typeIcon}>💬</div><div style={s.typeTitle}>Plain channel</div><div style={s.typeDesc}>Notes feed for chat, announcements, reference.</div></div>
 </div>
 <div style={s.typeRow}>
-<div style={s.typeCard} onClick={() => { setPickedType('materials'); setStep('name'); }}>
-<div style={s.typeIcon}>🧰</div>
-<div style={s.typeTitle}>Materials list</div>
-<div style={s.typeDesc}>Checkable list of items — tools, paint, fixings, etc.</div>
-</div>
-<div style={s.typeCard} onClick={() => { setPickedType('calendar'); setStep('name'); }}>
-<div style={s.typeIcon}>📅</div>
-<div style={s.typeTitle}>Calendar</div>
-<div style={s.typeDesc}>Month view — schedule jobs and crew per day.</div>
+<div style={s.typeCard} onClick={()=>{setPickedType('materials');setStep('name');}}><div style={s.typeIcon}>🧰</div><div style={s.typeTitle}>Materials list</div><div style={s.typeDesc}>Checkable list of items — tools, paint, fixings, etc.</div></div>
+<div style={s.typeCard} onClick={()=>{setPickedType('calendar');setStep('name');}}><div style={s.typeIcon}>📅</div><div style={s.typeTitle}>Calendar</div><div style={s.typeDesc}>Month view — schedule jobs and crew per day.</div></div>
 </div>
 </div>
-</div>
-<div style={s.modalFooter}>
-<button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-</div>
+<div style={s.modalFooter}><button style={s.cancelBtn} onClick={onClose}>Cancel</button></div>
 </div>
 </div>
 );
 }
 
-// ── ADD THREAD MODAL ────────────────────────────────────────────────────────
 function AddThreadModal({onClose, onSave}) {
-const [name, setName] = useState('');
-const [emoji, setEmoji] = useState('📝');
-const save = () => {
-if(!name.trim()) return;
-onSave({id:'thread-'+Date.now().toString(36), label:name.trim(), icon:emoji, fixed:false});
-onClose();
-};
+const [name, setName] = useState(''); const [emoji, setEmoji] = useState('📝');
+const save = () => { if(!name.trim()) return; onSave({id:'thread-'+Date.now().toString(36), label:name.trim(), icon:emoji, fixed:false}); onClose(); };
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={{...s.modal,...s.modalSm}} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div>
-<div style={s.modalKicker}>New · Thread</div>
-<div style={s.modalTitle}>Custom thread</div>
-</div>
+<div><div style={s.modalKicker}>New · Thread</div><div style={s.modalTitle}>Custom thread</div></div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
 <label style={s.label}>Thread name *</label>
-<input style={s.input} value={name} onChange={e => setName(e.target.value)}
-placeholder="e.g. Deliveries, Photos, Client notes" autoFocus
-onKeyDown={e => { if(e.key==='Enter' && name.trim()) save(); }}/>
+<input style={s.input} value={name} onChange={e=>setName(e.target.value)} autoFocus onKeyDown={e=>{if(e.key==='Enter'&&name.trim())save();}}/>
 <label style={s.label}>Emoji</label>
-<input style={s.input} value={emoji} onChange={e => setEmoji(e.target.value)} maxLength={4}/>
+<input style={s.input} value={emoji} onChange={e=>setEmoji(e.target.value)} maxLength={4}/>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>Create</button>
+<button style={{...s.primaryBtn, opacity:name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>Create</button>
 </div>
 </div>
 </div>
 );
 }
 
-// ── INCIDENT FORM ───────────────────────────────────────────────────────────
 function IncidentFormModal({onClose, onSave, project}) {
-const [data, setData] = useState({
-date: todayISO(),
-type: 'near-miss',
-technicians: project.teamLeader || '',
-whatHappened: '',
-howToAvoid: '',
-});
+const [data, setData] = useState({date:todayISO(), type:'near-miss', technicians:project.teamLeader||'', whatHappened:'', howToAvoid:''});
 const set = k => e => setData(p => ({...p, [k]: e.target.value}));
-
 const save = () => {
 if(!data.whatHappened.trim()) return alert('Describe what happened.');
-onSave({
-id: 'inc-' + Date.now().toString(36),
-projectId: project.id,
-projectName: project.name,
-projectAddress: project.address,
-createdAt: new Date().toISOString(),
-...data
-});
+onSave({id:'inc-'+Date.now().toString(36), projectId:project.id, projectName:project.name, projectAddress:project.address, createdAt:new Date().toISOString(), ...data});
 onClose();
 };
-
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={s.modal} onClick={e => e.stopPropagation()}>
+<div style={s.modal} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div>
-<div style={s.modalKicker}>New · Incident report</div>
-<div style={s.modalTitle}>Report an event</div>
-</div>
+<div><div style={s.modalKicker}>New · Incident report</div><div style={s.modalTitle}>Report an event</div></div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
-
 <label style={s.label}>Type</label>
 <div style={s.incidentTypePicker}>
-{INCIDENT_TYPES.map(t => {
-const active = data.type === t.id;
-return (
-<div key={t.id}
-style={{...s.incidentTypeBtn,
-...(active ? {...s.incidentTypeBtnActive, borderColor:t.color, background:t.bg} : {})
-}}
-onClick={() => setData(p => ({...p, type:t.id}))}>
+{INCIDENT_TYPES.map(t => { const active = data.type === t.id;
+return (<div key={t.id} style={{...s.incidentTypeBtn, ...(active ? {...s.incidentTypeBtnActive, borderColor:t.color, background:t.bg} : {})}}
+onClick={()=>setData(p=>({...p, type:t.id}))}>
 <div style={s.incidentTypeEmoji}>{t.emoji}</div>
-<div style={{...s.incidentTypeLabel, color: active ? t.color : 'var(--text)'}}>{t.label}</div>
+<div style={{...s.incidentTypeLabel, color:active ? t.color : 'var(--text)'}}>{t.label}</div>
+</div>); })}
 </div>
-);
-})}
-</div>
-
 <div style={s.row2}>
-<div>
-<label style={s.label}>Date</label>
-<input style={s.input} type="date" value={data.date} onChange={set('date')}/>
+<div><label style={s.label}>Date</label><input style={s.input} type="date" value={data.date} onChange={set('date')}/></div>
+<div><label style={s.label}>Job</label><input style={{...s.input, opacity:0.6, cursor:'not-allowed'}} value={project.name} disabled/></div>
 </div>
-<div>
-<label style={s.label}>Job</label>
-<input style={s.input} value={project.name} disabled
-style={{...s.input, opacity:0.6, cursor:'not-allowed'}}/>
-</div>
-</div>
-
 <label style={s.label}>Technicians involved</label>
-<input style={s.input} value={data.technicians} onChange={set('technicians')}
-placeholder="Names, comma-separated"/>
-
+<input style={s.input} value={data.technicians} onChange={set('technicians')} placeholder="Names, comma-separated"/>
 <label style={s.label}>What happened? *</label>
-<textarea style={s.textarea} value={data.whatHappened} onChange={set('whatHappened')}
-placeholder="Describe the event — what, where, when, who saw it" rows={5}/>
-
+<textarea style={s.textarea} value={data.whatHappened} onChange={set('whatHappened')} rows={5}/>
 <label style={s.label}>What can be done to avoid it?</label>
-<textarea style={s.textarea} value={data.howToAvoid} onChange={set('howToAvoid')}
-placeholder="Recommendations, controls, training, equipment changes..." rows={4}/>
-
+<textarea style={s.textarea} value={data.howToAvoid} onChange={set('howToAvoid')} rows={4}/>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
@@ -861,184 +737,179 @@ placeholder="Recommendations, controls, training, equipment changes..." rows={4}
 );
 }
 
-// ── ADD MATERIAL MODAL ──────────────────────────────────────────────────────
 function AddMaterialModal({onClose, onSave}) {
-const [name, setName] = useState('');
-const [qty, setQty] = useState('');
-const save = () => {
-if(!name.trim()) return;
-onSave({id:'m-'+Date.now().toString(36), name:name.trim(), qty:qty.trim(), done:false});
-onClose();
-};
+const [name, setName] = useState(''); const [qty, setQty] = useState('');
+const save = () => { if(!name.trim()) return; onSave({id:'m-'+Date.now().toString(36), name:name.trim(), qty:qty.trim(), done:false}); onClose(); };
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={{...s.modal,...s.modalSm}} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div>
-<div style={s.modalKicker}>New · Material</div>
-<div style={s.modalTitle}>Add item</div>
-</div>
+<div><div style={s.modalKicker}>New · Material</div><div style={s.modalTitle}>Add item</div></div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
 <label style={s.label}>Item *</label>
-<input style={s.input} value={name} onChange={e=>setName(e.target.value)} autoFocus
-placeholder="e.g. Resene Lumbersider 10L"
-onKeyDown={e => { if(e.key==='Enter' && name.trim()) save(); }}/>
+<input style={s.input} value={name} onChange={e=>setName(e.target.value)} autoFocus onKeyDown={e=>{if(e.key==='Enter'&&name.trim())save();}}/>
 <label style={s.label}>Quantity (optional)</label>
-<input style={s.input} value={qty} onChange={e=>setQty(e.target.value)} placeholder="e.g. 4 × 10L, 2 boxes, 100m"/>
+<input style={s.input} value={qty} onChange={e=>setQty(e.target.value)} placeholder="e.g. 4 × 10L"/>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>Add item</button>
+<button style={{...s.primaryBtn, opacity:name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>Add item</button>
 </div>
 </div>
 </div>
 );
 }
 
-// ── CALENDAR ENTRY MODAL ────────────────────────────────────────────────────
-function CalendarEntryModal({onClose, onSave, date, jobChannels}) {
-const [text, setText] = useState('');
-const [projectId, setProjectId] = useState(jobChannels[0]?.id || '');
+// ── CALENDAR ENTRY MODAL (booking form) ─────────────────────────────────────
+function CalendarBookingModal({onClose, onSave, jobChannels, allChannels, getCategory, editing, defaultDate}) {
+const [projectId, setProjectId] = useState(editing?.projectId || jobChannels[0]?.id || '');
+const [startDate, setStartDate] = useState(editing?.startDate || defaultDate || todayISO());
+const [days, setDays] = useState(editing?.days || 1);
+const [technicians, setTechnicians] = useState(editing?.technicians || '');
+const [tools, setTools] = useState(editing?.tools || '');
+const [comment, setComment] = useState(editing?.comment || '');
+
+const toolsRef = useRef(null);
+const commentRef = useRef(null);
+const toolsMentions = useMentions(tools, setTools, allChannels, null);
+const commentMentions = useMentions(comment, setComment, allChannels, null);
+
+const endDate = useMemo(() => addDays(startDate, Math.max(0, days-1)), [startDate, days]);
+
 const save = () => {
-if(!text.trim()) return;
 const project = jobChannels.find(c => c.id === projectId);
+if(!project) return alert('Pick a project.');
+const d = parseInt(days); if(!d || d < 1) return alert('Days must be at least 1.');
 onSave({
-id: 'cal-' + Date.now().toString(36),
-date,
-text: text.trim(),
-projectId,
-projectName: project?.name || '',
-createdAt: new Date().toISOString()
+id: editing?.id || 'cal-'+Date.now().toString(36),
+projectId, projectName: project.name, colorId: project.colorId,
+startDate, days: d, dates: datesFor(startDate, d),
+technicians, tools, comment,
+createdAt: editing?.createdAt || new Date().toISOString()
 });
 onClose();
 };
+
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={s.modal} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
 <div>
-<div style={s.modalKicker}>New · Schedule entry</div>
-<div style={s.modalTitle}>{formatDate(date)}</div>
+<div style={s.modalKicker}>{editing ? 'Edit' : 'New'} · Schedule entry</div>
+<div style={s.modalTitle}>{editing ? 'Edit booking' : 'Schedule a job'}</div>
 </div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
-<label style={s.label}>Project (optional)</label>
+
+<label style={s.label}>Project *</label>
 <select style={s.input} value={projectId} onChange={e=>setProjectId(e.target.value)}>
-<option value="">— No project —</option>
 {jobChannels.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
 </select>
-<label style={s.label}>Notes *</label>
-<textarea style={s.textarea} value={text} onChange={e=>setText(e.target.value)} autoFocus
-placeholder="e.g. Felipe + Lionel on site, paint crew arrives 8am" rows={4}/>
+
+<div style={s.row2}>
+<div>
+<label style={s.label}>Start date *</label>
+<input style={s.input} type="date" value={startDate} onChange={e=>setStartDate(e.target.value)}/>
+</div>
+<div>
+<label style={s.label}>Working days *</label>
+<input style={s.input} type="number" min="1" max="60" value={days} onChange={e=>setDays(parseInt(e.target.value)||1)}/>
+</div>
+</div>
+
+<div style={{fontSize:11,color:'var(--text-dim)',marginTop:-10,marginBottom:16,fontFamily:"'JetBrains Mono',monospace"}}>
+{days > 1
+? `${formatShortDate(startDate)} → ${formatShortDate(endDate)} · ${days} days`
+: `${formatShortDate(startDate)} · 1 day`}
+</div>
+
+<label style={s.label}>Technicians involved</label>
+<input style={s.input} value={technicians} onChange={e=>setTechnicians(e.target.value)} placeholder="Felipe, Lionel (@ autocomplete coming with user accounts)"/>
+
+<label style={s.label}>Tools / materials needed</label>
+<div style={s.noteInputWrap}>
+<MentionDropdown mentions={toolsMentions} inputRef={toolsRef} getCategory={getCategory} dropUp={false}/>
+<input ref={toolsRef} style={s.input} value={tools}
+onChange={(e)=>toolsMentions.handleChange(e)}
+onKeyDown={(e)=>toolsMentions.handleKeyDown(e, toolsRef)}
+placeholder="Type # to link material channels, e.g. #paint #netting"/>
+</div>
+
+<label style={s.label}>Comment</label>
+<div style={s.noteInputWrap}>
+<MentionDropdown mentions={commentMentions} inputRef={commentRef} getCategory={getCategory} dropUp={true}/>
+<textarea ref={commentRef} style={s.textarea} value={comment}
+onChange={(e)=>commentMentions.handleChange(e)}
+onKeyDown={(e)=>commentMentions.handleKeyDown(e, commentRef)}
+placeholder="Scope of work, access notes, client requests..." rows={4}/>
+</div>
+
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-<button style={{...s.primaryBtn, opacity: text.trim()?1:0.5}} disabled={!text.trim()} onClick={save}>Add</button>
+<button style={s.primaryBtn} onClick={save}>{editing ? 'Save' : 'Add booking'}</button>
 </div>
 </div>
 </div>
 );
 }
 
-// ── SHARE MODAL ─────────────────────────────────────────────────────────────
 function ShareModal({channel, onClose}) {
 const [copiedMsg, setCopiedMsg] = useState(false);
 const [copiedLink, setCopiedLink] = useState(false);
 const message = buildWhatsAppMessage(channel);
 const shareUrl = buildShareUrl(channel);
-const copy = (text, setFlag) => {
-navigator.clipboard.writeText(text).then(() => { setFlag(true); setTimeout(() => setFlag(false), 2000); });
-};
+const copy = (text, setFlag) => navigator.clipboard.writeText(text).then(() => { setFlag(true); setTimeout(()=>setFlag(false), 2000); });
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={s.modal} onClick={e => e.stopPropagation()}>
+<div style={s.modal} onClick={e=>e.stopPropagation()}>
 <div style={s.modalHeader}>
-<div>
-<div style={s.modalKicker}>Share</div>
-<div style={s.modalTitle}>Share project</div>
-</div>
+<div><div style={s.modalKicker}>Share</div><div style={s.modalTitle}>Share project</div></div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
 <label style={s.label}>WhatsApp message</label>
 <div style={s.sharePreview}>{message}</div>
 <div style={{display:'flex',gap:8,marginBottom:24,flexWrap:'wrap'}}>
-<button style={s.copyBtn} onClick={() => copy(message, setCopiedMsg)}>
-{copiedMsg ? '✓ Copied' : '📋 Copy message'}
-</button>
-{channel.whatsapp && (
-<a href={channel.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.copyBtn,background:'var(--success-bg)',color:'var(--success)',border:'1px solid var(--success)',textDecoration:'none'}}>
-💬 Open group
-</a>
-)}
+<button style={s.copyBtn} onClick={()=>copy(message, setCopiedMsg)}>{copiedMsg?'✓ Copied':'📋 Copy message'}</button>
+{channel.whatsapp && (<a href={channel.whatsapp} target="_blank" rel="noreferrer" style={{...s.copyBtn, background:'var(--success-bg)',color:'var(--success)',border:'1px solid var(--success)',textDecoration:'none'}}>💬 Open group</a>)}
 </div>
 <label style={s.label}>Shareable project link</label>
 <div style={s.linkBox}>{shareUrl}</div>
-<button style={s.copyBtn} onClick={() => copy(shareUrl, setCopiedLink)}>
-{copiedLink ? '✓ Copied' : '🔗 Copy link'}
-</button>
+<button style={s.copyBtn} onClick={()=>copy(shareUrl, setCopiedLink)}>{copiedLink?'✓ Copied':'🔗 Copy link'}</button>
 </div>
-<div style={s.modalFooter}>
-<button style={s.cancelBtn} onClick={onClose}>Close</button>
-</div>
+<div style={s.modalFooter}><button style={s.cancelBtn} onClick={onClose}>Close</button></div>
 </div>
 </div>
 );
 }
 
-// ── INFO DISPLAY ────────────────────────────────────────────────────────────
 function InfoDisplay({channel}) {
 return (
 <div style={s.infoList}>
-{INFO_FIELDS.map(f => {
-const val = channel[f.key];
-return (
-<div key={f.key} style={s.infoLine}>
+{INFO_FIELDS.map(f => { const val = channel[f.key];
+return (<div key={f.key} style={s.infoLine}>
 <span style={s.infoEmoji}>{f.emoji}</span>
 <div style={{flex:1}}>
 <span style={s.infoLabelBold}>{f.label}:</span>
 {val ? <span style={s.infoValText}>{val}</span> : <span style={s.infoEmpty}>—</span>}
-{f.key === 'clientName' && channel.clientMobile && (
-<span style={s.infoValText}> · 📱 {channel.clientMobile}</span>
-)}
+{f.key === 'clientName' && channel.clientMobile && (<span style={s.infoValText}> · 📱 {channel.clientMobile}</span>)}
 </div>
-</div>
-);
-})}
-{channel.startDate && (
-<div style={s.infoLine}>
-<span style={s.infoEmoji}>📅</span>
-<div style={{flex:1}}>
-<span style={s.infoLabelBold}>Start date:</span>
-<span style={s.infoValText}>{formatDate(channel.startDate)}</span>
-</div>
-</div>
-)}
+</div>); })}
+{channel.startDate && (<div style={s.infoLine}><span style={s.infoEmoji}>📅</span><div style={{flex:1}}><span style={s.infoLabelBold}>Start date:</span><span style={s.infoValText}>{formatDate(channel.startDate)}</span></div></div>)}
 {(channel.whatsapp || channel.surveyLink) && (
 <div style={s.infoLinksRow}>
-{channel.whatsapp && (
-<a href={channel.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'var(--success-bg)',color:'var(--success)',borderColor:'var(--success)'}}>
-💬 Join WhatsApp
-</a>
-)}
-{channel.surveyLink && (
-<a href={channel.surveyLink} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'var(--accent-bg)',color:'var(--accent-text)',borderColor:'var(--accent)'}}>
-🔍 Quick Survey
-</a>
-)}
+{channel.whatsapp && (<a href={channel.whatsapp} target="_blank" rel="noreferrer" style={{...s.infoLinkBtn, background:'var(--success-bg)', color:'var(--success)', borderColor:'var(--success)'}}>💬 Join WhatsApp</a>)}
+{channel.surveyLink && (<a href={channel.surveyLink} target="_blank" rel="noreferrer" style={{...s.infoLinkBtn, background:'var(--accent-bg)', color:'var(--accent-text)', borderColor:'var(--accent)'}}>🔍 Quick Survey</a>)}
 </div>
 )}
 </div>
 );
 }
 
-// ── SHARED VIEW ─────────────────────────────────────────────────────────────
 function SharedView({channel, onExit}) {
 return (
 <div style={s.sharedWrap}>
@@ -1050,55 +921,31 @@ return (
 </div>
 <div style={s.sharedSection}><InfoDisplay channel={channel}/></div>
 <div style={{padding:'16px 32px 28px',textAlign:'center'}}>
-<button onClick={onExit} style={{background:'none',border:'none',color:'var(--text-dim)',fontSize:11,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2}}>
-← Back
-</button>
+<button onClick={onExit} style={{background:'none',border:'none',color:'var(--text-dim)',fontSize:11,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2}}>← Back</button>
 </div>
 </div>
 </div>
 );
 }
 
-// ── INCIDENT CARD ───────────────────────────────────────────────────────────
 function IncidentCard({incident, allChannels, onMentionClick, showJob, onDelete}) {
 const t = INCIDENT_TYPES.find(t => t.id === incident.type);
 return (
 <div style={s.incidentCard}>
 <div style={s.incidentHead}>
-<span style={{...s.incidentBadge, color:t.color, background:t.bg, borderColor:t.color}}>
-{t.emoji} {t.label}
-</span>
+<span style={{...s.incidentBadge, color:t.color, background:t.bg, borderColor:t.color}}>{t.emoji} {t.label}</span>
 <span style={s.incidentDate}>{formatDate(incident.date)}</span>
-{showJob && incident.projectName && (
-<span style={s.incidentJob}>📋 {incident.projectName}</span>
-)}
-{onDelete && (
-<button onClick={() => onDelete(incident.id)}
-style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,marginLeft:'auto',padding:0}}>×</button>
-)}
+{showJob && incident.projectName && (<span style={s.incidentJob}>📋 {incident.projectName}</span>)}
+{onDelete && (<button onClick={()=>onDelete(incident.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,marginLeft:'auto',padding:0}}>×</button>)}
 </div>
-{incident.technicians && (
-<div style={s.incidentSection}>
-<div style={s.incidentSectionLabel}>Technicians</div>
-<div style={s.incidentSectionText}>{incident.technicians}</div>
-</div>
-)}
-<div style={s.incidentSection}>
-<div style={s.incidentSectionLabel}>What happened</div>
-<div style={s.incidentSectionText}>{renderWithMentions(incident.whatHappened, allChannels, onMentionClick)}</div>
-</div>
-{incident.howToAvoid && (
-<div style={s.incidentSection}>
-<div style={s.incidentSectionLabel}>How to avoid</div>
-<div style={s.incidentSectionText}>{renderWithMentions(incident.howToAvoid, allChannels, onMentionClick)}</div>
-</div>
-)}
+{incident.technicians && (<div style={s.incidentSection}><div style={s.incidentSectionLabel}>Technicians</div><div style={s.incidentSectionText}>{incident.technicians}</div></div>)}
+<div style={s.incidentSection}><div style={s.incidentSectionLabel}>What happened</div><div style={s.incidentSectionText}>{renderWithMentions(incident.whatHappened, allChannels, onMentionClick)}</div></div>
+{incident.howToAvoid && (<div style={s.incidentSection}><div style={s.incidentSectionLabel}>How to avoid</div><div style={s.incidentSectionText}>{renderWithMentions(incident.howToAvoid, allChannels, onMentionClick)}</div></div>)}
 <div style={{...s.incidentDate, marginTop:10, opacity:0.6}}>Reported {formatTime(incident.createdAt)}</div>
 </div>
 );
 }
 
-// ── INCIDENTS THREAD (per project) ──────────────────────────────────────────
 function ProjectIncidentsView({channel, incidents, allChannels, onMentionClick, onAdd, onDelete}) {
 const projectIncidents = incidents.filter(i => i.projectId === channel.id).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
 return (
@@ -1112,59 +959,40 @@ return (
 </div>
 <div style={{flex:1,overflowY:'auto'}}>
 {projectIncidents.length === 0
-? <div style={{...s.empty,height:'60%'}}>
-<span style={s.emptyIcon}>✅</span>
-<span style={s.emptyText}>No reports — keep it that way</span>
-</div>
-: projectIncidents.map(i => <IncidentCard key={i.id} incident={i} allChannels={allChannels} onMentionClick={onMentionClick} onDelete={onDelete}/>)
-}
+? <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>✅</span><span style={s.emptyText}>No reports — keep it that way</span></div>
+: projectIncidents.map(i => <IncidentCard key={i.id} incident={i} allChannels={allChannels} onMentionClick={onMentionClick} onDelete={onDelete}/>)}
 </div>
 </div>
 );
 }
 
-// ── INCIDENTS BIN VIEW (server-wide, filtered by type) ──────────────────────
 function IncidentsBinView({incidentType, incidents, allChannels, onMentionClick, onJumpToProject}) {
 const filtered = incidents.filter(i => i.type === incidentType).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
 const t = INCIDENT_TYPES.find(t => t.id === incidentType);
 return (
 <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
 <div style={{marginBottom:16}}>
-<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:4}}>
-{filtered.length} {t.label.toLowerCase()} report{filtered.length===1?'':'s'} across all projects
-</div>
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:4}}>{filtered.length} {t.label.toLowerCase()} report{filtered.length===1?'':'s'} across all projects</div>
 <div style={{fontSize:13,color:'var(--text-dim)'}}>Add new reports from inside a job → Incidents tab.</div>
 </div>
 <div style={{flex:1,overflowY:'auto'}}>
 {filtered.length === 0
-? <div style={{...s.empty,height:'60%'}}>
-<span style={s.emptyIcon}>{t.emoji}</span>
-<span style={s.emptyText}>No {t.label.toLowerCase()} reports</span>
-</div>
-: filtered.map(i => (
-<div key={i.id} onClick={() => i.projectId && onJumpToProject(i.projectId)} style={{cursor:i.projectId?'pointer':'default'}}>
-<IncidentCard incident={i} allChannels={allChannels} onMentionClick={onMentionClick} showJob={true}/>
-</div>
-))
-}
+? <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>{t.emoji}</span><span style={s.emptyText}>No {t.label.toLowerCase()} reports</span></div>
+: filtered.map(i => (<div key={i.id} onClick={()=>i.projectId && onJumpToProject(i.projectId)} style={{cursor:i.projectId?'pointer':'default'}}><IncidentCard incident={i} allChannels={allChannels} onMentionClick={onMentionClick} showJob={true}/></div>))}
 </div>
 </div>
 );
 }
 
-// ── MATERIALS VIEW ──────────────────────────────────────────────────────────
 function MaterialsView({channel, onUpdate, onAdd}) {
 const items = channel.materials || [];
 const toggle = (id) => onUpdate(items.map(m => m.id === id ? {...m, done:!m.done} : m));
 const remove = (id) => onUpdate(items.filter(m => m.id !== id));
-
 return (
 <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,flexWrap:'wrap',gap:8}}>
 <div>
-<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:2}}>
-{items.filter(m=>m.done).length} of {items.length} ready
-</div>
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:2}}>{items.filter(m=>m.done).length} of {items.length} ready</div>
 <div style={{fontSize:13,color:'var(--text-dim)'}}>Tick items as you load them.</div>
 </div>
 <button style={s.primaryBtn} onClick={onAdd}>+ Add item</button>
@@ -1172,24 +1000,21 @@ return (
 <div style={{flex:1,overflowY:'auto'}}>
 {items.length === 0
 ? <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>🧰</span><span style={s.emptyText}>No items yet</span></div>
-: items.map(m => (
-<div key={m.id} style={s.matRow}>
+: items.map(m => (<div key={m.id} style={s.matRow}>
 <input type="checkbox" style={s.matCheck} checked={m.done} onChange={()=>toggle(m.id)}/>
-<span style={{...s.matName, ...(m.done ? s.matNameDone : {})}}>{m.name}</span>
+<span style={{...s.matName, ...(m.done?s.matNameDone:{})}}>{m.name}</span>
 {m.qty && <span style={s.matQty}>{m.qty}</span>}
 <button onClick={()=>remove(m.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:0}}>×</button>
-</div>
-))
-}
+</div>))}
 </div>
 </div>
 );
 }
 
-// ── CALENDAR VIEW ───────────────────────────────────────────────────────────
-function CalendarView({entries, jobChannels, onAddEntry, onDeleteEntry, onJumpToProject}) {
+// ── CALENDAR VIEW (bookings with duration + colours + overlap) ──────────────
+function CalendarView({entries, jobChannels, allChannels, getCategory, onNewBooking, onEditBooking, onDeleteBooking, onJumpToProject, onMentionClick}) {
 const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
-const [pickedDate, setPickedDate] = useState(null);
+const [selectedEntryId, setSelectedEntryId] = useState(null);
 
 const year = cursor.getFullYear();
 const month = cursor.getMonth();
@@ -1201,22 +1026,21 @@ const daysInPrev = new Date(year, month, 0).getDate();
 const today = todayISO();
 
 const cells = [];
-for(let i = 0; i < startOffset; i++) {
-const day = daysInPrev - startOffset + 1 + i;
-cells.push({day, other:true, date: new Date(year, month-1, day).toISOString().slice(0,10)});
-}
-for(let i = 1; i <= daysInMonth; i++) {
-cells.push({day:i, other:false, date: new Date(year, month, i).toISOString().slice(0,10)});
-}
-while(cells.length % 7 !== 0) {
-const day = cells.length - daysInMonth - startOffset + 1;
-cells.push({day, other:true, date: new Date(year, month+1, day).toISOString().slice(0,10)});
-}
+for(let i = 0; i < startOffset; i++) { const day = daysInPrev - startOffset + 1 + i; cells.push({day, other:true, date: new Date(year, month-1, day).toISOString().slice(0,10)}); }
+for(let i = 1; i <= daysInMonth; i++) cells.push({day:i, other:false, date: new Date(year, month, i).toISOString().slice(0,10)});
+while(cells.length % 7 !== 0) { const day = cells.length - daysInMonth - startOffset + 1; cells.push({day, other:true, date: new Date(year, month+1, day).toISOString().slice(0,10)}); }
 
-const entriesByDate = entries.reduce((acc, e) => {
-(acc[e.date] = acc[e.date] || []).push(e);
-return acc;
-}, {});
+// For each date, list of entries active on that date
+const entriesByDate = {};
+entries.forEach(e => {
+(e.dates || []).forEach(d => { (entriesByDate[d] = entriesByDate[d] || []).push(e); });
+});
+
+// Running projects for legend
+const runningWithColor = jobChannels.filter(p => p.status !== 'done').slice(0, 12);
+
+const selectedEntry = selectedEntryId ? entries.find(e => e.id === selectedEntryId) : null;
+const selectedProject = selectedEntry ? jobChannels.find(p => p.id === selectedEntry.projectId) : null;
 
 return (
 <div>
@@ -1225,10 +1049,25 @@ return (
 <div style={s.calMonth}>{monthLabel}</div>
 <button style={s.calNavBtn} onClick={() => setCursor(new Date(year, month+1, 1))}>›</button>
 </div>
+
+{/* Legend */}
+{runningWithColor.length > 0 && (
+<div style={s.legend}>
+<span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginRight:4}}>Projects:</span>
+{runningWithColor.map(p => {
+const c = getColor(p.colorId);
+return (<span key={p.id} style={s.legendItem} onClick={()=>onJumpToProject(p.id)} role="button">
+<span style={{...s.legendDot, background:c.bar}}/>
+{p.name}
+</span>);
+})}
+</div>
+)}
+
 <div style={s.calGrid}>
 {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => <div key={d} style={s.calHeadCell}>{d}</div>)}
 {cells.map((c, i) => {
-const dayEntries = entriesByDate[c.date] || [];
+const dayEntries = (entriesByDate[c.date] || []);
 return (
 <div key={i}
 style={{
@@ -1236,111 +1075,115 @@ style={{
 ...(c.date === today ? s.calCellToday : {}),
 ...(c.other ? s.calCellOther : {})
 }}
-onClick={() => setPickedDate(c.date)}>
+onClick={() => { if(!c.other) onNewBooking(c.date); }}>
 <div style={s.calDay}>{c.day}</div>
-{dayEntries.slice(0,3).map(e => (
-<div key={e.id} style={s.calEntry}
-onClick={(ev) => { ev.stopPropagation(); if(e.projectId) onJumpToProject(e.projectId); }}
-title={e.text}>
-{e.projectName ? '◆ ' + e.projectName : e.text.slice(0,20)}
+{dayEntries.length > 0 && (
+<div style={s.calBarsRow}>
+{dayEntries.slice(0,4).map(e => {
+const col = getColor(e.colorId);
+return (
+<div key={e.id} style={{...s.calBar, background:col.bar}}
+title={e.projectName + (e.comment ? ' — ' + e.comment : '')}
+onClick={(ev) => { ev.stopPropagation(); setSelectedEntryId(e.id); }}>
+◆ {dayEntries.length > 2 ? e.projectName.slice(0,10) : e.projectName}
 </div>
-))}
-{dayEntries.length > 3 && (
-<div style={{...s.calEntry, background:'var(--bg-sunken)',color:'var(--text-dim)'}}>+{dayEntries.length-3} more</div>
+);
+})}
+{dayEntries.length > 4 && (
+<div style={{...s.calBar, background:'var(--bg-sunken)', color:'var(--text-dim)'}}>+{dayEntries.length-4}</div>
+)}
+</div>
 )}
 </div>
 );
 })}
 </div>
 
-{pickedDate && (
-<div style={{marginTop:20,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'18px 20px'}}>
-<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-<div style={{fontWeight:700,color:'var(--text)'}}>{formatDate(pickedDate)}</div>
-<div style={{display:'flex',gap:8}}>
-<button style={s.cancelBtn} onClick={() => setPickedDate(null)}>Close</button>
-<button style={s.primaryBtn} onClick={() => onAddEntry(pickedDate)}>+ Entry</button>
+{selectedEntry && (
+<div style={s.entryDetail}>
+<div style={s.entryHead}>
+<div style={{...s.entryColorBar, background:getColor(selectedEntry.colorId).bar}}/>
+<div style={{flex:1, minWidth:0}}>
+<div style={s.entryProjectName} onClick={()=>onJumpToProject(selectedEntry.projectId)}>
+◆ {selectedEntry.projectName}
+</div>
+<div style={{fontSize:12,color:'var(--text-dim)',marginTop:3}}>
+{selectedProject?.address || ''}
 </div>
 </div>
-{(entriesByDate[pickedDate] || []).length === 0
-? <div style={{fontSize:12,color:'var(--text-dim)',padding:'10px 0'}}>No entries yet for this day.</div>
-: (entriesByDate[pickedDate] || []).map(e => (
-<div key={e.id} style={{padding:'10px 12px',background:'var(--bg-raised)',borderRadius:6,marginBottom:6,display:'flex',justifyContent:'space-between',gap:10,alignItems:'flex-start'}}>
-<div style={{flex:1}}>
-{e.projectName && <div style={{fontSize:11,color:'var(--accent-text)',fontWeight:600,marginBottom:3,cursor:'pointer'}}
-onClick={() => onJumpToProject(e.projectId)}>◆ {e.projectName}</div>}
-<div style={{fontSize:13,color:'var(--text)'}}>{e.text}</div>
+<span style={s.entryDates}>
+{selectedEntry.days > 1
+? `${formatShortDate(selectedEntry.startDate)} → ${formatShortDate(addDays(selectedEntry.startDate, selectedEntry.days-1))} · ${selectedEntry.days} days`
+: `${formatShortDate(selectedEntry.startDate)} · 1 day`}
+</span>
 </div>
-<button onClick={() => onDeleteEntry(e.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14}}>×</button>
-</div>
-))
-}
+{selectedEntry.technicians && (
+<div style={s.entryField}>
+<div style={s.entryFieldLabel}>Technicians</div>
+<div style={s.entryFieldText}>{selectedEntry.technicians}</div>
 </div>
 )}
+{selectedEntry.tools && (
+<div style={s.entryField}>
+<div style={s.entryFieldLabel}>Tools / materials</div>
+<div style={s.entryFieldText}>{renderWithMentions(selectedEntry.tools, allChannels, onMentionClick)}</div>
+</div>
+)}
+{selectedEntry.comment && (
+<div style={s.entryField}>
+<div style={s.entryFieldLabel}>Comment</div>
+<div style={s.entryFieldText}>{renderWithMentions(selectedEntry.comment, allChannels, onMentionClick)}</div>
+</div>
+)}
+<div style={{display:'flex',gap:8,marginTop:16,flexWrap:'wrap'}}>
+<button style={s.copyBtn} onClick={()=>{ onEditBooking(selectedEntry); setSelectedEntryId(null); }}>✏ Edit</button>
+<button style={{...s.copyBtn, color:'var(--danger)', borderColor:'var(--danger)'}}
+onClick={()=>{ if(confirm('Delete this booking?')) { onDeleteBooking(selectedEntry.id); setSelectedEntryId(null); } }}>🗑 Delete</button>
+<button style={s.copyBtn} onClick={()=>setSelectedEntryId(null)}>Close</button>
+</div>
+</div>
+)}
+
+{/* Floating + button */}
+<div style={{display:'flex',justifyContent:'flex-end',marginTop:16}}>
+<button style={s.calNewBtn} onClick={()=>onNewBooking(null)}>+ NEW BOOKING</button>
+</div>
 </div>
 );
 }
 
-// ── NOTES FEED (with mentions) ──────────────────────────────────────────────
+// ── NOTES FEED ──────────────────────────────────────────────────────────────
 function NotesFeed({channelId, threadId, notes, setNotes, placeholder, allChannels, onMentionClick, getCategory}) {
 const [text, setText] = useState('');
 const inputRef = useRef(null);
 const mentions = useMentions(text, setText, allChannels, channelId);
 const feed = (notes[channelId]?.[threadId] || []).slice().reverse();
-
 const addNote = () => {
 if(!text.trim()) return;
-setNotes(prev => ({
-...prev,
-[channelId]: {
-...(prev[channelId] || {}),
-[threadId]: [...(prev[channelId]?.[threadId] || []), {
-id: Date.now().toString(), text: text.trim(), createdAt: new Date().toISOString()
-}]
-}
-}));
-setText('');
-mentions.close();
+setNotes(prev => ({...prev, [channelId]: {...(prev[channelId] || {}), [threadId]: [...(prev[channelId]?.[threadId] || []), {id: Date.now().toString(), text: text.trim(), createdAt: new Date().toISOString()}]}}));
+setText(''); mentions.close();
 };
-
-const deleteNote = (noteId) => {
-setNotes(prev => ({
-...prev,
-[channelId]: {
-...(prev[channelId] || {}),
-[threadId]: (prev[channelId]?.[threadId] || []).filter(n => n.id !== noteId)
-}
-}));
-};
-
+const deleteNote = (noteId) => setNotes(prev => ({...prev, [channelId]: {...(prev[channelId] || {}), [threadId]: (prev[channelId]?.[threadId] || []).filter(n => n.id !== noteId)}}));
 return (
 <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
 <div style={{flex:1,overflowY:'auto',paddingBottom:16}}>
 {feed.length === 0
 ? <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>📝</span><span style={s.emptyText}>No entries yet</span></div>
-: feed.map(n => (
-<div key={n.id} style={s.note}>
+: feed.map(n => (<div key={n.id} style={s.note}>
 <div style={s.noteText}>{renderWithMentions(n.text, allChannels, onMentionClick)}</div>
-<div style={{...s.noteMeta,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+<div style={{...s.noteMeta, display:'flex', justifyContent:'space-between', alignItems:'center'}}>
 <span>{formatTime(n.createdAt)}</span>
-<button onClick={() => deleteNote(n.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:'0 4px'}}>×</button>
+<button onClick={()=>deleteNote(n.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:'0 4px'}}>×</button>
 </div>
-</div>
-))
-}
+</div>))}
 </div>
 <div style={{paddingTop:12,borderTop:'1px solid var(--border)'}}>
 <div style={s.noteInputWrap}>
 <MentionDropdown mentions={mentions} inputRef={inputRef} getCategory={getCategory}/>
-<textarea ref={inputRef}
-style={s.noteInput} value={text}
-onChange={(e) => mentions.handleChange(e, inputRef)}
-placeholder={placeholder || 'Add a note... (type # to mention a channel)'}
-rows={3}
-onKeyDown={(e) => {
-const handled = mentions.handleKeyDown(e, inputRef);
-if(!handled && e.key==='Enter' && e.metaKey) addNote();
-}}/>
+<textarea ref={inputRef} style={s.noteInput} value={text}
+onChange={(e) => mentions.handleChange(e)}
+placeholder={placeholder || 'Add a note... (type # to mention)'} rows={3}
+onKeyDown={(e) => { const handled = mentions.handleKeyDown(e, inputRef); if(!handled && e.key==='Enter' && e.metaKey) addNote(); }}/>
 </div>
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
 <span style={{fontSize:10,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14}}>⌘ + Enter to send · # to mention</span>
@@ -1351,97 +1194,35 @@ if(!handled && e.key==='Enter' && e.metaKey) addNote();
 );
 }
 
-// ── THREAD VIEW ─────────────────────────────────────────────────────────────
-function ThreadView({channel, thread, notes, setNotes, allChannels, incidents, onIncidentSubmit, onIncidentDelete, onMentionClick, onJumpToProject, onUpdateMaterials, onAddMaterial, calendarEntries, onAddCalEntry, onDeleteCalEntry, getCategory}) {
-const jobChannels = allChannels.filter(c => c.type === 'job');
+function ThreadView({channel, thread, notes, setNotes, allChannels, incidents, onIncidentSubmit, onIncidentDelete, onMentionClick, onJumpToProject, onUpdateMaterials, onAddMaterial, calendarEntries, onNewBooking, onEditBooking, onDeleteBooking, getCategory, allJobs}) {
+if(channel.type === 'plain') return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} placeholder={`Post in #${channel.name}... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
+if(channel.type === 'materials') return <MaterialsView channel={channel} onUpdate={onUpdateMaterials} onAdd={onAddMaterial}/>;
+if(channel.type === 'calendar') return <CalendarView entries={calendarEntries} jobChannels={allJobs} allChannels={allChannels} getCategory={getCategory}
+onNewBooking={onNewBooking} onEditBooking={onEditBooking} onDeleteBooking={onDeleteBooking}
+onJumpToProject={onJumpToProject} onMentionClick={onMentionClick}/>;
+if(channel.type === 'incidents-bin') return <IncidentsBinView incidentType={channel.incidentType} incidents={incidents} allChannels={allChannels} onMentionClick={onMentionClick} onJumpToProject={onJumpToProject}/>;
 
-if(channel.type === 'plain') {
-return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes}
-placeholder={`Post in #${channel.name}... (type # to mention)`}
-allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
-}
-
-if(channel.type === 'materials') {
-return <MaterialsView channel={channel} onUpdate={onUpdateMaterials} onAdd={onAddMaterial}/>;
-}
-
-if(channel.type === 'calendar') {
-return <CalendarView entries={calendarEntries} jobChannels={jobChannels}
-onAddEntry={onAddCalEntry} onDeleteEntry={onDeleteCalEntry} onJumpToProject={onJumpToProject}/>;
-}
-
-if(channel.type === 'incidents-bin') {
-return <IncidentsBinView incidentType={channel.incidentType} incidents={incidents}
-allChannels={allChannels} onMentionClick={onMentionClick} onJumpToProject={onJumpToProject}/>;
-}
-
-// Job channel threads
 if(thread.id === 'info') return <InfoDisplay channel={channel}/>;
-
-if(thread.id === 'incidents') {
-return <ProjectIncidentsView channel={channel} incidents={incidents}
-allChannels={allChannels} onMentionClick={onMentionClick}
-onAdd={onIncidentSubmit} onDelete={onIncidentDelete}/>;
+if(thread.id === 'incidents') return <ProjectIncidentsView channel={channel} incidents={incidents} allChannels={allChannels} onMentionClick={onMentionClick} onAdd={onIncidentSubmit} onDelete={onIncidentDelete}/>;
+if(thread.id === 'rams') return (<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}><div style={{fontSize:40,opacity:0.7}}>📋</div><div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>RAMS Form</div><a href={RAMS_URL} target="_blank" rel="noreferrer" style={{...s.infoLinkBtn, background:'var(--accent)', color:'#fff', borderColor:'var(--accent)', marginTop:4}}>Open RAMS form →</a></div>);
+if(thread.id === 'survey') return (<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}><div style={{fontSize:40,opacity:0.7}}>🔍</div><div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Quick Survey</div>{channel.surveyLink ? <a href={channel.surveyLink} target="_blank" rel="noreferrer" style={{...s.infoLinkBtn, background:'var(--accent)', color:'#fff', borderColor:'var(--accent)', marginTop:4}}>Open Quick Survey →</a> : <div style={{fontSize:12,color:'var(--text-dim)'}}>No Quick Survey link set.</div>}</div>);
+if(thread.id === 'timesheet') return (<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}><div style={{fontSize:40,opacity:0.7}}>⏱️</div><div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Timesheet</div><div style={{fontSize:12,color:'var(--text-dim)'}}>Coming soon.</div></div>);
+return <NotesFeed channelId={channel.id} threadId={thread.id} notes={notes} setNotes={setNotes} placeholder={`Add a ${thread.label} note... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
 }
 
-if(thread.id === 'rams') {
-return (
-<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}>
-<div style={{fontSize:40,opacity:0.7}}>📋</div>
-<div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>RAMS Form</div>
-<div style={{fontSize:12,color:'var(--text-dim)',textAlign:'center',maxWidth:320,lineHeight:1.5}}>Opens the RAMS form in a new tab.</div>
-<a href={RAMS_URL} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>Open RAMS form →</a>
-</div>
-);
-}
-
-if(thread.id === 'survey') {
-return (
-<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}>
-<div style={{fontSize:40,opacity:0.7}}>🔍</div>
-<div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Quick Survey</div>
-{channel.surveyLink
-? <a href={channel.surveyLink} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>Open Quick Survey →</a>
-: <div style={{fontSize:12,color:'var(--text-dim)'}}>No Quick Survey link set.</div>}
-</div>
-);
-}
-
-if(thread.id === 'timesheet') {
-return (
-<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}>
-<div style={{fontSize:40,opacity:0.7}}>⏱️</div>
-<div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Timesheet</div>
-<div style={{fontSize:12,color:'var(--text-dim)'}}>Coming soon — editable timesheet for team leaders.</div>
-</div>
-);
-}
-
-return <NotesFeed channelId={channel.id} threadId={thread.id} notes={notes} setNotes={setNotes}
-placeholder={`Add a ${thread.label} note... (type # to mention)`}
-allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
-}
-
-// ── SIDEBAR CATEGORY ────────────────────────────────────────────────────────
-function CategoryBlock({category, channels, activeId, onSelect, onAddChannel, onEditCategory}) {
+function CategoryBlock({category, channels, activeId, onSelect, onAddChannel, onEditCategory, getColor}) {
 const [open, setOpen] = useState(!category.collapsed);
 return (
 <div style={s.catWrap}>
 <div style={s.catHeader}>
-<span onClick={() => setOpen(o => !o)} style={{display:'flex',alignItems:'center',gap:6,flex:1,minWidth:0}}>
+<span onClick={()=>setOpen(o=>!o)} style={{display:'flex',alignItems:'center',gap:6,flex:1,minWidth:0}}>
 <span style={{...s.catCaret, transform: open?'rotate(90deg)':'rotate(0deg)'}}>▶</span>
 <span style={s.catEmoji}>{category.emoji}</span>
 <span style={s.catLabel}>{category.name}</span>
 </span>
 <span style={s.catCount}>{channels.length}</span>
-{category.system !== 'incidents' && (
-<button style={s.catAddBtn} title="New channel" onClick={(e) => { e.stopPropagation(); onAddChannel(category); }}>+</button>
-)}
-{!category.system && (
-<button style={s.catAddBtn} title="Edit category" onClick={(e) => { e.stopPropagation(); onEditCategory(category); }}>✎</button>
-)}
+{category.system !== 'incidents' && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onAddChannel(category);}}>+</button>)}
+{!category.system && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onEditCategory(category);}}>✎</button>)}
 </div>
 {open && channels.map(ch => {
 const isActive = activeId === ch.id;
@@ -1450,16 +1231,13 @@ let hash = '#';
 if(ch.type === 'job') hash = '◆';
 else if(ch.type === 'materials') hash = '🧰';
 else if(ch.type === 'calendar') hash = '📅';
-else if(ch.type === 'incidents-bin') {
-const t = INCIDENT_TYPES.find(t => t.id === ch.incidentType);
-hash = t?.emoji || '⚠️';
-}
+else if(ch.type === 'incidents-bin') { const t = INCIDENT_TYPES.find(t => t.id === ch.incidentType); hash = t?.emoji || '⚠️'; }
+const col = ch.type === 'job' && ch.colorId && ch.status !== 'done' ? getColor(ch.colorId) : null;
 return (
-<div key={ch.id}
-style={{...s.chanItem, ...(isActive ? s.chanItemActive : {}), ...(isDone ? s.chanItemDone : {})}}
-onClick={() => onSelect(ch.id)}>
+<div key={ch.id} style={{...s.chanItem, ...(isActive?s.chanItemActive:{}), ...(isDone?s.chanItemDone:{})}} onClick={()=>onSelect(ch.id)}>
 <span style={s.chanHash}>{hash}</span>
-<span style={{...s.chanName, ...(isActive ? s.chanNameActive : {})}}>{ch.name}</span>
+<span style={{...s.chanName, ...(isActive?s.chanNameActive:{})}}>{ch.name}</span>
+{col && <span style={{...s.chanDot, background:col.bar}}/>}
 </div>
 );
 })}
@@ -1468,13 +1246,12 @@ onClick={() => onSelect(ch.id)}>
 );
 }
 
-// ── MAIN APP ────────────────────────────────────────────────────────────────
 function App() {
 const [theme, setTheme] = useTheme();
-const [data, setData] = useStorage('ral-data-v4', null);
+const [data, setData] = useStorage('ral-data-v5', null);
 const [notes, setNotes] = useStorage('ral-notes', {});
 const [incidents, setIncidents] = useStorage('ral-incidents', []);
-const [calendarEntries, setCalendarEntries] = useStorage('ral-calendar', []);
+const [calendarEntries, setCalendarEntries] = useStorage('ral-calendar-v2', null);
 const [activeId, setActiveId] = useState(null);
 const [activeThreadId, setActiveThreadId] = useState('info');
 const [showJobWizard, setShowJobWizard] = useState(false);
@@ -1487,62 +1264,47 @@ const [showTypePicker, setShowTypePicker] = useState(null);
 const [showAddThread, setShowAddThread] = useState(false);
 const [showIncidentForm, setShowIncidentForm] = useState(false);
 const [showAddMaterial, setShowAddMaterial] = useState(false);
-const [calEntryDate, setCalEntryDate] = useState(null);
+const [bookingModal, setBookingModal] = useState(null); // {defaultDate?, editing?}
 const [sharedChannel, setSharedChannel] = useState(null);
 
 useEffect(() => { if(data === null) setData(seedData()); }, [data]);
+useEffect(() => { if(calendarEntries === null) setCalendarEntries(seedCalendarEntries()); }, [calendarEntries]);
 
 useEffect(() => {
 const checkHash = () => {
 const hash = window.location.hash;
-if(hash.startsWith('#p=')) {
-const decoded = decodeObj(hash.slice(3));
-if(decoded) setSharedChannel(decoded);
-} else {
-setSharedChannel(null);
-}
+if(hash.startsWith('#p=')) { const decoded = decodeObj(hash.slice(3)); if(decoded) setSharedChannel(decoded); }
+else setSharedChannel(null);
 };
 checkHash();
 window.addEventListener('hashchange', checkHash);
 return () => window.removeEventListener('hashchange', checkHash);
 }, []);
 
-if(sharedChannel) {
-return <SharedView channel={sharedChannel} onExit={() => { window.location.hash = ''; setSharedChannel(null); }}/>;
-}
+if(sharedChannel) return <SharedView channel={sharedChannel} onExit={() => { window.location.hash = ''; setSharedChannel(null); }}/>;
 
 const d = data || {categories:[],channels:[]};
 const channel = d.channels.find(c => c.id === activeId);
 const getCategory = (id) => d.categories.find(c => c.id === id);
 const updateData = (fn) => setData(prev => fn(prev || {categories:[],channels:[]}));
+const allJobs = d.channels.filter(c => c.type === 'job');
 
 const saveJob = (job) => {
 updateData(prev => {
 const idx = prev.channels.findIndex(c => c.id === job.id);
 const targetCategoryId = editingJob ? job.categoryId : jobTargetCategory;
-const finalJob = {...job, categoryId: targetCategoryId};
+// Assign color if new
+const colorId = job.colorId || pickProjectColor(prev.channels.filter(c => c.type === 'job'));
+const finalJob = {...job, categoryId: targetCategoryId, colorId};
 if(idx >= 0) { const channels = [...prev.channels]; channels[idx] = finalJob; return {...prev, channels}; }
 return {...prev, channels: [finalJob, ...prev.channels]};
 });
-setActiveId(job.id);
-setActiveThreadId('info');
+setActiveId(job.id); setActiveThreadId('info');
 };
 
-const createPlainChannel = (categoryId, name) => {
-const ch = {id:'ch-'+Date.now().toString(36), type:'plain', name, categoryId, createdAt:new Date().toISOString()};
-updateData(prev => ({...prev, channels: [ch, ...prev.channels]}));
-setActiveId(ch.id); setShowTypePicker(null);
-};
-const createMaterialsChannel = (categoryId, name) => {
-const ch = {id:'ch-'+Date.now().toString(36), type:'materials', name, categoryId, materials:[], createdAt:new Date().toISOString()};
-updateData(prev => ({...prev, channels: [ch, ...prev.channels]}));
-setActiveId(ch.id); setShowTypePicker(null);
-};
-const createCalendarChannel = (categoryId, name) => {
-const ch = {id:'ch-'+Date.now().toString(36), type:'calendar', name, categoryId, createdAt:new Date().toISOString()};
-updateData(prev => ({...prev, channels: [ch, ...prev.channels]}));
-setActiveId(ch.id); setShowTypePicker(null);
-};
+const createPlainChannel = (cid, name) => { const ch = {id:'ch-'+Date.now().toString(36), type:'plain', name, categoryId:cid, createdAt:new Date().toISOString()}; updateData(prev => ({...prev, channels:[ch, ...prev.channels]})); setActiveId(ch.id); setShowTypePicker(null); };
+const createMaterialsChannel = (cid, name) => { const ch = {id:'ch-'+Date.now().toString(36), type:'materials', name, categoryId:cid, materials:[], createdAt:new Date().toISOString()}; updateData(prev => ({...prev, channels:[ch, ...prev.channels]})); setActiveId(ch.id); setShowTypePicker(null); };
+const createCalendarChannel = (cid, name) => { const ch = {id:'ch-'+Date.now().toString(36), type:'calendar', name, categoryId:cid, createdAt:new Date().toISOString()}; updateData(prev => ({...prev, channels:[ch, ...prev.channels]})); setActiveId(ch.id); setShowTypePicker(null); };
 
 const deleteChannel = (id) => {
 const ch = d.channels.find(c => c.id === id);
@@ -1553,9 +1315,7 @@ if(activeId === id) setActiveId(null);
 };
 
 const toggleStatus = (id) => {
-updateData(prev => ({
-...prev,
-channels: prev.channels.map(c => {
+updateData(prev => ({...prev, channels: prev.channels.map(c => {
 if(c.id !== id) return c;
 const newStatus = c.status === 'done' ? 'running' : 'done';
 const runCat = prev.categories.find(cat => cat.system === 'running');
@@ -1563,86 +1323,65 @@ const doneCat = prev.categories.find(cat => cat.system === 'done');
 let newCatId = c.categoryId;
 if(newStatus === 'done' && c.categoryId === runCat?.id) newCatId = doneCat?.id || c.categoryId;
 if(newStatus === 'running' && c.categoryId === doneCat?.id) newCatId = runCat?.id || c.categoryId;
-return {...c, status: newStatus, categoryId: newCatId};
-})
-}));
+// On re-opening, if the job has no color or its color is taken, re-pick
+let colorId = c.colorId;
+if(newStatus === 'running') {
+const others = prev.channels.filter(x => x.type === 'job' && x.id !== c.id && x.status !== 'done');
+const taken = new Set(others.map(x => x.colorId));
+if(!colorId || taken.has(colorId)) colorId = pickProjectColor([...others]);
+}
+return {...c, status: newStatus, categoryId: newCatId, colorId};
+})}));
 };
 
-const saveCategory = (cat) => {
-updateData(prev => {
-const idx = prev.categories.findIndex(c => c.id === cat.id);
-if(idx >= 0) { const categories = [...prev.categories]; categories[idx] = cat; return {...prev, categories}; }
-return {...prev, categories: [...prev.categories, cat]};
-});
-};
+const saveCategory = (cat) => updateData(prev => { const idx = prev.categories.findIndex(c => c.id === cat.id); if(idx >= 0) { const categories = [...prev.categories]; categories[idx] = cat; return {...prev, categories}; } return {...prev, categories: [...prev.categories, cat]}; });
 
-const addCustomThread = (thread) => {
-if(!channel || channel.type !== 'job') return;
-updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:[...(c.customThreads || []), thread]} : c)}));
-setActiveThreadId(thread.id);
-};
-const removeCustomThread = (threadId) => {
-if(!channel || channel.type !== 'job') return;
-if(!confirm('Remove this thread? Notes in it will be lost.')) return;
-updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:(c.customThreads || []).filter(t=>t.id!==threadId)} : c)}));
-if(activeThreadId === threadId) setActiveThreadId('info');
-};
+const addCustomThread = (thread) => { if(!channel || channel.type !== 'job') return; updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:[...(c.customThreads || []), thread]} : c)})); setActiveThreadId(thread.id); };
+const removeCustomThread = (threadId) => { if(!channel || channel.type !== 'job') return; if(!confirm('Remove this thread? Notes in it will be lost.')) return; updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:(c.customThreads || []).filter(t=>t.id!==threadId)} : c)})); if(activeThreadId === threadId) setActiveThreadId('info'); };
 
-const submitIncident = (inc) => { setIncidents(prev => [inc, ...prev]); };
+const submitIncident = (inc) => setIncidents(prev => [inc, ...prev]);
 const deleteIncident = (id) => { if(confirm('Delete this report?')) setIncidents(prev => prev.filter(i => i.id !== id)); };
 
-const updateMaterials = (newList) => {
-if(!channel) return;
-updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, materials:newList} : c)}));
-};
-const addMaterial = (item) => {
-if(!channel) return;
-updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, materials:[...(c.materials || []), item]} : c)}));
-};
+const updateMaterials = (newList) => { if(!channel) return; updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, materials:newList} : c)})); };
+const addMaterial = (item) => { if(!channel) return; updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, materials:[...(c.materials || []), item]} : c)})); };
 
-const addCalEntry = (entry) => { setCalendarEntries(prev => [entry, ...prev]); setCalEntryDate(null); };
-const deleteCalEntry = (id) => setCalendarEntries(prev => prev.filter(e => e.id !== id));
+const saveBooking = (entry) => {
+setCalendarEntries(prev => {
+const list = prev || [];
+const idx = list.findIndex(e => e.id === entry.id);
+if(idx >= 0) { const n = [...list]; n[idx] = entry; return n; }
+return [entry, ...list];
+});
+setBookingModal(null);
+};
+const deleteBooking = (id) => setCalendarEntries(prev => (prev || []).filter(e => e.id !== id));
 
 const selectChannel = (id) => { setActiveId(id); setActiveThreadId('info'); };
+const handleMentionClick = (id) => selectChannel(id);
 
-const handleMentionClick = (id) => { selectChannel(id); };
-
-// Thread list — custom threads shown FIRST, then defaults
-const allThreads = channel && channel.type === 'job'
-? [...(channel.customThreads || []), ...DEFAULT_THREADS]
-: [];
+const allThreads = channel && channel.type === 'job' ? [...(channel.customThreads || []), ...DEFAULT_THREADS] : [];
 const currentThread = allThreads.find(t => t.id === activeThreadId) || allThreads[0];
-
 const channelsByCat = (catId) => d.channels.filter(c => c.categoryId === catId);
 const currentCategory = channel ? d.categories.find(c => c.id === channel.categoryId) : null;
+const channelColor = channel && channel.type === 'job' && channel.colorId && channel.status !== 'done' ? getColor(channel.colorId) : null;
 
 return (
 <div style={s.app}>
 <div style={s.sidebar}>
 <div style={s.serverHeader}>
 <div style={s.serverIcon}>RAL</div>
-<div style={s.serverMeta}>
-<div style={s.serverSmallCap}>Server</div>
-<div style={s.serverName}>RAL</div>
+<div style={s.serverMeta}><div style={s.serverSmallCap}>Server</div><div style={s.serverName}>RAL</div></div>
+<button style={s.themeToggle} onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}>{theme === 'light' ? '🌙' : '☀️'}</button>
 </div>
-<button style={s.themeToggle} onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')} title="Toggle theme">
-{theme === 'light' ? '🌙' : '☀️'}
-</button>
-</div>
-
 <div style={s.actionBar}>
 <button style={s.actionBtn} onClick={() => { setEditingJob(null); setJobTargetCategory('cat-run'); setShowJobWizard(true); }}>+ NEW PROJECT</button>
 <button style={s.actionBtn} onClick={() => { setEditingCategory(null); setShowCategoryModal(true); }}>+ CATEGORY</button>
 </div>
-
 <div style={s.projList}>
 {d.categories.map(cat => (
 <CategoryBlock key={cat.id} category={cat} channels={channelsByCat(cat.id)}
-activeId={activeId} onSelect={selectChannel}
-onAddChannel={(c) => {
-if(c.system === 'running') { setEditingJob(null); setJobTargetCategory(c.id); setShowJobWizard(true); }
-else { setShowTypePicker({category: c}); }
-}}
+activeId={activeId} onSelect={selectChannel} getColor={getColor}
+onAddChannel={(c) => { if(c.system === 'running') { setEditingJob(null); setJobTargetCategory(c.id); setShowJobWizard(true); } else { setShowTypePicker({category: c}); } }}
 onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}/>
 ))}
 </div>
@@ -1650,47 +1389,31 @@ onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}/>
 
 <div style={s.main}>
 {!channel
-? <div style={{...s.empty,height:'100%'}}>
-<span style={s.emptyIcon}>🏗️</span>
-<span style={s.emptyText}>Select or create a channel</span>
-<button style={s.primaryBtn} onClick={() => { setEditingJob(null); setJobTargetCategory('cat-run'); setShowJobWizard(true); }}>+ New project</button>
-</div>
+? <div style={{...s.empty,height:'100%'}}><span style={s.emptyIcon}>🏗️</span><span style={s.emptyText}>Select or create a channel</span><button style={s.primaryBtn} onClick={() => { setEditingJob(null); setJobTargetCategory('cat-run'); setShowJobWizard(true); }}>+ New project</button></div>
 : <>
 <div style={s.header}>
 <div style={s.headerTitleWrap}>
-<div style={s.headerKicker}>
-{currentCategory ? `${currentCategory.emoji} ${currentCategory.name}` : ''}
-{channel.status === 'done' && ' · done'}
-</div>
+<div style={s.headerKicker}>{currentCategory ? `${currentCategory.emoji} ${currentCategory.name}` : ''}{channel.status === 'done' && ' · done'}</div>
 <div style={s.headerTitle}>
+{channelColor && <span style={{...s.headerColorDot, background:channelColor.bar}}/>}
 {(channel.type === 'plain' || channel.type === 'materials' || channel.type === 'calendar' || channel.type === 'incidents-bin') ? '#' + channel.name : channel.name}
 </div>
 <div style={s.headerMeta}>
 {channel.type === 'job' ? `${channel.address || 'No address'} · Started ${formatDate(channel.startDate)}` :
 channel.type === 'materials' ? 'Materials list' :
-channel.type === 'calendar' ? 'Calendar' :
+channel.type === 'calendar' ? 'Work calendar — bookings & crew scheduling' :
 channel.type === 'incidents-bin' ? 'All ' + channel.name + ' reports across projects' :
-'Plain channel'
-}
+'Plain channel'}
 </div>
 </div>
 <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
-{channel.type === 'job' && channel.whatsapp && (
-<a href={channel.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>💬 Chat</a>
-)}
-{channel.type === 'job' && (
-<>
+{channel.type === 'job' && channel.whatsapp && (<a href={channel.whatsapp} target="_blank" rel="noreferrer" style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>💬 Chat</a>)}
+{channel.type === 'job' && (<>
 <button style={{...s.badge,...s.badgePrimary}} onClick={() => setShowShare(true)}>↗ Share</button>
-<button style={{...s.badge,...s.badgeGhost}} onClick={() => toggleStatus(channel.id)}>
-{channel.status === 'done' ? '↻ Re-open' : '✓ Done'}
-</button>
+<button style={{...s.badge,...s.badgeGhost}} onClick={() => toggleStatus(channel.id)}>{channel.status === 'done' ? '↻ Re-open' : '✓ Done'}</button>
 <button style={{...s.badge,...s.badgeGhost}} onClick={() => { setEditingJob(channel); setShowJobWizard(true); }}>✏ Edit</button>
-</>
-)}
-{channel.type !== 'incidents-bin' && (
-<button style={{...s.badge,...s.badgeGhost}} onClick={() => deleteChannel(channel.id)}>🗑</button>
-)}
+</>)}
+{channel.type !== 'incidents-bin' && (<button style={{...s.badge,...s.badgeGhost}} onClick={() => deleteChannel(channel.id)}>🗑</button>)}
 </div>
 </div>
 
@@ -1698,69 +1421,42 @@ style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>💬 Chat</a>
 <div style={s.threadBar}>
 <button style={s.threadAdd} onClick={() => setShowAddThread(true)} title="Add custom thread">+</button>
 {(channel.customThreads || []).length > 0 && <div style={s.threadDivider}/>}
-{allThreads.map(t => (
-<button key={t.id}
-style={{...s.threadBtn, ...(activeThreadId===t.id ? s.threadBtnActive : {})}}
-onClick={() => setActiveThreadId(t.id)}>
-<span>{t.icon}</span>
-<span>{t.label}</span>
-{!t.fixed && activeThreadId===t.id && (
-<span style={s.threadRemove} onClick={(e) => { e.stopPropagation(); removeCustomThread(t.id); }}>×</span>
-)}
-</button>
-))}
+{allThreads.map(t => (<button key={t.id} style={{...s.threadBtn, ...(activeThreadId===t.id ? s.threadBtnActive : {})}} onClick={() => setActiveThreadId(t.id)}>
+<span>{t.icon}</span><span>{t.label}</span>
+{!t.fixed && activeThreadId===t.id && (<span style={s.threadRemove} onClick={(e) => { e.stopPropagation(); removeCustomThread(t.id); }}>×</span>)}
+</button>))}
 </div>
 )}
 
 <div style={s.content}>
-<ThreadView
-channel={channel} thread={currentThread}
-notes={notes} setNotes={setNotes}
+<ThreadView channel={channel} thread={currentThread} notes={notes} setNotes={setNotes}
 allChannels={d.channels} incidents={incidents}
-onIncidentSubmit={() => setShowIncidentForm(true)}
-onIncidentDelete={deleteIncident}
-onMentionClick={handleMentionClick}
-onJumpToProject={selectChannel}
-onUpdateMaterials={updateMaterials}
-onAddMaterial={() => setShowAddMaterial(true)}
-calendarEntries={calendarEntries}
-onAddCalEntry={(date) => setCalEntryDate(date)}
-onDeleteCalEntry={deleteCalEntry}
-getCategory={getCategory}
-/>
+onIncidentSubmit={() => setShowIncidentForm(true)} onIncidentDelete={deleteIncident}
+onMentionClick={handleMentionClick} onJumpToProject={selectChannel}
+onUpdateMaterials={updateMaterials} onAddMaterial={() => setShowAddMaterial(true)}
+calendarEntries={calendarEntries || []}
+onNewBooking={(date) => setBookingModal({defaultDate: date})}
+onEditBooking={(entry) => setBookingModal({editing: entry})}
+onDeleteBooking={deleteBooking}
+getCategory={getCategory} allJobs={allJobs}/>
 </div>
-</>
-}
+</>}
 </div>
 
-{showJobWizard && (
-<JobWizard onClose={() => setShowJobWizard(false)} onSave={saveJob} editing={editingJob}/>
-)}
-{showShare && channel && channel.type === 'job' && (
-<ShareModal channel={channel} onClose={() => setShowShare(false)}/>
-)}
-{showCategoryModal && (
-<CategoryModal onClose={() => { setShowCategoryModal(false); setEditingCategory(null); }} onSave={saveCategory} editing={editingCategory}/>
-)}
-{showTypePicker && (
-<ChannelTypePicker
-onClose={() => setShowTypePicker(null)}
-categoryName={showTypePicker.category.name}
+{showJobWizard && (<JobWizard onClose={() => setShowJobWizard(false)} onSave={saveJob} editing={editingJob}/>)}
+{showShare && channel && channel.type === 'job' && (<ShareModal channel={channel} onClose={() => setShowShare(false)}/>)}
+{showCategoryModal && (<CategoryModal onClose={() => { setShowCategoryModal(false); setEditingCategory(null); }} onSave={saveCategory} editing={editingCategory}/>)}
+{showTypePicker && (<ChannelTypePicker onClose={() => setShowTypePicker(null)} categoryName={showTypePicker.category.name}
 onPickJob={() => { setJobTargetCategory(showTypePicker.category.id); setEditingJob(null); setShowTypePicker(null); setShowJobWizard(true); }}
 onPickPlain={(name) => createPlainChannel(showTypePicker.category.id, name)}
 onPickMaterials={(name) => createMaterialsChannel(showTypePicker.category.id, name)}
-onPickCalendar={(name) => createCalendarChannel(showTypePicker.category.id, name)}
-/>
-)}
+onPickCalendar={(name) => createCalendarChannel(showTypePicker.category.id, name)}/>)}
 {showAddThread && <AddThreadModal onClose={() => setShowAddThread(false)} onSave={addCustomThread}/>}
-{showIncidentForm && channel && channel.type === 'job' && (
-<IncidentFormModal onClose={() => setShowIncidentForm(false)} onSave={submitIncident} project={channel}/>
-)}
+{showIncidentForm && channel && channel.type === 'job' && (<IncidentFormModal onClose={() => setShowIncidentForm(false)} onSave={submitIncident} project={channel}/>)}
 {showAddMaterial && <AddMaterialModal onClose={() => setShowAddMaterial(false)} onSave={addMaterial}/>}
-{calEntryDate && (
-<CalendarEntryModal onClose={() => setCalEntryDate(null)} onSave={addCalEntry}
-date={calEntryDate} jobChannels={d.channels.filter(c => c.type === 'job')}/>
-)}
+{bookingModal && (<CalendarBookingModal onClose={() => setBookingModal(null)} onSave={saveBooking}
+jobChannels={allJobs.filter(j => j.status !== 'done')} allChannels={d.channels} getCategory={getCategory}
+editing={bookingModal.editing} defaultDate={bookingModal.defaultDate}/>)}
 </div>
 );
 }
