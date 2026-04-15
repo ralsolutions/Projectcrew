@@ -10,93 +10,48 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* ── DESIGN TOKENS ─────────────────────────────────────────────────── */
 :root[data-theme="light"] {
-  --bg:            #f6f8fa;
-  --bg-panel:      #ffffff;
-  --bg-raised:    #f1f4f7;
-  --bg-sunken:    #eef1f5;
-  --bg-input:      #ffffff;
-  --border:        #e3e8ef;
-  --border-strong: #d0d7de;
-  --text:          #0f1e2e;
-  --text-muted:    #5a6573;
-  --text-dim:      #8b95a3;
-  --text-faint:    #b4bcc7;
-  --accent:        #0891b2;      /* cyan-600 — quick survey bright teal */
-  --accent-hover:  #0e7490;
-  --accent-bg:     #cffafe;
-  --accent-text:   #0e7490;
-  --accent-2:      #4f46e5;      /* indigo-600 */
-  --accent-2-bg:   #e0e7ff;
-  --success:       #059669;
-  --success-bg:    #d1fae5;
-  --warn:          #d97706;
-  --danger:        #dc2626;
-  --shadow-sm:     0 1px 2px rgba(15,30,46,0.04);
-  --shadow-md:     0 2px 8px rgba(15,30,46,0.06);
-  --shadow-lg:     0 8px 24px rgba(15,30,46,0.10);
+  --bg: #f6f8fa; --bg-panel:#fff; --bg-raised:#f1f4f7; --bg-sunken:#eef1f5; --bg-input:#fff;
+  --border:#e3e8ef; --border-strong:#d0d7de;
+  --text:#0f1e2e; --text-muted:#5a6573; --text-dim:#8b95a3; --text-faint:#b4bcc7;
+  --accent:#0891b2; --accent-hover:#0e7490; --accent-bg:#cffafe; --accent-text:#0e7490;
+  --accent-2:#4f46e5; --accent-2-bg:#e0e7ff;
+  --success:#059669; --success-bg:#d1fae5;
+  --warn:#d97706; --warn-bg:#fef3c7;
+  --danger:#dc2626; --danger-bg:#fee2e2;
+  --shadow-sm:0 1px 2px rgba(15,30,46,0.04);
+  --shadow-md:0 2px 8px rgba(15,30,46,0.06);
+  --shadow-lg:0 8px 24px rgba(15,30,46,0.10);
 }
-
 :root[data-theme="dark"] {
-  --bg:            #0a1520;       /* deep navy-teal (not pure black) */
-  --bg-panel:      #0f1e2e;
-  --bg-raised:    #142838;
-  --bg-sunken:    #091420;
-  --bg-input:      #0a1826;
-  --border:        #1e3448;
-  --border-strong: #2a4a62;
-  --text:          #e6eef7;
-  --text-muted:    #8a9cb0;
-  --text-dim:      #5a6f85;
-  --text-faint:    #3d5168;
-  --accent:        #22d3ee;      /* cyan-400 — bright teal from screenshot */
-  --accent-hover:  #67e8f9;
-  --accent-bg:     #083344;
-  --accent-text:   #67e8f9;
-  --accent-2:      #818cf8;      /* indigo-400 */
-  --accent-2-bg:   #1e1b4b;
-  --success:       #34d399;
-  --success-bg:    #064e3b;
-  --warn:          #fbbf24;
-  --danger:        #f87171;
-  --shadow-sm:     0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md:     0 2px 8px rgba(0,0,0,0.4);
-  --shadow-lg:     0 8px 24px rgba(0,0,0,0.5);
+  --bg:#0a1520; --bg-panel:#0f1e2e; --bg-raised:#142838; --bg-sunken:#091420; --bg-input:#0a1826;
+  --border:#1e3448; --border-strong:#2a4a62;
+  --text:#e6eef7; --text-muted:#8a9cb0; --text-dim:#5a6f85; --text-faint:#3d5168;
+  --accent:#22d3ee; --accent-hover:#67e8f9; --accent-bg:#083344; --accent-text:#67e8f9;
+  --accent-2:#818cf8; --accent-2-bg:#1e1b4b;
+  --success:#34d399; --success-bg:#064e3b;
+  --warn:#fbbf24; --warn-bg:#451a03;
+  --danger:#f87171; --danger-bg:#450a0a;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.5);
 }
-
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
-body{
-  font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  transition:background 0.2s,color 0.2s;
-  -webkit-font-smoothing:antialiased;
-}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.2s,color 0.2s;-webkit-font-smoothing:antialiased;}
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px;}
-::-webkit-scrollbar-thumb:hover{background:var(--text-dim);}
 input,textarea,select,button{font-family:'Inter',sans-serif;}
-input:focus,textarea:focus{border-color:var(--accent)!important;}
-
-/* Small-caps label style used everywhere */
-.label-caps{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  font-weight:600;
-  color:var(--text-dim);
-  text-transform:uppercase;
-  letter-spacing:0.12em;
-}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;}
+.mention{color:var(--accent);background:var(--accent-bg);padding:1px 6px;border-radius:4px;font-weight:600;cursor:pointer;text-decoration:none;font-size:0.95em;}
+.mention:hover{background:var(--accent);color:#fff;}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useRef} = React;
+const {useState,useEffect,useRef,useMemo} = React;
 
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
 const DEFAULT_THREADS = [
@@ -109,6 +64,8 @@ const DEFAULT_THREADS = [
 ];
 
 const RAMS_URL = 'https://lionelagilecoach-rgb.github.io/Ral-rams/Rams/';
+const SURVEY_URL = 'https://ralsolutions.github.io/Survey/';
+const FAKE_WA = 'https://chat.whatsapp.com/example-';
 
 const INFO_FIELDS = [
 {key:'address',        emoji:'🏢', label:'Address'},
@@ -124,13 +81,18 @@ const INFO_FIELDS = [
 
 const EMOJI_GRID = ['📁','📂','🏗️','🏢','🏙️','🛠️','🔧','🧰','⚙️','🦺','🪢','🧗','🚧','⚠️','🛡️','📋','📌','🗂️','📊','📈','💼','💬','📣','🗣️','🎯','⭐','🔥','✅','❌','🔒','🔓','🔑','🌏','🌐','🇳🇿','🇦🇺','⏰','📅','🧪','🔬'];
 
-// ── STYLES (using CSS vars) ──────────────────────────────────────────────────
+const INCIDENT_TYPES = [
+{id:'near-miss', label:'Near miss', emoji:'⚡', color:'var(--warn)', bg:'var(--warn-bg)'},
+{id:'incident',  label:'Incident',  emoji:'⚠️', color:'var(--accent)', bg:'var(--accent-bg)'},
+{id:'accident',  label:'Accident',  emoji:'🚨', color:'var(--danger)', bg:'var(--danger-bg)'},
+];
+
+// ── STYLES ──────────────────────────────────────────────────────────────────
 const s = {
 app: {display:'flex',height:'100vh',overflow:'hidden',background:'var(--bg)'},
 sidebar: {width:264,background:'var(--bg-panel)',borderRight:'1px solid var(--border)',display:'flex',flexDirection:'column',flexShrink:0},
 main: {flex:1,display:'flex',flexDirection:'column',overflow:'hidden',background:'var(--bg)'},
 
-// Server header (Quick Survey style — compact badge + title)
 serverHeader: {padding:'14px 14px 12px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:10},
 serverIcon: {width:36,height:36,borderRadius:8,background:'linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',letterSpacing:0.5,flexShrink:0,boxShadow:'var(--shadow-sm)'},
 serverMeta: {flex:1,minWidth:0},
@@ -138,13 +100,11 @@ serverSmallCap: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:6
 serverName: {fontSize:14,fontWeight:700,color:'var(--text)',letterSpacing:0.2,marginTop:1},
 themeToggle: {width:28,height:28,borderRadius:6,border:'1px solid var(--border)',background:'var(--bg-raised)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0,color:'var(--text-muted)'},
 
-// Action bar
 actionBar: {padding:'10px 12px 8px',display:'flex',gap:6},
 actionBtn: {flex:1,padding:'8px 8px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',letterSpacing:0.2,transition:'all 0.12s'},
 
 projList: {flex:1,overflowY:'auto',padding:'4px 8px 12px'},
 
-// Category
 catWrap: {marginBottom:6},
 catHeader: {display:'flex',alignItems:'center',gap:6,padding:'9px 8px 6px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.12,cursor:'pointer',userSelect:'none',borderRadius:4},
 catCaret: {fontSize:8,color:'var(--text-faint)',transition:'transform 0.15s',display:'inline-block',width:8},
@@ -153,7 +113,6 @@ catLabel: {flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}
 catCount: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',background:'var(--bg-raised)',padding:'2px 6px',borderRadius:10,fontWeight:600},
 catAddBtn: {background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:13,padding:'0 4px',opacity:0.8,fontWeight:600},
 
-// Channel item
 chanItem: {display:'flex',alignItems:'center',gap:8,padding:'7px 10px 7px 18px',borderRadius:6,cursor:'pointer',marginBottom:2,transition:'all 0.1s'},
 chanItemActive: {background:'var(--accent-bg)',boxShadow:'inset 2px 0 0 var(--accent)'},
 chanItemDone: {opacity:0.5},
@@ -163,7 +122,6 @@ chanNameActive: {color:'var(--accent-text)',fontWeight:600},
 
 emptyCat: {fontSize:10,color:'var(--text-faint)',padding:'4px 18px',fontStyle:'italic'},
 
-// Header
 header: {padding:'14px 24px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',background:'var(--bg-panel)',gap:12,flexWrap:'wrap'},
 headerTitleWrap:{minWidth:0,flex:1},
 headerKicker: {fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
@@ -174,18 +132,16 @@ badge: {display:'inline-flex',alignItems:'center',gap:5,padding:'5px 11px',borde
 badgeGhost:{background:'var(--bg-raised)',color:'var(--text-muted)',border:'1px solid var(--border)',cursor:'pointer'},
 badgePrimary:{background:'var(--accent-bg)',color:'var(--accent-text)',border:'1px solid var(--accent)',cursor:'pointer'},
 badgeSuccess:{background:'var(--success-bg)',color:'var(--success)',border:'1px solid var(--success)'},
-badgeDone:{background:'var(--bg-raised)',color:'var(--text-dim)',border:'1px solid var(--border)'},
 
-// Threads
 threadBar: {display:'flex',gap:4,padding:'10px 24px',borderBottom:'1px solid var(--border)',background:'var(--bg-panel)',overflowX:'auto',alignItems:'center'},
-threadBtn: {padding:'7px 13px',borderRadius:6,border:'1px solid var(--border)',fontSize:12,fontWeight:500,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.12s',background:'transparent',color:'var(--text-muted)',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'Inter',sans-serif"},
+threadBtn: {padding:'7px 13px',borderRadius:6,border:'1px solid var(--border)',fontSize:12,fontWeight:500,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.12s',background:'transparent',color:'var(--text-muted)',display:'inline-flex',alignItems:'center',gap:6},
 threadBtnActive: {background:'var(--accent)',border:'1px solid var(--accent)',color:'#fff',fontWeight:600,boxShadow:'var(--shadow-sm)'},
-threadAdd: {padding:'7px 11px',borderRadius:6,border:'1px dashed var(--border-strong)',background:'transparent',color:'var(--text-dim)',fontSize:13,cursor:'pointer',fontWeight:700,flexShrink:0},
+threadAdd: {padding:'7px 11px',borderRadius:6,border:'1px dashed var(--border-strong)',background:'transparent',color:'var(--text-dim)',fontSize:13,cursor:'pointer',fontWeight:700,flexShrink:0,marginRight:6},
+threadDivider: {width:1,height:18,background:'var(--border)',margin:'0 4px',flexShrink:0},
 threadRemove: {marginLeft:3,background:'none',border:'none',color:'currentColor',cursor:'pointer',fontSize:14,padding:0,opacity:0.8,lineHeight:1},
 
 content: {flex:1,overflowY:'auto',padding:'24px'},
 
-// Info tab
 infoList: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'22px 26px',maxWidth:820,boxShadow:'var(--shadow-sm)'},
 infoLine: {display:'flex',gap:10,padding:'8px 0',fontSize:14,lineHeight:1.55,alignItems:'flex-start'},
 infoEmoji: {fontSize:17,flexShrink:0,width:24},
@@ -195,18 +151,24 @@ infoEmpty: {color:'var(--text-faint)',marginLeft:4,fontStyle:'italic'},
 infoLinksRow: {display:'flex',gap:10,marginTop:20,flexWrap:'wrap',paddingTop:18,borderTop:'1px solid var(--border)'},
 infoLinkBtn: {padding:'10px 16px',borderRadius:8,fontSize:12,fontWeight:700,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3,border:'1px solid'},
 
-// Notes
+noteInputWrap:{position:'relative'},
 noteInput: {width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:8,padding:'12px 14px',color:'var(--text)',fontSize:14,resize:'none',outline:'none',marginBottom:10,lineHeight:1.6},
 sendBtn: {padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
 note: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,padding:'13px 16px',marginBottom:8,boxShadow:'var(--shadow-sm)'},
 noteText: {fontSize:14,color:'var(--text)',lineHeight:1.55,whiteSpace:'pre-wrap'},
 noteMeta: {fontSize:10,color:'var(--text-dim)',marginTop:8,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.1},
 
+// Mention dropdown
+mentionDrop:{position:'absolute',background:'var(--bg-panel)',border:'1px solid var(--border-strong)',borderRadius:8,boxShadow:'var(--shadow-lg)',padding:4,maxHeight:240,overflowY:'auto',width:280,zIndex:50},
+mentionItem:{padding:'8px 10px',borderRadius:6,cursor:'pointer',display:'flex',alignItems:'center',gap:8,fontSize:13,color:'var(--text)'},
+mentionItemActive:{background:'var(--accent-bg)',color:'var(--accent-text)'},
+mentionItemHash:{fontFamily:"'JetBrains Mono',monospace",color:'var(--text-faint)',fontSize:12},
+mentionItemMeta:{marginLeft:'auto',fontSize:9,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14},
+
 empty: {display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:12,color:'var(--text-faint)'},
 emptyIcon: {fontSize:44,opacity:0.5},
 emptyText: {fontSize:13,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14},
 
-// Modal
 overlay: {position:'fixed',inset:0,background:'rgba(10,21,32,0.72)',backdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100,padding:20},
 modal: {background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:12,width:'100%',maxWidth:540,maxHeight:'90vh',overflowY:'auto',boxShadow:'var(--shadow-lg)'},
 modalSm: {maxWidth:420},
@@ -218,29 +180,26 @@ modalFooter: {padding:'14px 22px',borderTop:'1px solid var(--border)',display:'f
 closeBtn: {background:'none',border:'none',color:'var(--text-dim)',fontSize:22,cursor:'pointer',lineHeight:1},
 label: {fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.14},
 input: {width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',color:'var(--text)',fontSize:14,outline:'none',marginBottom:16,transition:'border-color 0.15s'},
+textarea:{width:'100%',background:'var(--bg-input)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',color:'var(--text)',fontSize:14,outline:'none',marginBottom:16,resize:'vertical',minHeight:80,lineHeight:1.55,fontFamily:"'Inter',sans-serif"},
 row2: {display:'grid',gridTemplateColumns:'1fr 1fr',gap:12},
 cancelBtn: {padding:'9px 18px',background:'transparent',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:12,cursor:'pointer',fontWeight:600,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
 primaryBtn: {padding:'9px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:7,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
 stepDot: {width:8,height:8,borderRadius:'50%',display:'inline-block',marginRight:4},
 
-// Emoji picker
 emojiGrid: {display:'grid',gridTemplateColumns:'repeat(10,1fr)',gap:4,marginBottom:12},
 emojiCell: {aspectRatio:'1',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,fontSize:17,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.1s'},
 emojiCellActive: {background:'var(--accent-bg)',border:'1px solid var(--accent)'},
 
-// Channel type picker
-typeRow: {display:'flex',gap:10,marginBottom:8},
-typeCard: {flex:1,padding:'16px',border:'1px solid var(--border)',borderRadius:10,cursor:'pointer',background:'var(--bg-raised)',transition:'all 0.1s'},
+typeRow: {display:'flex',gap:10,marginBottom:8,flexWrap:'wrap'},
+typeCard: {flex:'1 1 130px',padding:'14px',border:'1px solid var(--border)',borderRadius:10,cursor:'pointer',background:'var(--bg-raised)',transition:'all 0.1s'},
 typeIcon: {fontSize:22,marginBottom:6},
 typeTitle: {fontSize:13,fontWeight:700,color:'var(--text)',marginBottom:3},
 typeDesc: {fontSize:11,color:'var(--text-dim)',lineHeight:1.4},
 
-// Share
 sharePreview: {background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:8,padding:'14px 16px',fontSize:12,color:'var(--text)',lineHeight:1.7,whiteSpace:'pre-wrap',fontFamily:"'JetBrains Mono',monospace",maxHeight:280,overflowY:'auto',marginBottom:12},
 copyBtn: {padding:'8px 13px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:7,color:'var(--text-muted)',fontSize:11,fontWeight:600,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2},
 linkBox: {background:'var(--bg-sunken)',border:'1px solid var(--border)',borderRadius:7,padding:'10px 12px',fontSize:10,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace",wordBreak:'break-all',marginBottom:8,maxHeight:80,overflowY:'auto'},
 
-// Shared view
 sharedWrap: {minHeight:'100vh',background:'var(--bg)',padding:'40px 20px',display:'flex',justifyContent:'center'},
 sharedCard: {width:'100%',maxWidth:680,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:14,overflow:'hidden',boxShadow:'var(--shadow-lg)'},
 sharedHeader: {padding:'28px 32px 22px',borderBottom:'1px solid var(--border)'},
@@ -248,6 +207,42 @@ sharedBadge: {display:'inline-block',padding:'4px 10px',background:'var(--accent
 sharedTitle: {fontSize:24,fontWeight:700,color:'var(--text)',marginBottom:6,letterSpacing:-0.3},
 sharedSub: {fontSize:13,color:'var(--text-dim)'},
 sharedSection: {padding:'24px 32px',borderBottom:'1px solid var(--border)'},
+
+// Incident form
+incidentTypePicker:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:16},
+incidentTypeBtn:{padding:'14px 10px',border:'1px solid var(--border)',borderRadius:8,background:'var(--bg-raised)',cursor:'pointer',textAlign:'center',transition:'all 0.12s'},
+incidentTypeBtnActive:{borderWidth:2,padding:'13px 9px'},
+incidentTypeEmoji:{fontSize:22,marginBottom:4},
+incidentTypeLabel:{fontSize:11,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2,color:'var(--text)'},
+
+// Incident card
+incidentCard:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'16px 18px',marginBottom:10,boxShadow:'var(--shadow-sm)'},
+incidentHead:{display:'flex',alignItems:'center',gap:8,marginBottom:10,flexWrap:'wrap'},
+incidentBadge:{display:'inline-flex',alignItems:'center',gap:5,padding:'3px 9px',borderRadius:5,fontSize:10,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2,border:'1px solid'},
+incidentDate:{fontSize:11,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace"},
+incidentJob:{fontSize:11,color:'var(--text-muted)',fontWeight:600,marginLeft:'auto'},
+incidentSection:{marginTop:8},
+incidentSectionLabel:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
+incidentSectionText:{fontSize:13,color:'var(--text)',lineHeight:1.5,whiteSpace:'pre-wrap'},
+
+// Materials
+matRow:{display:'flex',gap:10,padding:'10px 14px',background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,marginBottom:6,alignItems:'center',boxShadow:'var(--shadow-sm)'},
+matCheck:{width:18,height:18,flexShrink:0,cursor:'pointer',accentColor:'var(--accent)'},
+matName:{flex:1,fontSize:14,color:'var(--text)'},
+matNameDone:{textDecoration:'line-through',color:'var(--text-dim)'},
+matQty:{fontSize:11,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",padding:'2px 8px',background:'var(--bg-raised)',borderRadius:10},
+
+// Calendar
+calGrid:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:4,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:8},
+calHeadCell:{padding:'8px 6px',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,borderBottom:'1px solid var(--border)'},
+calCell:{minHeight:96,padding:8,background:'var(--bg-raised)',borderRadius:6,cursor:'pointer',display:'flex',flexDirection:'column',gap:4,transition:'all 0.1s',border:'1px solid transparent'},
+calCellToday:{borderColor:'var(--accent)'},
+calCellOther:{opacity:0.4},
+calDay:{fontSize:12,fontWeight:600,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace"},
+calEntry:{fontSize:10,padding:'2px 5px',background:'var(--accent-bg)',color:'var(--accent-text)',borderRadius:3,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',cursor:'pointer'},
+calNav:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12},
+calMonth:{fontSize:16,fontWeight:700,color:'var(--text)'},
+calNavBtn:{padding:'6px 12px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text-muted)',cursor:'pointer',fontSize:14,fontWeight:600},
 };
 
 // ── HOOKS ───────────────────────────────────────────────────────────────────
@@ -274,41 +269,26 @@ function formatDate(iso) {
 if(!iso) return '—';
 return new Date(iso).toLocaleDateString('en-NZ', {day:'numeric',month:'short',year:'numeric'});
 }
-
 function formatTime(iso) {
 if(!iso) return '';
 return new Date(iso).toLocaleString('en-NZ', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 }
+function todayISO(){ const d = new Date(); return d.toISOString().slice(0,10); }
 
 // ── ENCODE/DECODE ───────────────────────────────────────────────────────────
 function encodeObj(p) {
-try {
-const json = JSON.stringify(p);
-const b64 = btoa(unescape(encodeURIComponent(json)));
-return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-} catch { return ''; }
+try { const json = JSON.stringify(p); const b64 = btoa(unescape(encodeURIComponent(json))); return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); } catch { return ''; }
 }
-
 function decodeObj(str) {
-try {
-let b64 = str.replace(/-/g,'+').replace(/_/g,'/');
-while(b64.length % 4) b64 += '=';
-const json = decodeURIComponent(escape(atob(b64)));
-return JSON.parse(json);
-} catch { return null; }
+try { let b64 = str.replace(/-/g,'+').replace(/_/g,'/'); while(b64.length % 4) b64 += '='; const json = decodeURIComponent(escape(atob(b64))); return JSON.parse(json); } catch { return null; }
 }
-
 function buildShareUrl(channel) {
 const base = window.location.origin + window.location.pathname;
 return `${base}#p=${encodeObj(channel)}`;
 }
-
 function buildWhatsAppMessage(ch) {
 const lines = [`📋 *${ch.name}*`, ''];
-INFO_FIELDS.forEach(f => {
-const val = ch[f.key];
-if(val) lines.push(`${f.emoji} *${f.label}:* ${val}`);
-});
+INFO_FIELDS.forEach(f => { const val = ch[f.key]; if(val) lines.push(`${f.emoji} *${f.label}:* ${val}`); });
 if(ch.clientMobile) lines.push(`📱 *Client mobile:* ${ch.clientMobile}`);
 if(ch.startDate) lines.push(`📅 *Start date:* ${formatDate(ch.startDate)}`);
 lines.push('');
@@ -317,28 +297,47 @@ if(ch.surveyLink) lines.push('🔍 *Quick Survey:* ' + ch.surveyLink);
 return lines.join('\n');
 }
 
+// Mention slug from a channel name
+function slugify(name){ return name.toLowerCase().replace(/[^\w]+/g,'-').replace(/^-|-$/g,''); }
+
+// Render text with #mentions converted to clickable spans
+function renderWithMentions(text, channels, onMentionClick) {
+if(!text) return null;
+const parts = text.split(/(#[\w-]+)/g);
+return parts.map((part, i) => {
+if(part.startsWith('#')) {
+const slug = part.slice(1).toLowerCase();
+const ch = channels.find(c => slugify(c.name) === slug);
+if(ch) {
+return <a key={i} className="mention" onClick={(e) => { e.preventDefault(); onMentionClick(ch.id); }}>{part}</a>;
+}
+}
+return part;
+});
+}
+
 // ── SEED DATA ───────────────────────────────────────────────────────────────
 function seedData() {
 const now = Date.now();
-const jobDefaults = (name, extra) => ({
-id: 'seed-' + name.toLowerCase().replace(/\s+/g,'-').replace(/[^\w-]/g,''),
-type: 'job',
-name,
-status: 'running',
-customThreads: [],
-createdAt: new Date(now).toISOString(),
+const job = (slug, extra) => ({
+id:'seed-'+slug, type:'job', status:'running',
+customThreads:[], createdAt: new Date(now).toISOString(),
+whatsapp: FAKE_WA + slug, surveyLink: SURVEY_URL,
 ...extra
 });
 
 return {
 categories: [
-{id:'cat-run',   name:'Projects on Run', emoji:'🚧', system:'running', collapsed:false},
-{id:'cat-done',  name:'Done',            emoji:'✅', system:'done',    collapsed:true},
-{id:'cat-general',name:'General',        emoji:'💬', system:null,      collapsed:false},
+{id:'cat-run',     name:'Projects on Run',  emoji:'🚧', system:'running',  collapsed:false},
+{id:'cat-done',    name:'Done',             emoji:'✅', system:'done',     collapsed:true},
+{id:'cat-incidents',name:'Incident Reports',emoji:'⚠️', system:'incidents',collapsed:false},
+{id:'cat-tools',   name:'Tools & Materials',emoji:'🧰', system:null,       collapsed:false},
+{id:'cat-crew',    name:'Crew',             emoji:'👥', system:null,       collapsed:false},
 ],
 channels: [
-{...jobDefaults('80 Queen Street', {
-categoryId:'cat-run',
+// Job channels
+{...job('80-queen-street', {
+name:'80 Queen Street', categoryId:'cat-run',
 address:'80 Queen St, Auckland CBD',
 parking:'No parking on site — use Victoria St carpark',
 assemblingPoint:'Ground floor lobby',
@@ -346,89 +345,168 @@ toilet:'Level 2 bathrooms',
 keyLocation:'Reception desk, ask for building manager',
 firstAid:'Site office level 1',
 lunchroom:'Café next door or level 1 breakroom',
-clientName:'Tony Martinez',
-clientMobile:'+64 21 555 0101',
-teamLeader:'Felipe',
-whatsapp:'https://chat.whatsapp.com/example-80queen',
-surveyLink:'https://ralsolutions.github.io/Survey/',
-startDate:'2026-04-12',
+clientName:'Tony Martinez', clientMobile:'+64 21 555 0101',
+teamLeader:'Felipe', startDate:'2026-04-12',
 })},
-{...jobDefaults('Sky Tower — Facade Clean', {
-categoryId:'cat-run',
+{...job('sky-tower-facade-clean', {
+name:'Sky Tower — Facade Clean', categoryId:'cat-run',
 address:'Victoria St W, Auckland CBD',
 parking:'Loading bay access only — book 24h ahead',
 assemblingPoint:'Sky Tower service entrance',
 toilet:'Ground floor staff amenities',
 keyLocation:'Security desk — sign in required',
-firstAid:'Security office',
-lunchroom:'SkyCity food court',
-clientName:'Sarah Chen',
-clientMobile:'+64 27 555 0202',
-teamLeader:'Lionel',
-whatsapp:'https://chat.whatsapp.com/example-skytower',
-surveyLink:'https://ralsolutions.github.io/Survey/',
-startDate:'2026-04-14',
+firstAid:'Security office', lunchroom:'SkyCity food court',
+clientName:'Sarah Chen', clientMobile:'+64 27 555 0202',
+teamLeader:'Lionel', startDate:'2026-04-14',
 })},
-{...jobDefaults('2 Bond St Sydney', {
-categoryId:'cat-run',
+{...job('2-bond-st-sydney', {
+name:'2 Bond St Sydney', categoryId:'cat-run',
 address:'2 Bond St, Sydney CBD',
 parking:'No parking. Public transport recommended — middle of CBD',
 assemblingPoint:'Basement entrance',
 toilet:'Next to site office in the basement',
 keyLocation:'RMW Site. Lockpad TBC',
-firstAid:'In site office',
-lunchroom:'In the site office',
-clientName:'Tony',
-teamLeader:'Felipe',
-startDate:'2026-04-16',
+firstAid:'In site office', lunchroom:'In the site office',
+clientName:'Tony', clientMobile:'+61 4 555 0303',
+teamLeader:'Felipe', startDate:'2026-04-16',
 })},
-{...jobDefaults('Hamilton Warehouse Inspection', {
-categoryId:'cat-done', status:'done',
-address:'120 Kent St, Hamilton',
-parking:'On-site parking available',
-assemblingPoint:'Warehouse main gate',
-toilet:'Inside warehouse by office',
-keyLocation:'Padlock code 4421',
-firstAid:'Main office',
-lunchroom:'On-site canteen',
-clientName:'Mike Thompson',
-clientMobile:'+64 21 555 0303',
-teamLeader:'Lionel',
-startDate:'2026-03-02',
+{...job('hamilton-warehouse', {
+name:'Hamilton Warehouse Inspection', categoryId:'cat-done', status:'done',
+address:'120 Kent St, Hamilton', parking:'On-site parking available',
+assemblingPoint:'Warehouse main gate', toilet:'Inside warehouse by office',
+keyLocation:'Padlock code 4421', firstAid:'Main office', lunchroom:'On-site canteen',
+clientName:'Mike Thompson', clientMobile:'+64 21 555 0404',
+teamLeader:'Lionel', startDate:'2026-03-02',
 })},
-{...jobDefaults('Wellington Harbour Tower', {
-categoryId:'cat-done', status:'done',
-address:'15 Customhouse Quay, Wellington',
-parking:'Street parking (metered)',
-assemblingPoint:'Lobby reception',
-toilet:'Level 3 bathrooms',
-keyLocation:'Collect from concierge',
-firstAid:'Concierge desk',
-lunchroom:'Ground floor café',
-clientName:'Emma Wilson',
-clientMobile:'+64 27 555 0404',
-teamLeader:'Felipe',
-startDate:'2026-02-15',
+{...job('wellington-harbour-tower', {
+name:'Wellington Harbour Tower', categoryId:'cat-done', status:'done',
+address:'15 Customhouse Quay, Wellington', parking:'Street parking (metered)',
+assemblingPoint:'Lobby reception', toilet:'Level 3 bathrooms',
+keyLocation:'Collect from concierge', firstAid:'Concierge desk', lunchroom:'Ground floor café',
+clientName:'Emma Wilson', clientMobile:'+64 27 555 0505',
+teamLeader:'Felipe', startDate:'2026-02-15',
 })},
-{
-id:'seed-general',
-type:'plain',
-name:'announcements',
-categoryId:'cat-general',
-createdAt: new Date(now).toISOString()
-},
-{
-id:'seed-banter',
-type:'plain',
-name:'banter',
-categoryId:'cat-general',
-createdAt: new Date(now).toISOString()
-},
+
+// Incident report system channels (auto-created)
+{id:'inc-near-miss', type:'incidents-bin', incidentType:'near-miss', name:'near-miss', categoryId:'cat-incidents', createdAt:new Date(now).toISOString()},
+{id:'inc-incident',  type:'incidents-bin', incidentType:'incident',  name:'incident',  categoryId:'cat-incidents', createdAt:new Date(now).toISOString()},
+{id:'inc-accident',  type:'incidents-bin', incidentType:'accident',  name:'accident',  categoryId:'cat-incidents', createdAt:new Date(now).toISOString()},
+
+// Materials channels
+{id:'mat-paint', type:'materials', name:'paint', categoryId:'cat-tools', createdAt:new Date(now).toISOString(),
+materials:[
+{id:'m1', name:'Resene Lumbersider — white', qty:'4 × 10L', done:false},
+{id:'m2', name:'Sash brushes (50mm)', qty:'6', done:false},
+{id:'m3', name:'Roller sleeves — short nap', qty:'12', done:true},
+{id:'m4', name:'Drop sheets (4x5m)', qty:'3', done:false},
+]},
+{id:'mat-netting', type:'materials', name:'netting', categoryId:'cat-tools', createdAt:new Date(now).toISOString(),
+materials:[
+{id:'m1', name:'Bird netting (50m roll)', qty:'2', done:false},
+{id:'m2', name:'Stainless steel clips', qty:'200', done:false},
+{id:'m3', name:'Tensioning wire', qty:'100m', done:false},
+]},
+{id:'mat-sealant', type:'materials', name:'sealant', categoryId:'cat-tools', createdAt:new Date(now).toISOString(),
+materials:[
+{id:'m1', name:'Sika Liquid Membrane (15L)', qty:'2', done:false},
+{id:'m2', name:'Caulking gun', qty:'2', done:true},
+{id:'m3', name:'Sikaflex 11FC sausages', qty:'24', done:false},
+]},
+
+// Crew channels
+{id:'crew-calendar', type:'calendar', name:'work-calendar', categoryId:'cat-crew', createdAt:new Date(now).toISOString()},
+{id:'crew-general', type:'plain', name:'general', categoryId:'cat-crew', createdAt:new Date(now).toISOString()},
 ]
 };
 }
 
-// ── JOB WIZARD ──────────────────────────────────────────────────────────────
+// ── MENTION DROPDOWN HOOK ───────────────────────────────────────────────────
+function useMentions(text, setText, allChannels, currentChannelId) {
+const [open, setOpen] = useState(false);
+const [query, setQuery] = useState('');
+const [pos, setPos] = useState(0); // start index of #
+const [activeIdx, setActiveIdx] = useState(0);
+
+const matches = useMemo(() => {
+if(!open) return [];
+const q = query.toLowerCase();
+return allChannels
+.filter(c => c.id !== currentChannelId)
+.filter(c => slugify(c.name).includes(q) || c.name.toLowerCase().includes(q))
+.slice(0, 8);
+}, [open, query, allChannels, currentChannelId]);
+
+useEffect(() => { setActiveIdx(0); }, [query]);
+
+const handleChange = (e, ref) => {
+const v = e.target.value;
+setText(v);
+const cursor = e.target.selectionStart;
+// Find last '#' before cursor with no space after it
+const before = v.slice(0, cursor);
+const m = before.match(/#([\w-]*)$/);
+if(m) {
+setOpen(true);
+setQuery(m[1]);
+setPos(cursor - m[0].length);
+} else {
+setOpen(false);
+}
+};
+
+const insert = (channel, ref) => {
+const slug = slugify(channel.name);
+const before = text.slice(0, pos);
+const after = text.slice(pos + 1 + query.length);
+const newText = before + '#' + slug + ' ' + after;
+setText(newText);
+setOpen(false);
+setTimeout(() => {
+if(ref?.current) {
+const newCursor = (before + '#' + slug + ' ').length;
+ref.current.focus();
+ref.current.setSelectionRange(newCursor, newCursor);
+}
+}, 0);
+};
+
+const handleKeyDown = (e, ref) => {
+if(!open || matches.length === 0) return false;
+if(e.key === 'ArrowDown'){ e.preventDefault(); setActiveIdx(i => (i+1) % matches.length); return true; }
+if(e.key === 'ArrowUp'){ e.preventDefault(); setActiveIdx(i => (i-1+matches.length) % matches.length); return true; }
+if(e.key === 'Enter' || e.key === 'Tab'){ e.preventDefault(); insert(matches[activeIdx], ref); return true; }
+if(e.key === 'Escape'){ e.preventDefault(); setOpen(false); return true; }
+return false;
+};
+
+return {open, matches, activeIdx, setActiveIdx, insert, handleChange, handleKeyDown, close:()=>setOpen(false)};
+}
+
+// ── MENTION DROPDOWN UI ─────────────────────────────────────────────────────
+function MentionDropdown({mentions, inputRef, getCategory}) {
+if(!mentions.open || mentions.matches.length === 0) return null;
+return (
+<div style={{...s.mentionDrop, bottom:'100%', left:0, marginBottom:6}}>
+{mentions.matches.map((c, i) => {
+const cat = getCategory(c.categoryId);
+const isActive = i === mentions.activeIdx;
+const hash = c.type === 'job' ? '◆' : '#';
+return (
+<div key={c.id}
+style={{...s.mentionItem, ...(isActive ? s.mentionItemActive : {})}}
+onMouseEnter={() => mentions.setActiveIdx(i)}
+onClick={() => mentions.insert(c, inputRef)}>
+<span style={s.mentionItemHash}>{hash}</span>
+<span>{c.name}</span>
+<span style={s.mentionItemMeta}>{cat?.name || ''}</span>
+</div>
+);
+})}
+</div>
+);
+}
+
+// ── JOB WIZARD (unchanged from prev pass, with all fields populated for seeds) ──
 function JobWizard({onClose, onSave, editing}) {
 const blank = {
 id:'', type:'job', status:'running', categoryId:'cat-run', customThreads:[],
@@ -447,14 +525,10 @@ const steps = [
 <label style={s.label}>Project name *</label>
 <input style={s.input} value={data.name} onChange={set('name')} placeholder="e.g. 80 Queen Street" autoFocus/>
 <div style={s.row2}>
-<div>
-<label style={s.label}>Start date</label>
-<input style={s.input} type="date" value={data.startDate} onChange={set('startDate')}/>
-</div>
-<div>
-<label style={s.label}>Team leader</label>
-<input style={s.input} value={data.teamLeader} onChange={set('teamLeader')} placeholder="Name"/>
-</div>
+<div><label style={s.label}>Start date</label>
+<input style={s.input} type="date" value={data.startDate} onChange={set('startDate')}/></div>
+<div><label style={s.label}>Team leader</label>
+<input style={s.input} value={data.teamLeader} onChange={set('teamLeader')} placeholder="Name"/></div>
 </div>
 <label style={s.label}>Address / location</label>
 <input style={s.input} value={data.address} onChange={set('address')} placeholder="Full address"/>
@@ -485,26 +559,22 @@ const steps = [
 <label style={s.label}>WhatsApp group invite link</label>
 <input style={s.input} value={data.whatsapp} onChange={set('whatsapp')} placeholder="https://chat.whatsapp.com/..."/>
 <div style={{fontSize:11,color:'var(--text-dim)',marginTop:-10,marginBottom:16,lineHeight:1.5}}>
-Create the group manually in WhatsApp first, then paste the invite link here. Reset the link in WhatsApp once everyone has joined.
+Create the group manually in WhatsApp first, then paste the invite link here.
 </div>
 <label style={s.label}>Quick Survey link</label>
-<input style={s.input} value={data.surveyLink} onChange={set('surveyLink')} placeholder="https://ralsolutions.github.io/Survey/..."/>
+<input style={s.input} value={data.surveyLink} onChange={set('surveyLink')} placeholder="https://ralsolutions.github.io/Survey/"/>
 </>)}
 ];
 
 const canNext = step === 0 ? data.name.trim() : true;
-
 const handleSave = () => {
 const channel = {
-...data,
-id: editing?.id || 'ch-' + Date.now().toString(36),
-type: 'job',
-status: data.status || 'running',
+...data, id: editing?.id || 'ch-' + Date.now().toString(36),
+type:'job', status: data.status || 'running',
 customThreads: data.customThreads || [],
 createdAt: editing?.createdAt || new Date().toISOString()
 };
-onSave(channel);
-onClose();
+onSave(channel); onClose();
 };
 
 return (
@@ -525,14 +595,11 @@ return (
 </div>
 <div style={s.modalBody}>{steps[step].fields}</div>
 <div style={s.modalFooter}>
-{step > 0
-? <button style={s.cancelBtn} onClick={() => setStep(p => p-1)}>← Back</button>
-: <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-}
+{step > 0 ? <button style={s.cancelBtn} onClick={() => setStep(p => p-1)}>← Back</button>
+: <button style={s.cancelBtn} onClick={onClose}>Cancel</button>}
 {step < steps.length - 1
 ? <button style={{...s.primaryBtn, opacity: canNext?1:0.5}} disabled={!canNext} onClick={() => setStep(p => p+1)}>Next →</button>
-: <button style={s.primaryBtn} onClick={handleSave}>{editing ? 'Save' : 'Create'}</button>
-}
+: <button style={s.primaryBtn} onClick={handleSave}>{editing ? 'Save' : 'Create'}</button>}
 </div>
 </div>
 </div>
@@ -556,7 +623,6 @@ collapsed: editing?.collapsed ?? false
 });
 onClose();
 };
-
 return (
 <div style={s.overlay} onClick={onClose}>
 <div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
@@ -569,27 +635,20 @@ return (
 </div>
 <div style={s.modalBody}>
 <label style={s.label}>Name *</label>
-<input style={s.input} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Sydney Jobs, Admin, Archive..." autoFocus/>
-
+<input style={s.input} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Sydney Jobs, Admin..." autoFocus/>
 <label style={s.label}>Emoji — pick one</label>
 <div style={s.emojiGrid}>
 {EMOJI_GRID.map(em => (
-<div key={em}
-style={{...s.emojiCell, ...(emoji===em && !customEmoji ? s.emojiCellActive : {})}}
-onClick={() => { setEmoji(em); setCustomEmoji(''); }}>
-{em}
-</div>
+<div key={em} style={{...s.emojiCell, ...(emoji===em && !customEmoji ? s.emojiCellActive : {})}}
+onClick={() => { setEmoji(em); setCustomEmoji(''); }}>{em}</div>
 ))}
 </div>
-
 <label style={s.label}>Or paste any emoji</label>
-<input style={s.input} value={customEmoji} onChange={e => setCustomEmoji(e.target.value)} placeholder="Paste any emoji here" maxLength={4}/>
+<input style={s.input} value={customEmoji} onChange={e => setCustomEmoji(e.target.value)} placeholder="Paste any emoji" maxLength={4}/>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Cancel</button>
-<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>
-{editing ? 'Save' : 'Create'}
-</button>
+<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>{editing ? 'Save' : 'Create'}</button>
 </div>
 </div>
 </div>
@@ -597,35 +656,38 @@ onClick={() => { setEmoji(em); setCustomEmoji(''); }}>
 }
 
 // ── CHANNEL TYPE PICKER ─────────────────────────────────────────────────────
-function ChannelTypePicker({onClose, onPickJob, onPickPlain, categoryName}) {
-const [type, setType] = useState(null);
-const [plainName, setPlainName] = useState('');
+function ChannelTypePicker({onClose, onPickJob, onPickPlain, onPickMaterials, onPickCalendar, categoryName}) {
+const [step, setStep] = useState('pick'); // pick | name
+const [pickedType, setPickedType] = useState(null);
+const [chanName, setChanName] = useState('');
 
-if(type === 'plain') {
+const submit = () => {
+if(!chanName.trim()) return;
+if(pickedType === 'plain') onPickPlain(chanName.trim());
+if(pickedType === 'materials') onPickMaterials(chanName.trim());
+if(pickedType === 'calendar') onPickCalendar(chanName.trim());
+};
+
+if(step === 'name') {
 return (
 <div style={s.overlay} onClick={onClose}>
 <div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
 <div>
-<div style={s.modalKicker}>New · Plain Channel</div>
+<div style={s.modalKicker}>New · {pickedType} channel</div>
 <div style={s.modalTitle}>Channel name</div>
 </div>
 <button style={s.closeBtn} onClick={onClose}>×</button>
 </div>
 <div style={s.modalBody}>
 <label style={s.label}>Channel name *</label>
-<input style={s.input} value={plainName} onChange={e => setPlainName(e.target.value)}
-placeholder="e.g. general, announcements..." autoFocus
-onKeyDown={e => { if(e.key==='Enter' && plainName.trim()) onPickPlain(plainName.trim()); }}/>
-<div style={{fontSize:11,color:'var(--text-dim)',marginTop:-10,lineHeight:1.5}}>
-A plain channel is just a notes feed — no project info, no threads. Use it for announcements, banter, or reference material.
-</div>
+<input style={s.input} value={chanName} onChange={e => setChanName(e.target.value)}
+placeholder={pickedType === 'materials' ? 'e.g. paint, netting, sealant' : 'e.g. general, announcements'} autoFocus
+onKeyDown={e => { if(e.key==='Enter' && chanName.trim()) submit(); }}/>
 </div>
 <div style={s.modalFooter}>
-<button style={s.cancelBtn} onClick={() => setType(null)}>← Back</button>
-<button style={{...s.primaryBtn, opacity: plainName.trim()?1:0.5}} disabled={!plainName.trim()} onClick={() => onPickPlain(plainName.trim())}>
-Create
-</button>
+<button style={s.cancelBtn} onClick={() => setStep('pick')}>← Back</button>
+<button style={{...s.primaryBtn, opacity: chanName.trim()?1:0.5}} disabled={!chanName.trim()} onClick={submit}>Create</button>
 </div>
 </div>
 </div>
@@ -634,7 +696,7 @@ Create
 
 return (
 <div style={s.overlay} onClick={onClose}>
-<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={s.modal} onClick={e => e.stopPropagation()}>
 <div style={s.modalHeader}>
 <div>
 <div style={s.modalKicker}>New Channel · in {categoryName}</div>
@@ -647,12 +709,24 @@ return (
 <div style={s.typeCard} onClick={onPickJob}>
 <div style={s.typeIcon}>🏗️</div>
 <div style={s.typeTitle}>Job channel</div>
-<div style={s.typeDesc}>Full rope access job with wizard, info tab, toolbox talks, RAMS, surveys.</div>
+<div style={s.typeDesc}>Full rope access job — wizard, info, toolbox, RAMS, surveys.</div>
 </div>
-<div style={s.typeCard} onClick={() => setType('plain')}>
+<div style={s.typeCard} onClick={() => { setPickedType('plain'); setStep('name'); }}>
 <div style={s.typeIcon}>💬</div>
 <div style={s.typeTitle}>Plain channel</div>
-<div style={s.typeDesc}>Just a notes feed. For general chat, announcements, or reference material.</div>
+<div style={s.typeDesc}>Notes feed for chat, announcements, reference.</div>
+</div>
+</div>
+<div style={s.typeRow}>
+<div style={s.typeCard} onClick={() => { setPickedType('materials'); setStep('name'); }}>
+<div style={s.typeIcon}>🧰</div>
+<div style={s.typeTitle}>Materials list</div>
+<div style={s.typeDesc}>Checkable list of items — tools, paint, fixings, etc.</div>
+</div>
+<div style={s.typeCard} onClick={() => { setPickedType('calendar'); setStep('name'); }}>
+<div style={s.typeIcon}>📅</div>
+<div style={s.typeTitle}>Calendar</div>
+<div style={s.typeDesc}>Month view — schedule jobs and crew per day.</div>
 </div>
 </div>
 </div>
@@ -664,22 +738,15 @@ return (
 );
 }
 
-// ── CUSTOM THREAD MODAL ─────────────────────────────────────────────────────
+// ── ADD THREAD MODAL ────────────────────────────────────────────────────────
 function AddThreadModal({onClose, onSave}) {
 const [name, setName] = useState('');
 const [emoji, setEmoji] = useState('📝');
-
 const save = () => {
 if(!name.trim()) return;
-onSave({
-id: 'thread-' + Date.now().toString(36),
-label: name.trim(),
-icon: emoji,
-fixed: false
-});
+onSave({id:'thread-'+Date.now().toString(36), label:name.trim(), icon:emoji, fixed:false});
 onClose();
 };
-
 return (
 <div style={s.overlay} onClick={onClose}>
 <div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
@@ -693,7 +760,7 @@ return (
 <div style={s.modalBody}>
 <label style={s.label}>Thread name *</label>
 <input style={s.input} value={name} onChange={e => setName(e.target.value)}
-placeholder="e.g. Deliveries, Photos, Client notes..." autoFocus
+placeholder="e.g. Deliveries, Photos, Client notes" autoFocus
 onKeyDown={e => { if(e.key==='Enter' && name.trim()) save(); }}/>
 <label style={s.label}>Emoji</label>
 <input style={s.input} value={emoji} onChange={e => setEmoji(e.target.value)} maxLength={4}/>
@@ -707,20 +774,184 @@ onKeyDown={e => { if(e.key==='Enter' && name.trim()) save(); }}/>
 );
 }
 
+// ── INCIDENT FORM ───────────────────────────────────────────────────────────
+function IncidentFormModal({onClose, onSave, project}) {
+const [data, setData] = useState({
+date: todayISO(),
+type: 'near-miss',
+technicians: project.teamLeader || '',
+whatHappened: '',
+howToAvoid: '',
+});
+const set = k => e => setData(p => ({...p, [k]: e.target.value}));
+
+const save = () => {
+if(!data.whatHappened.trim()) return alert('Describe what happened.');
+onSave({
+id: 'inc-' + Date.now().toString(36),
+projectId: project.id,
+projectName: project.name,
+projectAddress: project.address,
+createdAt: new Date().toISOString(),
+...data
+});
+onClose();
+};
+
+return (
+<div style={s.overlay} onClick={onClose}>
+<div style={s.modal} onClick={e => e.stopPropagation()}>
+<div style={s.modalHeader}>
+<div>
+<div style={s.modalKicker}>New · Incident report</div>
+<div style={s.modalTitle}>Report an event</div>
+</div>
+<button style={s.closeBtn} onClick={onClose}>×</button>
+</div>
+<div style={s.modalBody}>
+
+<label style={s.label}>Type</label>
+<div style={s.incidentTypePicker}>
+{INCIDENT_TYPES.map(t => {
+const active = data.type === t.id;
+return (
+<div key={t.id}
+style={{...s.incidentTypeBtn,
+...(active ? {...s.incidentTypeBtnActive, borderColor:t.color, background:t.bg} : {})
+}}
+onClick={() => setData(p => ({...p, type:t.id}))}>
+<div style={s.incidentTypeEmoji}>{t.emoji}</div>
+<div style={{...s.incidentTypeLabel, color: active ? t.color : 'var(--text)'}}>{t.label}</div>
+</div>
+);
+})}
+</div>
+
+<div style={s.row2}>
+<div>
+<label style={s.label}>Date</label>
+<input style={s.input} type="date" value={data.date} onChange={set('date')}/>
+</div>
+<div>
+<label style={s.label}>Job</label>
+<input style={s.input} value={project.name} disabled
+style={{...s.input, opacity:0.6, cursor:'not-allowed'}}/>
+</div>
+</div>
+
+<label style={s.label}>Technicians involved</label>
+<input style={s.input} value={data.technicians} onChange={set('technicians')}
+placeholder="Names, comma-separated"/>
+
+<label style={s.label}>What happened? *</label>
+<textarea style={s.textarea} value={data.whatHappened} onChange={set('whatHappened')}
+placeholder="Describe the event — what, where, when, who saw it" rows={5}/>
+
+<label style={s.label}>What can be done to avoid it?</label>
+<textarea style={s.textarea} value={data.howToAvoid} onChange={set('howToAvoid')}
+placeholder="Recommendations, controls, training, equipment changes..." rows={4}/>
+
+</div>
+<div style={s.modalFooter}>
+<button style={s.cancelBtn} onClick={onClose}>Cancel</button>
+<button style={s.primaryBtn} onClick={save}>Submit report</button>
+</div>
+</div>
+</div>
+);
+}
+
+// ── ADD MATERIAL MODAL ──────────────────────────────────────────────────────
+function AddMaterialModal({onClose, onSave}) {
+const [name, setName] = useState('');
+const [qty, setQty] = useState('');
+const save = () => {
+if(!name.trim()) return;
+onSave({id:'m-'+Date.now().toString(36), name:name.trim(), qty:qty.trim(), done:false});
+onClose();
+};
+return (
+<div style={s.overlay} onClick={onClose}>
+<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={s.modalHeader}>
+<div>
+<div style={s.modalKicker}>New · Material</div>
+<div style={s.modalTitle}>Add item</div>
+</div>
+<button style={s.closeBtn} onClick={onClose}>×</button>
+</div>
+<div style={s.modalBody}>
+<label style={s.label}>Item *</label>
+<input style={s.input} value={name} onChange={e=>setName(e.target.value)} autoFocus
+placeholder="e.g. Resene Lumbersider 10L"
+onKeyDown={e => { if(e.key==='Enter' && name.trim()) save(); }}/>
+<label style={s.label}>Quantity (optional)</label>
+<input style={s.input} value={qty} onChange={e=>setQty(e.target.value)} placeholder="e.g. 4 × 10L, 2 boxes, 100m"/>
+</div>
+<div style={s.modalFooter}>
+<button style={s.cancelBtn} onClick={onClose}>Cancel</button>
+<button style={{...s.primaryBtn, opacity: name.trim()?1:0.5}} disabled={!name.trim()} onClick={save}>Add item</button>
+</div>
+</div>
+</div>
+);
+}
+
+// ── CALENDAR ENTRY MODAL ────────────────────────────────────────────────────
+function CalendarEntryModal({onClose, onSave, date, jobChannels}) {
+const [text, setText] = useState('');
+const [projectId, setProjectId] = useState(jobChannels[0]?.id || '');
+const save = () => {
+if(!text.trim()) return;
+const project = jobChannels.find(c => c.id === projectId);
+onSave({
+id: 'cal-' + Date.now().toString(36),
+date,
+text: text.trim(),
+projectId,
+projectName: project?.name || '',
+createdAt: new Date().toISOString()
+});
+onClose();
+};
+return (
+<div style={s.overlay} onClick={onClose}>
+<div style={{...s.modal,...s.modalSm}} onClick={e => e.stopPropagation()}>
+<div style={s.modalHeader}>
+<div>
+<div style={s.modalKicker}>New · Schedule entry</div>
+<div style={s.modalTitle}>{formatDate(date)}</div>
+</div>
+<button style={s.closeBtn} onClick={onClose}>×</button>
+</div>
+<div style={s.modalBody}>
+<label style={s.label}>Project (optional)</label>
+<select style={s.input} value={projectId} onChange={e=>setProjectId(e.target.value)}>
+<option value="">— No project —</option>
+{jobChannels.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+</select>
+<label style={s.label}>Notes *</label>
+<textarea style={s.textarea} value={text} onChange={e=>setText(e.target.value)} autoFocus
+placeholder="e.g. Felipe + Lionel on site, paint crew arrives 8am" rows={4}/>
+</div>
+<div style={s.modalFooter}>
+<button style={s.cancelBtn} onClick={onClose}>Cancel</button>
+<button style={{...s.primaryBtn, opacity: text.trim()?1:0.5}} disabled={!text.trim()} onClick={save}>Add</button>
+</div>
+</div>
+</div>
+);
+}
+
 // ── SHARE MODAL ─────────────────────────────────────────────────────────────
 function ShareModal({channel, onClose}) {
 const [copiedMsg, setCopiedMsg] = useState(false);
 const [copiedLink, setCopiedLink] = useState(false);
 const message = buildWhatsAppMessage(channel);
 const shareUrl = buildShareUrl(channel);
-
 const copy = (text, setFlag) => {
-navigator.clipboard.writeText(text).then(() => {
-setFlag(true);
-setTimeout(() => setFlag(false), 2000);
-});
+navigator.clipboard.writeText(text).then(() => { setFlag(true); setTimeout(() => setFlag(false), 2000); });
 };
-
 return (
 <div style={s.overlay} onClick={onClose}>
 <div style={s.modal} onClick={e => e.stopPropagation()}>
@@ -750,9 +981,6 @@ style={{...s.copyBtn,background:'var(--success-bg)',color:'var(--success)',borde
 <button style={s.copyBtn} onClick={() => copy(shareUrl, setCopiedLink)}>
 {copiedLink ? '✓ Copied' : '🔗 Copy link'}
 </button>
-<div style={{fontSize:11,color:'var(--text-dim)',marginTop:16,lineHeight:1.6}}>
-The shareable link contains the project info encoded in the URL — anyone with the link can view it without logging in.
-</div>
 </div>
 <div style={s.modalFooter}>
 <button style={s.cancelBtn} onClick={onClose}>Close</button>
@@ -820,12 +1048,10 @@ return (
 <div style={s.sharedTitle}>{channel.name}</div>
 {channel.address && <div style={s.sharedSub}>{channel.address}</div>}
 </div>
-<div style={s.sharedSection}>
-<InfoDisplay channel={channel}/>
-</div>
+<div style={s.sharedSection}><InfoDisplay channel={channel}/></div>
 <div style={{padding:'16px 32px 28px',textAlign:'center'}}>
 <button onClick={onExit} style={{background:'none',border:'none',color:'var(--text-dim)',fontSize:11,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2}}>
-← Back to project manager
+← Back
 </button>
 </div>
 </div>
@@ -833,9 +1059,233 @@ return (
 );
 }
 
-// ── NOTES FEED ──────────────────────────────────────────────────────────────
-function NotesFeed({channelId, threadId, notes, setNotes, placeholder}) {
+// ── INCIDENT CARD ───────────────────────────────────────────────────────────
+function IncidentCard({incident, allChannels, onMentionClick, showJob, onDelete}) {
+const t = INCIDENT_TYPES.find(t => t.id === incident.type);
+return (
+<div style={s.incidentCard}>
+<div style={s.incidentHead}>
+<span style={{...s.incidentBadge, color:t.color, background:t.bg, borderColor:t.color}}>
+{t.emoji} {t.label}
+</span>
+<span style={s.incidentDate}>{formatDate(incident.date)}</span>
+{showJob && incident.projectName && (
+<span style={s.incidentJob}>📋 {incident.projectName}</span>
+)}
+{onDelete && (
+<button onClick={() => onDelete(incident.id)}
+style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,marginLeft:'auto',padding:0}}>×</button>
+)}
+</div>
+{incident.technicians && (
+<div style={s.incidentSection}>
+<div style={s.incidentSectionLabel}>Technicians</div>
+<div style={s.incidentSectionText}>{incident.technicians}</div>
+</div>
+)}
+<div style={s.incidentSection}>
+<div style={s.incidentSectionLabel}>What happened</div>
+<div style={s.incidentSectionText}>{renderWithMentions(incident.whatHappened, allChannels, onMentionClick)}</div>
+</div>
+{incident.howToAvoid && (
+<div style={s.incidentSection}>
+<div style={s.incidentSectionLabel}>How to avoid</div>
+<div style={s.incidentSectionText}>{renderWithMentions(incident.howToAvoid, allChannels, onMentionClick)}</div>
+</div>
+)}
+<div style={{...s.incidentDate, marginTop:10, opacity:0.6}}>Reported {formatTime(incident.createdAt)}</div>
+</div>
+);
+}
+
+// ── INCIDENTS THREAD (per project) ──────────────────────────────────────────
+function ProjectIncidentsView({channel, incidents, allChannels, onMentionClick, onAdd, onDelete}) {
+const projectIncidents = incidents.filter(i => i.projectId === channel.id).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+return (
+<div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,flexWrap:'wrap',gap:8}}>
+<div>
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:2}}>{projectIncidents.length} report{projectIncidents.length===1?'':'s'} on this project</div>
+<div style={{fontSize:13,color:'var(--text-dim)'}}>All reports also appear in the server-wide Incident Reports category.</div>
+</div>
+<button style={s.primaryBtn} onClick={onAdd}>+ New report</button>
+</div>
+<div style={{flex:1,overflowY:'auto'}}>
+{projectIncidents.length === 0
+? <div style={{...s.empty,height:'60%'}}>
+<span style={s.emptyIcon}>✅</span>
+<span style={s.emptyText}>No reports — keep it that way</span>
+</div>
+: projectIncidents.map(i => <IncidentCard key={i.id} incident={i} allChannels={allChannels} onMentionClick={onMentionClick} onDelete={onDelete}/>)
+}
+</div>
+</div>
+);
+}
+
+// ── INCIDENTS BIN VIEW (server-wide, filtered by type) ──────────────────────
+function IncidentsBinView({incidentType, incidents, allChannels, onMentionClick, onJumpToProject}) {
+const filtered = incidents.filter(i => i.type === incidentType).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+const t = INCIDENT_TYPES.find(t => t.id === incidentType);
+return (
+<div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+<div style={{marginBottom:16}}>
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:4}}>
+{filtered.length} {t.label.toLowerCase()} report{filtered.length===1?'':'s'} across all projects
+</div>
+<div style={{fontSize:13,color:'var(--text-dim)'}}>Add new reports from inside a job → Incidents tab.</div>
+</div>
+<div style={{flex:1,overflowY:'auto'}}>
+{filtered.length === 0
+? <div style={{...s.empty,height:'60%'}}>
+<span style={s.emptyIcon}>{t.emoji}</span>
+<span style={s.emptyText}>No {t.label.toLowerCase()} reports</span>
+</div>
+: filtered.map(i => (
+<div key={i.id} onClick={() => i.projectId && onJumpToProject(i.projectId)} style={{cursor:i.projectId?'pointer':'default'}}>
+<IncidentCard incident={i} allChannels={allChannels} onMentionClick={onMentionClick} showJob={true}/>
+</div>
+))
+}
+</div>
+</div>
+);
+}
+
+// ── MATERIALS VIEW ──────────────────────────────────────────────────────────
+function MaterialsView({channel, onUpdate, onAdd}) {
+const items = channel.materials || [];
+const toggle = (id) => onUpdate(items.map(m => m.id === id ? {...m, done:!m.done} : m));
+const remove = (id) => onUpdate(items.filter(m => m.id !== id));
+
+return (
+<div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,flexWrap:'wrap',gap:8}}>
+<div>
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:2}}>
+{items.filter(m=>m.done).length} of {items.length} ready
+</div>
+<div style={{fontSize:13,color:'var(--text-dim)'}}>Tick items as you load them.</div>
+</div>
+<button style={s.primaryBtn} onClick={onAdd}>+ Add item</button>
+</div>
+<div style={{flex:1,overflowY:'auto'}}>
+{items.length === 0
+? <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>🧰</span><span style={s.emptyText}>No items yet</span></div>
+: items.map(m => (
+<div key={m.id} style={s.matRow}>
+<input type="checkbox" style={s.matCheck} checked={m.done} onChange={()=>toggle(m.id)}/>
+<span style={{...s.matName, ...(m.done ? s.matNameDone : {})}}>{m.name}</span>
+{m.qty && <span style={s.matQty}>{m.qty}</span>}
+<button onClick={()=>remove(m.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:0}}>×</button>
+</div>
+))
+}
+</div>
+</div>
+);
+}
+
+// ── CALENDAR VIEW ───────────────────────────────────────────────────────────
+function CalendarView({entries, jobChannels, onAddEntry, onDeleteEntry, onJumpToProject}) {
+const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
+const [pickedDate, setPickedDate] = useState(null);
+
+const year = cursor.getFullYear();
+const month = cursor.getMonth();
+const monthLabel = cursor.toLocaleDateString('en-NZ', {month:'long', year:'numeric'});
+const firstDay = new Date(year, month, 1);
+const startOffset = firstDay.getDay();
+const daysInMonth = new Date(year, month+1, 0).getDate();
+const daysInPrev = new Date(year, month, 0).getDate();
+const today = todayISO();
+
+const cells = [];
+for(let i = 0; i < startOffset; i++) {
+const day = daysInPrev - startOffset + 1 + i;
+cells.push({day, other:true, date: new Date(year, month-1, day).toISOString().slice(0,10)});
+}
+for(let i = 1; i <= daysInMonth; i++) {
+cells.push({day:i, other:false, date: new Date(year, month, i).toISOString().slice(0,10)});
+}
+while(cells.length % 7 !== 0) {
+const day = cells.length - daysInMonth - startOffset + 1;
+cells.push({day, other:true, date: new Date(year, month+1, day).toISOString().slice(0,10)});
+}
+
+const entriesByDate = entries.reduce((acc, e) => {
+(acc[e.date] = acc[e.date] || []).push(e);
+return acc;
+}, {});
+
+return (
+<div>
+<div style={s.calNav}>
+<button style={s.calNavBtn} onClick={() => setCursor(new Date(year, month-1, 1))}>‹</button>
+<div style={s.calMonth}>{monthLabel}</div>
+<button style={s.calNavBtn} onClick={() => setCursor(new Date(year, month+1, 1))}>›</button>
+</div>
+<div style={s.calGrid}>
+{['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => <div key={d} style={s.calHeadCell}>{d}</div>)}
+{cells.map((c, i) => {
+const dayEntries = entriesByDate[c.date] || [];
+return (
+<div key={i}
+style={{
+...s.calCell,
+...(c.date === today ? s.calCellToday : {}),
+...(c.other ? s.calCellOther : {})
+}}
+onClick={() => setPickedDate(c.date)}>
+<div style={s.calDay}>{c.day}</div>
+{dayEntries.slice(0,3).map(e => (
+<div key={e.id} style={s.calEntry}
+onClick={(ev) => { ev.stopPropagation(); if(e.projectId) onJumpToProject(e.projectId); }}
+title={e.text}>
+{e.projectName ? '◆ ' + e.projectName : e.text.slice(0,20)}
+</div>
+))}
+{dayEntries.length > 3 && (
+<div style={{...s.calEntry, background:'var(--bg-sunken)',color:'var(--text-dim)'}}>+{dayEntries.length-3} more</div>
+)}
+</div>
+);
+})}
+</div>
+
+{pickedDate && (
+<div style={{marginTop:20,background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'18px 20px'}}>
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+<div style={{fontWeight:700,color:'var(--text)'}}>{formatDate(pickedDate)}</div>
+<div style={{display:'flex',gap:8}}>
+<button style={s.cancelBtn} onClick={() => setPickedDate(null)}>Close</button>
+<button style={s.primaryBtn} onClick={() => onAddEntry(pickedDate)}>+ Entry</button>
+</div>
+</div>
+{(entriesByDate[pickedDate] || []).length === 0
+? <div style={{fontSize:12,color:'var(--text-dim)',padding:'10px 0'}}>No entries yet for this day.</div>
+: (entriesByDate[pickedDate] || []).map(e => (
+<div key={e.id} style={{padding:'10px 12px',background:'var(--bg-raised)',borderRadius:6,marginBottom:6,display:'flex',justifyContent:'space-between',gap:10,alignItems:'flex-start'}}>
+<div style={{flex:1}}>
+{e.projectName && <div style={{fontSize:11,color:'var(--accent-text)',fontWeight:600,marginBottom:3,cursor:'pointer'}}
+onClick={() => onJumpToProject(e.projectId)}>◆ {e.projectName}</div>}
+<div style={{fontSize:13,color:'var(--text)'}}>{e.text}</div>
+</div>
+<button onClick={() => onDeleteEntry(e.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14}}>×</button>
+</div>
+))
+}
+</div>
+)}
+</div>
+);
+}
+
+// ── NOTES FEED (with mentions) ──────────────────────────────────────────────
+function NotesFeed({channelId, threadId, notes, setNotes, placeholder, allChannels, onMentionClick, getCategory}) {
 const [text, setText] = useState('');
+const inputRef = useRef(null);
+const mentions = useMentions(text, setText, allChannels, channelId);
 const feed = (notes[channelId]?.[threadId] || []).slice().reverse();
 
 const addNote = () => {
@@ -845,13 +1295,12 @@ setNotes(prev => ({
 [channelId]: {
 ...(prev[channelId] || {}),
 [threadId]: [...(prev[channelId]?.[threadId] || []), {
-id: Date.now().toString(),
-text: text.trim(),
-createdAt: new Date().toISOString()
+id: Date.now().toString(), text: text.trim(), createdAt: new Date().toISOString()
 }]
 }
 }));
 setText('');
+mentions.close();
 };
 
 const deleteNote = (noteId) => {
@@ -868,13 +1317,10 @@ return (
 <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
 <div style={{flex:1,overflowY:'auto',paddingBottom:16}}>
 {feed.length === 0
-? <div style={{...s.empty,height:'60%'}}>
-<span style={s.emptyIcon}>📝</span>
-<span style={s.emptyText}>No entries yet</span>
-</div>
+? <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>📝</span><span style={s.emptyText}>No entries yet</span></div>
 : feed.map(n => (
 <div key={n.id} style={s.note}>
-<div style={s.noteText}>{n.text}</div>
+<div style={s.noteText}>{renderWithMentions(n.text, allChannels, onMentionClick)}</div>
 <div style={{...s.noteMeta,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
 <span>{formatTime(n.createdAt)}</span>
 <button onClick={() => deleteNote(n.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:'0 4px'}}>×</button>
@@ -884,16 +1330,20 @@ return (
 }
 </div>
 <div style={{paddingTop:12,borderTop:'1px solid var(--border)'}}>
-<textarea
-style={s.noteInput}
-value={text}
-onChange={e => setText(e.target.value)}
-placeholder={placeholder || 'Add a note...'}
+<div style={s.noteInputWrap}>
+<MentionDropdown mentions={mentions} inputRef={inputRef} getCategory={getCategory}/>
+<textarea ref={inputRef}
+style={s.noteInput} value={text}
+onChange={(e) => mentions.handleChange(e, inputRef)}
+placeholder={placeholder || 'Add a note... (type # to mention a channel)'}
 rows={3}
-onKeyDown={e => { if(e.key==='Enter' && e.metaKey) addNote(); }}
-/>
+onKeyDown={(e) => {
+const handled = mentions.handleKeyDown(e, inputRef);
+if(!handled && e.key==='Enter' && e.metaKey) addNote();
+}}/>
+</div>
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-<span style={{fontSize:10,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14}}>⌘ + Enter to send</span>
+<span style={{fontSize:10,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.14}}>⌘ + Enter to send · # to mention</span>
 <button style={s.sendBtn} onClick={addNote}>Add entry</button>
 </div>
 </div>
@@ -902,23 +1352,46 @@ onKeyDown={e => { if(e.key==='Enter' && e.metaKey) addNote(); }}
 }
 
 // ── THREAD VIEW ─────────────────────────────────────────────────────────────
-function ThreadView({channel, thread, notes, setNotes}) {
+function ThreadView({channel, thread, notes, setNotes, allChannels, incidents, onIncidentSubmit, onIncidentDelete, onMentionClick, onJumpToProject, onUpdateMaterials, onAddMaterial, calendarEntries, onAddCalEntry, onDeleteCalEntry, getCategory}) {
+const jobChannels = allChannels.filter(c => c.type === 'job');
+
 if(channel.type === 'plain') {
-return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} placeholder={`Post in #${channel.name}...`}/>;
+return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes}
+placeholder={`Post in #${channel.name}... (type # to mention)`}
+allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
 }
 
+if(channel.type === 'materials') {
+return <MaterialsView channel={channel} onUpdate={onUpdateMaterials} onAdd={onAddMaterial}/>;
+}
+
+if(channel.type === 'calendar') {
+return <CalendarView entries={calendarEntries} jobChannels={jobChannels}
+onAddEntry={onAddCalEntry} onDeleteEntry={onDeleteCalEntry} onJumpToProject={onJumpToProject}/>;
+}
+
+if(channel.type === 'incidents-bin') {
+return <IncidentsBinView incidentType={channel.incidentType} incidents={incidents}
+allChannels={allChannels} onMentionClick={onMentionClick} onJumpToProject={onJumpToProject}/>;
+}
+
+// Job channel threads
 if(thread.id === 'info') return <InfoDisplay channel={channel}/>;
+
+if(thread.id === 'incidents') {
+return <ProjectIncidentsView channel={channel} incidents={incidents}
+allChannels={allChannels} onMentionClick={onMentionClick}
+onAdd={onIncidentSubmit} onDelete={onIncidentDelete}/>;
+}
 
 if(thread.id === 'rams') {
 return (
 <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}>
 <div style={{fontSize:40,opacity:0.7}}>📋</div>
 <div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>RAMS Form</div>
-<div style={{fontSize:12,color:'var(--text-dim)',textAlign:'center',maxWidth:320,lineHeight:1.5}}>Opens the RAMS form in a new tab. Fill it out, sign it and send it directly from there.</div>
+<div style={{fontSize:12,color:'var(--text-dim)',textAlign:'center',maxWidth:320,lineHeight:1.5}}>Opens the RAMS form in a new tab.</div>
 <a href={RAMS_URL} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>
-Open RAMS form →
-</a>
+style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>Open RAMS form →</a>
 </div>
 );
 }
@@ -930,11 +1403,8 @@ return (
 <div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Quick Survey</div>
 {channel.surveyLink
 ? <a href={channel.surveyLink} target="_blank" rel="noreferrer"
-style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>
-Open Quick Survey →
-</a>
-: <div style={{fontSize:12,color:'var(--text-dim)'}}>No Quick Survey link set. Edit the project to add one.</div>
-}
+style={{...s.infoLinkBtn,background:'var(--accent)',color:'#fff',borderColor:'var(--accent)',marginTop:4}}>Open Quick Survey →</a>
+: <div style={{fontSize:12,color:'var(--text-dim)'}}>No Quick Survey link set.</div>}
 </div>
 );
 }
@@ -949,7 +1419,9 @@ return (
 );
 }
 
-return <NotesFeed channelId={channel.id} threadId={thread.id} notes={notes} setNotes={setNotes} placeholder={`Add a ${thread.label} note...`}/>;
+return <NotesFeed channelId={channel.id} threadId={thread.id} notes={notes} setNotes={setNotes}
+placeholder={`Add a ${thread.label} note... (type # to mention)`}
+allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
 }
 
 // ── SIDEBAR CATEGORY ────────────────────────────────────────────────────────
@@ -964,7 +1436,9 @@ return (
 <span style={s.catLabel}>{category.name}</span>
 </span>
 <span style={s.catCount}>{channels.length}</span>
+{category.system !== 'incidents' && (
 <button style={s.catAddBtn} title="New channel" onClick={(e) => { e.stopPropagation(); onAddChannel(category); }}>+</button>
+)}
 {!category.system && (
 <button style={s.catAddBtn} title="Edit category" onClick={(e) => { e.stopPropagation(); onEditCategory(category); }}>✎</button>
 )}
@@ -972,23 +1446,24 @@ return (
 {open && channels.map(ch => {
 const isActive = activeId === ch.id;
 const isDone = ch.status === 'done';
-const hash = ch.type === 'plain' ? '#' : '◆';
+let hash = '#';
+if(ch.type === 'job') hash = '◆';
+else if(ch.type === 'materials') hash = '🧰';
+else if(ch.type === 'calendar') hash = '📅';
+else if(ch.type === 'incidents-bin') {
+const t = INCIDENT_TYPES.find(t => t.id === ch.incidentType);
+hash = t?.emoji || '⚠️';
+}
 return (
 <div key={ch.id}
-style={{
-...s.chanItem,
-...(isActive ? s.chanItemActive : {}),
-...(isDone ? s.chanItemDone : {})
-}}
+style={{...s.chanItem, ...(isActive ? s.chanItemActive : {}), ...(isDone ? s.chanItemDone : {})}}
 onClick={() => onSelect(ch.id)}>
 <span style={s.chanHash}>{hash}</span>
 <span style={{...s.chanName, ...(isActive ? s.chanNameActive : {})}}>{ch.name}</span>
 </div>
 );
 })}
-{open && channels.length === 0 && (
-<div style={s.emptyCat}>no channels yet</div>
-)}
+{open && channels.length === 0 && <div style={s.emptyCat}>no channels yet</div>}
 </div>
 );
 }
@@ -996,8 +1471,10 @@ onClick={() => onSelect(ch.id)}>
 // ── MAIN APP ────────────────────────────────────────────────────────────────
 function App() {
 const [theme, setTheme] = useTheme();
-const [data, setData] = useStorage('ral-data-v3', null);
+const [data, setData] = useStorage('ral-data-v4', null);
 const [notes, setNotes] = useStorage('ral-notes', {});
+const [incidents, setIncidents] = useStorage('ral-incidents', []);
+const [calendarEntries, setCalendarEntries] = useStorage('ral-calendar', []);
 const [activeId, setActiveId] = useState(null);
 const [activeThreadId, setActiveThreadId] = useState('info');
 const [showJobWizard, setShowJobWizard] = useState(false);
@@ -1008,11 +1485,12 @@ const [showCategoryModal, setShowCategoryModal] = useState(false);
 const [editingCategory, setEditingCategory] = useState(null);
 const [showTypePicker, setShowTypePicker] = useState(null);
 const [showAddThread, setShowAddThread] = useState(false);
+const [showIncidentForm, setShowIncidentForm] = useState(false);
+const [showAddMaterial, setShowAddMaterial] = useState(false);
+const [calEntryDate, setCalEntryDate] = useState(null);
 const [sharedChannel, setSharedChannel] = useState(null);
 
-useEffect(() => {
-if(data === null) setData(seedData());
-}, [data]);
+useEffect(() => { if(data === null) setData(seedData()); }, [data]);
 
 useEffect(() => {
 const checkHash = () => {
@@ -1030,15 +1508,12 @@ return () => window.removeEventListener('hashchange', checkHash);
 }, []);
 
 if(sharedChannel) {
-return <SharedView channel={sharedChannel} onExit={() => {
-window.location.hash = '';
-setSharedChannel(null);
-}}/>;
+return <SharedView channel={sharedChannel} onExit={() => { window.location.hash = ''; setSharedChannel(null); }}/>;
 }
 
 const d = data || {categories:[],channels:[]};
 const channel = d.channels.find(c => c.id === activeId);
-
+const getCategory = (id) => d.categories.find(c => c.id === id);
 const updateData = (fn) => setData(prev => fn(prev || {categories:[],channels:[]}));
 
 const saveJob = (job) => {
@@ -1046,11 +1521,7 @@ updateData(prev => {
 const idx = prev.channels.findIndex(c => c.id === job.id);
 const targetCategoryId = editingJob ? job.categoryId : jobTargetCategory;
 const finalJob = {...job, categoryId: targetCategoryId};
-if(idx >= 0) {
-const channels = [...prev.channels];
-channels[idx] = finalJob;
-return {...prev, channels};
-}
+if(idx >= 0) { const channels = [...prev.channels]; channels[idx] = finalJob; return {...prev, channels}; }
 return {...prev, channels: [finalJob, ...prev.channels]};
 });
 setActiveId(job.id);
@@ -1058,19 +1529,24 @@ setActiveThreadId('info');
 };
 
 const createPlainChannel = (categoryId, name) => {
-const ch = {
-id: 'ch-' + Date.now().toString(36),
-type: 'plain',
-name,
-categoryId,
-createdAt: new Date().toISOString()
-};
+const ch = {id:'ch-'+Date.now().toString(36), type:'plain', name, categoryId, createdAt:new Date().toISOString()};
 updateData(prev => ({...prev, channels: [ch, ...prev.channels]}));
-setActiveId(ch.id);
-setShowTypePicker(null);
+setActiveId(ch.id); setShowTypePicker(null);
+};
+const createMaterialsChannel = (categoryId, name) => {
+const ch = {id:'ch-'+Date.now().toString(36), type:'materials', name, categoryId, materials:[], createdAt:new Date().toISOString()};
+updateData(prev => ({...prev, channels: [ch, ...prev.channels]}));
+setActiveId(ch.id); setShowTypePicker(null);
+};
+const createCalendarChannel = (categoryId, name) => {
+const ch = {id:'ch-'+Date.now().toString(36), type:'calendar', name, categoryId, createdAt:new Date().toISOString()};
+updateData(prev => ({...prev, channels: [ch, ...prev.channels]}));
+setActiveId(ch.id); setShowTypePicker(null);
 };
 
 const deleteChannel = (id) => {
+const ch = d.channels.find(c => c.id === id);
+if(ch?.type === 'incidents-bin') return alert('System channels cannot be deleted.');
 if(!confirm('Delete this channel?')) return;
 updateData(prev => ({...prev, channels: prev.channels.filter(c => c.id !== id)}));
 if(activeId === id) setActiveId(null);
@@ -1095,45 +1571,45 @@ return {...c, status: newStatus, categoryId: newCatId};
 const saveCategory = (cat) => {
 updateData(prev => {
 const idx = prev.categories.findIndex(c => c.id === cat.id);
-if(idx >= 0) {
-const categories = [...prev.categories];
-categories[idx] = cat;
-return {...prev, categories};
-}
+if(idx >= 0) { const categories = [...prev.categories]; categories[idx] = cat; return {...prev, categories}; }
 return {...prev, categories: [...prev.categories, cat]};
 });
 };
 
 const addCustomThread = (thread) => {
 if(!channel || channel.type !== 'job') return;
-updateData(prev => ({
-...prev,
-channels: prev.channels.map(c =>
-c.id === channel.id ? {...c, customThreads: [...(c.customThreads || []), thread]} : c
-)
-}));
+updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:[...(c.customThreads || []), thread]} : c)}));
 setActiveThreadId(thread.id);
 };
-
 const removeCustomThread = (threadId) => {
 if(!channel || channel.type !== 'job') return;
 if(!confirm('Remove this thread? Notes in it will be lost.')) return;
-updateData(prev => ({
-...prev,
-channels: prev.channels.map(c =>
-c.id === channel.id ? {...c, customThreads: (c.customThreads || []).filter(t => t.id !== threadId)} : c
-)
-}));
+updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:(c.customThreads || []).filter(t=>t.id!==threadId)} : c)}));
 if(activeThreadId === threadId) setActiveThreadId('info');
 };
 
-const selectChannel = (id) => {
-setActiveId(id);
-setActiveThreadId('info');
+const submitIncident = (inc) => { setIncidents(prev => [inc, ...prev]); };
+const deleteIncident = (id) => { if(confirm('Delete this report?')) setIncidents(prev => prev.filter(i => i.id !== id)); };
+
+const updateMaterials = (newList) => {
+if(!channel) return;
+updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, materials:newList} : c)}));
+};
+const addMaterial = (item) => {
+if(!channel) return;
+updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, materials:[...(c.materials || []), item]} : c)}));
 };
 
+const addCalEntry = (entry) => { setCalendarEntries(prev => [entry, ...prev]); setCalEntryDate(null); };
+const deleteCalEntry = (id) => setCalendarEntries(prev => prev.filter(e => e.id !== id));
+
+const selectChannel = (id) => { setActiveId(id); setActiveThreadId('info'); };
+
+const handleMentionClick = (id) => { selectChannel(id); };
+
+// Thread list — custom threads shown FIRST, then defaults
 const allThreads = channel && channel.type === 'job'
-? [...DEFAULT_THREADS, ...(channel.customThreads || [])]
+? [...(channel.customThreads || []), ...DEFAULT_THREADS]
 : [];
 const currentThread = allThreads.find(t => t.id === activeThreadId) || allThreads[0];
 
@@ -1142,7 +1618,6 @@ const currentCategory = channel ? d.categories.find(c => c.id === channel.catego
 
 return (
 <div style={s.app}>
-{/* SIDEBAR */}
 <div style={s.sidebar}>
 <div style={s.serverHeader}>
 <div style={s.serverIcon}>RAL</div>
@@ -1156,38 +1631,23 @@ return (
 </div>
 
 <div style={s.actionBar}>
-<button style={s.actionBtn} onClick={() => { setEditingJob(null); setJobTargetCategory('cat-run'); setShowJobWizard(true); }}>
-+ NEW PROJECT
-</button>
-<button style={s.actionBtn} onClick={() => { setEditingCategory(null); setShowCategoryModal(true); }}>
-+ CATEGORY
-</button>
+<button style={s.actionBtn} onClick={() => { setEditingJob(null); setJobTargetCategory('cat-run'); setShowJobWizard(true); }}>+ NEW PROJECT</button>
+<button style={s.actionBtn} onClick={() => { setEditingCategory(null); setShowCategoryModal(true); }}>+ CATEGORY</button>
 </div>
 
 <div style={s.projList}>
 {d.categories.map(cat => (
-<CategoryBlock
-key={cat.id}
-category={cat}
-channels={channelsByCat(cat.id)}
-activeId={activeId}
-onSelect={selectChannel}
+<CategoryBlock key={cat.id} category={cat} channels={channelsByCat(cat.id)}
+activeId={activeId} onSelect={selectChannel}
 onAddChannel={(c) => {
-if(c.system === 'running') {
-setEditingJob(null);
-setJobTargetCategory(c.id);
-setShowJobWizard(true);
-} else {
-setShowTypePicker({category: c});
-}
+if(c.system === 'running') { setEditingJob(null); setJobTargetCategory(c.id); setShowJobWizard(true); }
+else { setShowTypePicker({category: c}); }
 }}
-onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}
-/>
+onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}/>
 ))}
 </div>
 </div>
 
-{/* MAIN */}
 <div style={s.main}>
 {!channel
 ? <div style={{...s.empty,height:'100%'}}>
@@ -1203,43 +1663,41 @@ onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}
 {channel.status === 'done' && ' · done'}
 </div>
 <div style={s.headerTitle}>
-{channel.type === 'plain' ? '#' + channel.name : channel.name}
+{(channel.type === 'plain' || channel.type === 'materials' || channel.type === 'calendar' || channel.type === 'incidents-bin') ? '#' + channel.name : channel.name}
 </div>
 <div style={s.headerMeta}>
-{channel.type === 'job'
-? `${channel.address || 'No address'} · Started ${formatDate(channel.startDate)}`
-: 'Plain channel'
+{channel.type === 'job' ? `${channel.address || 'No address'} · Started ${formatDate(channel.startDate)}` :
+channel.type === 'materials' ? 'Materials list' :
+channel.type === 'calendar' ? 'Calendar' :
+channel.type === 'incidents-bin' ? 'All ' + channel.name + ' reports across projects' :
+'Plain channel'
 }
 </div>
 </div>
 <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
 {channel.type === 'job' && channel.whatsapp && (
 <a href={channel.whatsapp} target="_blank" rel="noreferrer"
-style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>
-💬 Chat
-</a>
+style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>💬 Chat</a>
 )}
 {channel.type === 'job' && (
 <>
-<button style={{...s.badge,...s.badgePrimary}} onClick={() => setShowShare(true)}>
-↗ Share
-</button>
+<button style={{...s.badge,...s.badgePrimary}} onClick={() => setShowShare(true)}>↗ Share</button>
 <button style={{...s.badge,...s.badgeGhost}} onClick={() => toggleStatus(channel.id)}>
 {channel.status === 'done' ? '↻ Re-open' : '✓ Done'}
 </button>
-<button style={{...s.badge,...s.badgeGhost}} onClick={() => { setEditingJob(channel); setShowJobWizard(true); }}>
-✏ Edit
-</button>
+<button style={{...s.badge,...s.badgeGhost}} onClick={() => { setEditingJob(channel); setShowJobWizard(true); }}>✏ Edit</button>
 </>
 )}
-<button style={{...s.badge,...s.badgeGhost}} onClick={() => deleteChannel(channel.id)}>
-🗑
-</button>
+{channel.type !== 'incidents-bin' && (
+<button style={{...s.badge,...s.badgeGhost}} onClick={() => deleteChannel(channel.id)}>🗑</button>
+)}
 </div>
 </div>
 
 {channel.type === 'job' && (
 <div style={s.threadBar}>
+<button style={s.threadAdd} onClick={() => setShowAddThread(true)} title="Add custom thread">+</button>
+{(channel.customThreads || []).length > 0 && <div style={s.threadDivider}/>}
 {allThreads.map(t => (
 <button key={t.id}
 style={{...s.threadBtn, ...(activeThreadId===t.id ? s.threadBtnActive : {})}}
@@ -1251,18 +1709,24 @@ onClick={() => setActiveThreadId(t.id)}>
 )}
 </button>
 ))}
-<button style={s.threadAdd} onClick={() => setShowAddThread(true)} title="Add thread">
-+
-</button>
 </div>
 )}
 
 <div style={s.content}>
 <ThreadView
-channel={channel}
-thread={currentThread}
-notes={notes}
-setNotes={setNotes}
+channel={channel} thread={currentThread}
+notes={notes} setNotes={setNotes}
+allChannels={d.channels} incidents={incidents}
+onIncidentSubmit={() => setShowIncidentForm(true)}
+onIncidentDelete={deleteIncident}
+onMentionClick={handleMentionClick}
+onJumpToProject={selectChannel}
+onUpdateMaterials={updateMaterials}
+onAddMaterial={() => setShowAddMaterial(true)}
+calendarEntries={calendarEntries}
+onAddCalEntry={(date) => setCalEntryDate(date)}
+onDeleteCalEntry={deleteCalEntry}
+getCategory={getCategory}
 />
 </div>
 </>
@@ -1270,44 +1734,32 @@ setNotes={setNotes}
 </div>
 
 {showJobWizard && (
-<JobWizard
-onClose={() => setShowJobWizard(false)}
-onSave={saveJob}
-editing={editingJob}
-/>
+<JobWizard onClose={() => setShowJobWizard(false)} onSave={saveJob} editing={editingJob}/>
 )}
-
 {showShare && channel && channel.type === 'job' && (
 <ShareModal channel={channel} onClose={() => setShowShare(false)}/>
 )}
-
 {showCategoryModal && (
-<CategoryModal
-onClose={() => { setShowCategoryModal(false); setEditingCategory(null); }}
-onSave={saveCategory}
-editing={editingCategory}
-/>
+<CategoryModal onClose={() => { setShowCategoryModal(false); setEditingCategory(null); }} onSave={saveCategory} editing={editingCategory}/>
 )}
-
 {showTypePicker && (
 <ChannelTypePicker
 onClose={() => setShowTypePicker(null)}
 categoryName={showTypePicker.category.name}
-onPickJob={() => {
-setJobTargetCategory(showTypePicker.category.id);
-setEditingJob(null);
-setShowTypePicker(null);
-setShowJobWizard(true);
-}}
+onPickJob={() => { setJobTargetCategory(showTypePicker.category.id); setEditingJob(null); setShowTypePicker(null); setShowJobWizard(true); }}
 onPickPlain={(name) => createPlainChannel(showTypePicker.category.id, name)}
+onPickMaterials={(name) => createMaterialsChannel(showTypePicker.category.id, name)}
+onPickCalendar={(name) => createCalendarChannel(showTypePicker.category.id, name)}
 />
 )}
-
-{showAddThread && (
-<AddThreadModal
-onClose={() => setShowAddThread(false)}
-onSave={addCustomThread}
-/>
+{showAddThread && <AddThreadModal onClose={() => setShowAddThread(false)} onSave={addCustomThread}/>}
+{showIncidentForm && channel && channel.type === 'job' && (
+<IncidentFormModal onClose={() => setShowIncidentForm(false)} onSave={submitIncident} project={channel}/>
+)}
+{showAddMaterial && <AddMaterialModal onClose={() => setShowAddMaterial(false)} onSave={addMaterial}/>}
+{calEntryDate && (
+<CalendarEntryModal onClose={() => setCalEntryDate(null)} onSave={addCalEntry}
+date={calEntryDate} jobChannels={d.channels.filter(c => c.type === 'job')}/>
 )}
 </div>
 );
