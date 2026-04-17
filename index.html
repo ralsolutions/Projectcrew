@@ -482,6 +482,14 @@ return <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
 <div style={{flex:1,overflowY:'auto',marginTop:16}}>{list.length===0?<div style={{...s.empty,height:'50%'}}><span style={s.emptyIcon}>💬</span><span style={s.emptyText}>No notes</span></div>:list.map(n=><div key={n.id} style={s.note}><div style={s.noteText}>{renderWithMentions(n.text,channels,onJump)}</div><div style={s.noteMeta}>{formatTime(n.createdAt)}</div></div>)}</div>
 </div>;}
 
+// Timesheet Tab Wrapper (avoids hooks in conditional)
+function TimesheetTabWrapper({project,timesheets,allCrew,onEditEntry,onApproveWeek,onDeleteEntry,onAddTimesheet,onAddWorker}){
+const[showAdd,setShowAdd]=useState(false);
+return <>
+<ProjectTimesheetView project={project} timesheets={timesheets} allCrew={allCrew} onAddEntry={()=>setShowAdd(true)} onEditEntry={onEditEntry} onApproveWeek={onApproveWeek} onDeleteEntry={onDeleteEntry}/>
+{showAdd&&<TimesheetEntryModal project={project} allCrew={allCrew} onClose={()=>setShowAdd(false)} onSave={r=>{if(r.type==='entry')onAddTimesheet(r.entry);if(r.type==='add-worker')onAddWorker(r.worker,project.id);setShowAdd(false);}}/>}
+</>;}
+
 // Thread View - routes to appropriate view
 function ThreadView({channel,threadId,notes,incidents,timesheets,channels,allCrew,currentUserId,onAddNote,onJump,onAddIncident,onDeleteIncident,onAddTimesheet,onEditTimesheet,onApproveWeek,onDeleteTimesheet,onAddWorker,onSetCurrentUser}){
 if(threadId==='info')return <InfoDisplay channel={channel}/>;
@@ -489,13 +497,7 @@ if(threadId==='toolbox')return <NotesFeed channelId={channel.id} threadId={threa
 if(threadId==='incidents')return <ProjectIncidentsView channel={channel} incidents={incidents} channels={channels} onClick={onJump} onAdd={onAddIncident} onDelete={onDeleteIncident}/>;
 if(threadId==='rams')return <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>📋</span><span style={s.emptyText}>RAMS</span><a href={RAMS_URL} target="_blank" rel="noreferrer" style={{...s.primaryBtn,marginTop:16,textDecoration:'none'}}>Open RAMS ↗</a></div>;
 if(threadId==='survey')return <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>🔍</span><span style={s.emptyText}>Survey</span><a href={channel.surveyLink||SURVEY_URL} target="_blank" rel="noreferrer" style={{...s.primaryBtn,marginTop:16,textDecoration:'none'}}>Open Survey ↗</a></div>;
-if(threadId==='timesheet'){
-const[showAdd,setShowAdd]=useState(false);
-return <>
-<ProjectTimesheetView project={channel} timesheets={timesheets} allCrew={allCrew} onAddEntry={()=>setShowAdd(true)} onEditEntry={onEditTimesheet} onApproveWeek={onApproveWeek} onDeleteEntry={onDeleteTimesheet}/>
-{showAdd&&<TimesheetEntryModal project={channel} allCrew={allCrew} onClose={()=>setShowAdd(false)} onSave={r=>{if(r.type==='entry')onAddTimesheet(r.entry);if(r.type==='add-worker')onAddWorker(r.worker,r.addToProject?channel.id:null);setShowAdd(false);}}/>}
-</>;
-}
+if(threadId==='timesheet')return <TimesheetTabWrapper project={channel} timesheets={timesheets} allCrew={allCrew} onEditEntry={onEditTimesheet} onApproveWeek={onApproveWeek} onDeleteEntry={onDeleteTimesheet} onAddTimesheet={onAddTimesheet} onAddWorker={onAddWorker}/>;
 // Custom threads
 return <NotesFeed channelId={channel.id} threadId={threadId} notes={notes} channels={channels} onAdd={onAddNote} onJump={onJump}/>;
 }
@@ -579,7 +581,7 @@ return <div style={s.empty}><span style={s.emptyIcon}>❓</span><span style={s.e
 return <div style={s.app}>
 <div style={s.sidebar}>
 <div style={s.serverHeader}><div style={s.serverIcon}>RAL</div><div style={s.serverMeta}><div style={s.serverSmallCap}>Altitude Access</div><div style={s.serverName}>Project Manager</div></div><button style={s.themeToggle} onClick={()=>setTheme(t=>t==='dark'?'light':'dark')}>{theme==='dark'?'☀️':'🌙'}</button></div>
-<div style={s.actionBar}><button style={s.actionBtn} onClick={()=>setModal({type:'job'})}>+ Job</button><button style={s.actionBtn} onClick={()=>setModal({type:'category'})}>+ Category</button></div>
+<div style={s.actionBar}><button style={s.actionBtn} onClick={()=>setModal({type:'job'})}>+ Job</button><button style={s.actionBtn} onClick={()=>setModal({type:'category'})}>+ Category</button><button style={{...s.actionBtn,fontSize:9,color:'var(--text-faint)'}} onClick={()=>{if(confirm('Reset all data?')){localStorage.clear();window.location.reload();}}}>↺ Reset</button></div>
 <div style={s.projList}>{categories.map(cat=><CategoryBlock key={cat.id} cat={cat} channels={channels} activeId={activeId} collapsed={cat.collapsed} onToggle={()=>toggleCategory(cat.id)} onSelect={id=>selectChannel(id)} onAddChannel={()=>setModal({type:'channelPicker',categoryId:cat.id,categoryName:cat.name})} getColor={getColor}/>)}</div>
 </div>
 <div style={s.main}>
