@@ -45,12 +45,14 @@ input,textarea,select,button{font-family:'Inter',sans-serif;}
 input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;}
 .mention{color:var(--accent);background:var(--accent-bg);padding:1px 6px;border-radius:4px;font-weight:600;cursor:pointer;text-decoration:none;font-size:0.95em;}
 .mention:hover{background:var(--accent);color:#fff;}
+.cat-dragging{opacity:0.5;}
+.cat-drag-over{border-top:2px solid var(--accent)!important;}
 </style>
 </head>
 <body>
   <script>
 // Auto-migration: adds Timesheets category + crew-roster to existing localStorage data
-// Also renames anuncios to 📢announcements and reorders Crew category
+// Also renames anuncios to 📢announcements, reorders Crew category, and adds order field to categories
 (function(){
 try{
 var raw=localStorage.getItem('ral-data-v5');
@@ -58,8 +60,15 @@ if(!raw)return;
 var d=JSON.parse(raw);
 if(!d||!d.categories||!d.channels)return;
 var ch=false;
+
+// Add order field to categories if missing
+if(d.categories.length > 0 && d.categories[0].order === undefined){
+  d.categories.forEach(function(c, i){ c.order = i; });
+  ch=true;
+}
+
 if(!d.categories.find(function(c){return c.id==='cat-timesheets'})){
-d.categories.splice(2,0,{id:'cat-timesheets',name:'Timesheets',emoji:'⏱️',system:'timesheets',collapsed:false});
+d.categories.splice(2,0,{id:'cat-timesheets',name:'Timesheets',emoji:'⏱️',system:'timesheets',collapsed:false,order:2});
 ch=true;}
 if(!d.channels.find(function(c){return c.id==='ts-overview'})){
 d.channels.push({id:'ts-overview',type:'ts-overview',name:'worked-hours',categoryId:'cat-timesheets',createdAt:new Date().toISOString()});
@@ -67,6 +76,13 @@ ch=true;}
 if(!d.channels.find(function(c){return c.id==='crew-roster'})){
 d.channels.push({id:'crew-roster',type:'roster',name:'📋crew-roster',categoryId:'cat-crew',createdAt:new Date().toISOString()});
 ch=true;}
+
+// Fix duplicate emoji in work-calendar
+var cal=d.channels.find(function(c){return c.id==='crew-calendar'});
+if(cal){
+  cal.name = '📅work-calendar';
+  ch=true;
+}
 
 // Rename anuncios to 📢announcements and add WhatsApp link
 var g=d.channels.find(function(c){return (c.id==='crew-general' || c.name==='anuncios') && c.categoryId==='cat-crew'});
@@ -77,11 +93,7 @@ if(g){
   ch=true;
 }
 
-// Add emoji to work-calendar if missing
-var cal=d.channels.find(function(c){return c.id==='crew-calendar'});
-if(cal && !cal.name.includes('📅')){cal.name='📅work-calendar';ch=true;}
-
-// Reorder Crew category channels: announcements, calendar, roster
+// Reorder Crew category channels
 var crewChannels = d.channels.filter(function(c){return c.categoryId==='cat-crew';});
 if(crewChannels.length){
   var order = ['📢announcements','📅work-calendar','📋crew-roster'];
@@ -162,13 +174,15 @@ actionBtn:{flex:1,padding:'8px 8px',background:'var(--bg-raised)',border:'1px so
 
 projList:{flex:1,overflowY:'auto',padding:'4px 8px 12px'},
 
-catWrap:{marginBottom:6},
-catHeader:{display:'flex',alignItems:'center',gap:6,padding:'9px 8px 6px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.12,cursor:'pointer',userSelect:'none',borderRadius:4},
+catWrap:{marginBottom:6,cursor:'grab',userSelect:'none'},
+catWrapDragging:{opacity:0.5},
+catHeader:{display:'flex',alignItems:'center',gap:6,padding:'9px 8px 6px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.12,cursor:'pointer',borderRadius:4},
 catCaret:{fontSize:8,color:'var(--text-faint)',transition:'transform 0.15s',display:'inline-block',width:8},
 catEmoji:{fontSize:13},
 catLabel:{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'},
 catCount:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',background:'var(--bg-raised)',padding:'2px 6px',borderRadius:10,fontWeight:600},
 catAddBtn:{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:13,padding:'0 4px',opacity:0.8,fontWeight:600},
+catDragHandle:{cursor:'grab',color:'var(--text-faint)',fontSize:12,padding:'0 2px',opacity:0.6},
 
 chanItem:{display:'flex',alignItems:'center',gap:8,padding:'7px 10px 7px 18px',borderRadius:6,cursor:'pointer',marginBottom:2,transition:'all 0.1s'},
 chanItemActive:{background:'var(--accent-bg)',boxShadow:'inset 2px 0 0 var(--accent)'},
@@ -440,12 +454,12 @@ whatsapp: FAKE_WA + slug, surveyLink: SURVEY_URL,
 
 return {
 categories: [
-{id:'cat-run',name:'Projects on Run',emoji:'🚧',system:'running',collapsed:false},
-{id:'cat-done',name:'Done',emoji:'✅',system:'done',collapsed:true},
-{id:'cat-timesheets',name:'Timesheets',emoji:'⏱️',system:'timesheets',collapsed:false},
-{id:'cat-incidents',name:'Incident Reports',emoji:'⚠️',system:'incidents',collapsed:false},
-{id:'cat-tools',name:'Tools & Materials',emoji:'🧰',system:null,collapsed:false},
-{id:'cat-crew',name:'Crew',emoji:'👥',system:null,collapsed:false},
+{id:'cat-run',name:'Projects on Run',emoji:'🚧',system:'running',collapsed:false,order:0},
+{id:'cat-done',name:'Done',emoji:'✅',system:'done',collapsed:true,order:1},
+{id:'cat-timesheets',name:'Timesheets',emoji:'⏱️',system:'timesheets',collapsed:false,order:2},
+{id:'cat-incidents',name:'Incident Reports',emoji:'⚠️',system:'incidents',collapsed:false,order:3},
+{id:'cat-tools',name:'Tools & Materials',emoji:'🧰',system:null,collapsed:false,order:4},
+{id:'cat-crew',name:'Crew',emoji:'👥',system:null,collapsed:false,order:5},
 ],
 channels: [
 {...job('80-queen-street', colors[0], {
@@ -696,7 +710,7 @@ function CategoryModal({onClose, onSave, editing}) {
 const [name, setName] = useState(editing?.name || '');
 const [emoji, setEmoji] = useState(editing?.emoji || '📁');
 const [customEmoji, setCustomEmoji] = useState('');
-const save = () => { if(!name.trim()) return; onSave({id:editing?.id || 'cat-'+Date.now().toString(36), name:name.trim(), emoji:(customEmoji||emoji).trim()||'📁', system:editing?.system||null, collapsed:editing?.collapsed??false}); onClose(); };
+const save = () => { if(!name.trim()) return; onSave({id:editing?.id || 'cat-'+Date.now().toString(36), name:name.trim(), emoji:(customEmoji||emoji).trim()||'📁', system:editing?.system||null, collapsed:editing?.collapsed??false, order:editing?.order??999}); onClose(); };
 return (
 <div style={s.overlay} onClick={onClose}>
 <div style={{...s.modal,...s.modalSm}} onClick={e=>e.stopPropagation()}>
@@ -1645,7 +1659,7 @@ if(channel.type === 'plain') {
   if(channel.name === '📢announcements') {
     return <AnnouncementsView channel={channel} notes={notes} setNotes={setNotes} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
   }
-  return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} placeholder={`Post in #${channel.name}... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
+  return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} placeholder={`Post in ${channel.name}... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
 }
 if(channel.type === 'materials') return <MaterialsView channel={channel} onUpdate={onUpdateMaterials} onAdd={onAddMaterial}/>;
 if(channel.type === 'calendar') return <CalendarView entries={calendarEntries} jobChannels={allJobs} allChannels={allChannels} getCategory={getCategory}
@@ -1664,10 +1678,18 @@ if(thread.id === 'survey') return (<div style={{display:'flex',flexDirection:'co
 return <NotesFeed channelId={channel.id} threadId={thread.id} notes={notes} setNotes={setNotes} placeholder={`Add a ${thread.label} note... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
 }
 
-function CategoryBlock({category, channels, activeId, onSelect, onAddChannel, onEditCategory, getColor}) {
+function CategoryBlock({category, channels, activeId, onSelect, onAddChannel, onEditCategory, getColor, onDragStart, onDragOver, onDrop, isDragging}) {
 const [open, setOpen] = useState(!category.collapsed);
+const dragHandleRef = useRef(null);
 return (
-<div style={s.catWrap}>
+<div 
+  style={{...s.catWrap, ...(isDragging ? s.catWrapDragging : {})}} 
+  draggable={!category.system} 
+  onDragStart={(e) => onDragStart(e, category)}
+  onDragOver={onDragOver}
+  onDrop={(e) => onDrop(e, category)}
+  data-category-id={category.id}
+>
 <div style={s.catHeader}>
 <span onClick={()=>setOpen(o=>!o)} style={{display:'flex',alignItems:'center',gap:6,flex:1,minWidth:0}}>
 <span style={{...s.catCaret, transform: open?'rotate(90deg)':'rotate(0deg)'}}>▶</span>
@@ -1677,6 +1699,7 @@ return (
 <span style={s.catCount}>{channels.length}</span>
 {category.system !== 'incidents' && category.system !== 'timesheets' && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onAddChannel(category);}}>+</button>)}
 {!category.system && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onEditCategory(category);}}>✎</button>)}
+{!category.system && (<span style={s.catDragHandle} ref={dragHandleRef}>⋮⋮</span>)}
 </div>
 {open && channels.map(ch => {
 const isActive = activeId === ch.id;
@@ -1727,7 +1750,8 @@ const [showIncidentForm, setShowIncidentForm] = useState(false);
 const [showAddMaterial, setShowAddMaterial] = useState(false);
 const [bookingModal, setBookingModal] = useState(null);
 const [sharedChannel, setSharedChannel] = useState(null);
-const [showTimesheetModal, setShowTimesheetModal] = useState(null); // {projectId, projectName, editing?}
+const [showTimesheetModal, setShowTimesheetModal] = useState(null);
+const [draggedCategory, setDraggedCategory] = useState(null);
 
 useEffect(() => { if(data === null) setData(seedData()); }, [data]);
 useEffect(() => { if(calendarEntries === null) setCalendarEntries(seedCalendarEntries()); }, [calendarEntries]);
@@ -1748,6 +1772,11 @@ if(sharedChannel) return <SharedView channel={sharedChannel} onExit={() => { win
 
 const d = data || {categories:[],channels:[]};
 const allJobs = d.channels.filter(c => c.type === 'job');
+
+// Sort categories by order
+const sortedCategories = useMemo(() => {
+  return [...d.categories].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+}, [d.categories]);
 
 // Dynamic timesheet project channels
 const tsProjectChannels = useMemo(() => {
@@ -1775,6 +1804,41 @@ const channelsByCat = (catId) => {
   const regular = d.channels.filter(c => c.categoryId === catId);
   if(catId === 'cat-timesheets') return [...regular, ...tsProjectChannels];
   return regular;
+};
+
+// Drag and drop handlers for categories
+const handleDragStart = (e, category) => {
+  if(category.system) { e.preventDefault(); return; }
+  setDraggedCategory(category);
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', category.id);
+};
+
+const handleDragOver = (e) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+};
+
+const handleDrop = (e, targetCategory) => {
+  e.preventDefault();
+  if(!draggedCategory || draggedCategory.id === targetCategory.id) return;
+  if(draggedCategory.system || targetCategory.system) return;
+  
+  updateData(prev => {
+    const categories = [...prev.categories];
+    const draggedIdx = categories.findIndex(c => c.id === draggedCategory.id);
+    const targetIdx = categories.findIndex(c => c.id === targetCategory.id);
+    if(draggedIdx === -1 || targetIdx === -1) return prev;
+    
+    const [removed] = categories.splice(draggedIdx, 1);
+    categories.splice(targetIdx, 0, removed);
+    
+    // Update order field
+    categories.forEach((c, i) => { c.order = i; });
+    
+    return {...prev, categories};
+  });
+  setDraggedCategory(null);
 };
 
 const saveJob = (job) => {
@@ -1820,7 +1884,16 @@ return {...c, status: newStatus, categoryId: newCatId, colorId};
 })}));
 };
 
-const saveCategory = (cat) => updateData(prev => { const idx = prev.categories.findIndex(c => c.id === cat.id); if(idx >= 0) { const categories = [...prev.categories]; categories[idx] = cat; return {...prev, categories}; } return {...prev, categories: [...prev.categories, cat]}; });
+const saveCategory = (cat) => updateData(prev => { 
+  const idx = prev.categories.findIndex(c => c.id === cat.id); 
+  if(idx >= 0) { 
+    const categories = [...prev.categories]; 
+    categories[idx] = {...cat, order: cat.order ?? idx}; 
+    return {...prev, categories}; 
+  } 
+  const newCat = {...cat, order: prev.categories.length};
+  return {...prev, categories: [...prev.categories, newCat]}; 
+});
 
 const addCustomThread = (thread) => { if(!channel || channel.type !== 'job') return; updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:[...(c.customThreads || []), thread]} : c)})); setActiveThreadId(thread.id); };
 const removeCustomThread = (threadId) => { if(!channel || channel.type !== 'job') return; if(!confirm('Remove this thread? Notes in it will be lost.')) return; updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, customThreads:(c.customThreads || []).filter(t=>t.id!==threadId)} : c)})); if(activeThreadId === threadId) setActiveThreadId('info'); };
@@ -1886,11 +1959,16 @@ return (
 <button style={s.actionBtn} onClick={() => { setEditingCategory(null); setShowCategoryModal(true); }}>+ CATEGORY</button>
 </div>
 <div style={s.projList}>
-{d.categories.map(cat => (
+{sortedCategories.map(cat => (
 <CategoryBlock key={cat.id} category={cat} channels={channelsByCat(cat.id)}
 activeId={activeId} onSelect={selectChannel} getColor={getColor}
 onAddChannel={(c) => { if(c.system === 'running') { setEditingJob(null); setJobTargetCategory(c.id); setShowJobWizard(true); } else { setShowTypePicker({category: c}); } }}
-onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}/>
+onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}
+onDragStart={handleDragStart}
+onDragOver={handleDragOver}
+onDrop={handleDrop}
+isDragging={draggedCategory?.id === cat.id}
+/>
 ))}
 </div>
 </div>
