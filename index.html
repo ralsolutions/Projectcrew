@@ -82,8 +82,6 @@ const INCIDENT_TYPES = [
 {id:'accident',label:'Accident',emoji:'🚨',color:'var(--danger)',bg:'var(--danger-bg)'},
 ];
 
-// Project colour palette — each entry: {bar, text, text-on-light}
-// Designed to be readable in both themes. Bar colours are mid-saturation so white text works on them.
 const PROJECT_COLORS = [
 {id:'teal',    bar:'#0891b2', label:'#0891b2', bgLight:'#cffafe', bgDark:'#083344'},
 {id:'amber',   bar:'#d97706', label:'#d97706', bgLight:'#fef3c7', bgDark:'#451a03'},
@@ -237,7 +235,6 @@ matName:{flex:1,fontSize:14,color:'var(--text)'},
 matNameDone:{textDecoration:'line-through',color:'var(--text-dim)'},
 matQty:{fontSize:11,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace",padding:'2px 8px',background:'var(--bg-raised)',borderRadius:10},
 
-// Calendar
 calNav:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12},
 calMonth:{fontSize:16,fontWeight:700,color:'var(--text)'},
 calNavBtn:{padding:'6px 12px',background:'var(--bg-raised)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text-muted)',cursor:'pointer',fontSize:14,fontWeight:600},
@@ -251,7 +248,6 @@ calBarsRow:{display:'flex',gap:2,flex:1,minHeight:0},
 calBar:{flex:1,minWidth:0,padding:'4px 5px',color:'#fff',fontSize:10,fontWeight:600,borderRadius:3,cursor:'pointer',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3},
 calNewBtn:{padding:'12px 18px',background:'var(--accent)',border:'1px solid var(--accent)',borderRadius:8,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3},
 
-// Entry detail panel
 entryDetail:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:10,padding:'18px 20px',marginTop:20,boxShadow:'var(--shadow-sm)'},
 entryHead:{display:'flex',alignItems:'center',gap:10,marginBottom:10,flexWrap:'wrap'},
 entryColorBar:{width:4,alignSelf:'stretch',borderRadius:2,flexShrink:0},
@@ -261,10 +257,31 @@ entryField:{marginTop:10},
 entryFieldLabel:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:3},
 entryFieldText:{fontSize:13,color:'var(--text)',lineHeight:1.55,whiteSpace:'pre-wrap'},
 
-// Legend
 legend:{display:'flex',gap:8,flexWrap:'wrap',padding:'12px 0 16px',alignItems:'center'},
 legendItem:{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 10px',background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:16,fontSize:11,color:'var(--text-muted)',fontWeight:500},
 legendDot:{width:10,height:10,borderRadius:2,flexShrink:0},
+
+// Timesheet styles
+tsRow:{display:'flex',gap:10,padding:'12px 16px',background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,marginBottom:6,alignItems:'center',boxShadow:'var(--shadow-sm)',flexWrap:'wrap'},
+tsWorker:{fontSize:14,fontWeight:600,color:'var(--text)',minWidth:100},
+tsTime:{fontSize:12,color:'var(--text-muted)',fontFamily:"'JetBrains Mono',monospace"},
+tsHours:{fontSize:12,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",padding:'3px 8px',borderRadius:10,background:'var(--accent-bg)',color:'var(--accent-text)'},
+tsDesc:{fontSize:12,color:'var(--text-muted)',flex:1,minWidth:120,lineHeight:1.4},
+tsStatus:{fontSize:10,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.2,padding:'4px 10px',borderRadius:5,cursor:'pointer',border:'1px solid'},
+tsPending:{color:'var(--warn)',background:'var(--warn-bg)',borderColor:'var(--warn)'},
+tsConfirmed:{color:'var(--success)',background:'var(--success-bg)',borderColor:'var(--success)'},
+tsDateGroup:{fontSize:12,fontWeight:700,color:'var(--text-muted)',padding:'14px 0 6px',fontFamily:"'JetBrains Mono',monospace",borderBottom:'1px solid var(--border)',marginBottom:8},
+tsSummary:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:10,marginBottom:20},
+tsSummaryCard:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,padding:'14px 16px',boxShadow:'var(--shadow-sm)'},
+tsSummaryLabel:{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:4},
+tsSummaryValue:{fontSize:22,fontWeight:800,color:'var(--text)'},
+tsSummaryUnit:{fontSize:11,color:'var(--text-dim)',fontWeight:500,marginLeft:4},
+tsWorkerSummary:{background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,padding:'12px 16px',marginBottom:6,display:'flex',alignItems:'center',gap:12,boxShadow:'var(--shadow-sm)'},
+tsWorkerName:{fontSize:14,fontWeight:600,color:'var(--text)',flex:1},
+tsWorkerHours:{fontSize:14,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",color:'var(--accent-text)'},
+crewRow:{display:'flex',gap:10,padding:'10px 14px',background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,marginBottom:6,alignItems:'center',boxShadow:'var(--shadow-sm)'},
+crewName:{flex:1,fontSize:14,color:'var(--text)',fontWeight:500},
+crewRemove:{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:'0 4px'},
 };
 
 function useStorage(key, init) {
@@ -284,7 +301,6 @@ function formatShortDate(iso) { if(!iso) return '—'; return new Date(iso+'T00:
 function formatTime(iso) { if(!iso) return ''; return new Date(iso).toLocaleString('en-NZ', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function todayISO(){ const d = new Date(); return d.toISOString().slice(0,10); }
 
-// Date math helpers
 function addDays(iso, n) {
 const d = new Date(iso+'T00:00:00');
 d.setDate(d.getDate() + n);
@@ -295,11 +311,26 @@ const d1 = new Date(a+'T00:00:00');
 const d2 = new Date(b+'T00:00:00');
 return Math.round((d2-d1)/(1000*60*60*24));
 }
-// Generate array of ISO dates from start for `days` days
 function datesFor(start, days) {
 const arr = [];
 for(let i = 0; i < days; i++) arr.push(addDays(start, i));
 return arr;
+}
+
+// Calculate hours between two HH:MM times
+function calcHours(start, end) {
+if(!start || !end) return 0;
+const [sh,sm] = start.split(':').map(Number);
+const [eh,em] = end.split(':').map(Number);
+let mins = (eh*60+em) - (sh*60+sm);
+if(mins < 0) mins += 24*60; // overnight
+return Math.round(mins/60*100)/100;
+}
+// Date X months ago as ISO
+function monthsAgo(n) {
+const d = new Date();
+d.setMonth(d.getMonth() - n);
+return d.toISOString().slice(0,10);
 }
 
 function encodeObj(p) { try { const json = JSON.stringify(p); const b64 = btoa(unescape(encodeURIComponent(json))); return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); } catch { return ''; } }
@@ -329,12 +360,10 @@ return part;
 });
 }
 
-// Pick a colour for a new project — first unused by any running project
 function pickProjectColor(allProjects) {
 const usedByRunning = new Set(allProjects.filter(p => p.status !== 'done' && p.colorId).map(p => p.colorId));
 const available = PROJECT_COLORS.find(c => !usedByRunning.has(c.id));
 if(available) return available.id;
-// All taken — reuse the first one. Not ideal but simple.
 return PROJECT_COLORS[0].id;
 }
 function getColor(colorId) { return PROJECT_COLORS.find(c => c.id === colorId) || PROJECT_COLORS[0]; }
@@ -354,6 +383,7 @@ return {
 categories: [
 {id:'cat-run',name:'Projects on Run',emoji:'🚧',system:'running',collapsed:false},
 {id:'cat-done',name:'Done',emoji:'✅',system:'done',collapsed:true},
+{id:'cat-timesheets',name:'Timesheets',emoji:'⏱️',system:'timesheets',collapsed:false},
 {id:'cat-incidents',name:'Incident Reports',emoji:'⚠️',system:'incidents',collapsed:false},
 {id:'cat-tools',name:'Tools & Materials',emoji:'🧰',system:null,collapsed:false},
 {id:'cat-crew',name:'Crew',emoji:'👥',system:null,collapsed:false},
@@ -405,6 +435,9 @@ keyLocation:'Collect from concierge', firstAid:'Concierge desk', lunchroom:'Grou
 clientName:'Emma Wilson', clientMobile:'+64 27 555 0505',
 teamLeader:'Felipe', startDate:'2026-02-15',
 })},
+// Timesheet category
+{id:'ts-overview',type:'ts-overview',name:'worked-hours',categoryId:'cat-timesheets',createdAt:new Date(now).toISOString()},
+// Incidents
 {id:'inc-near-miss',type:'incidents-bin',incidentType:'near-miss',name:'near-miss',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
 {id:'inc-incident',type:'incidents-bin',incidentType:'incident',name:'incident',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
 {id:'inc-accident',type:'incidents-bin',incidentType:'accident',name:'accident',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
@@ -427,13 +460,13 @@ materials:[
 {id:'m2',name:'Caulking gun',qty:'2',done:true},
 {id:'m3',name:'Sikaflex 11FC sausages',qty:'24',done:false},
 ]},
+{id:'crew-roster',type:'roster',name:'crew-roster',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
 {id:'crew-calendar',type:'calendar',name:'work-calendar',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
 {id:'crew-general',type:'plain',name:'general',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
 ]
 };
 }
 
-// Seed calendar entries for demo
 function seedCalendarEntries() {
 const today = new Date();
 const y = today.getFullYear();
@@ -449,6 +482,20 @@ startDate: iso(17), days:2, dates: datesFor(iso(17), 2),
 technicians:'Mike, Dave', tools:'#sealant',
 comment:'High-level wash. Confirm access window with building security morning of.',
 createdAt: new Date().toISOString()},
+];
+}
+
+function seedTimesheetEntries() {
+const today = new Date();
+const y = today.getFullYear();
+const m = today.getMonth();
+const iso = (day) => new Date(y, m, day).toISOString().slice(0,10);
+return [
+{id:'ts-seed-1', projectId:'seed-80-queen-street', projectName:'80 Queen Street', workerName:'Felipe', date:iso(14), startTime:'07:00', endTime:'15:30', hours:8.5, description:'Rigged ropes on north elevation, set up exclusion zone on ground level', status:'confirmed', createdAt:new Date().toISOString()},
+{id:'ts-seed-2', projectId:'seed-80-queen-street', projectName:'80 Queen Street', workerName:'Lionel', date:iso(14), startTime:'07:00', endTime:'16:00', hours:9, description:'Rigging north elevation and safety checks with Felipe', status:'confirmed', createdAt:new Date().toISOString()},
+{id:'ts-seed-3', projectId:'seed-80-queen-street', projectName:'80 Queen Street', workerName:'Felipe', date:iso(15), startTime:'07:30', endTime:'15:00', hours:7.5, description:'Caulking around balcony level 4 and 5, waterproofing prep', status:'pending', createdAt:new Date().toISOString()},
+{id:'ts-seed-4', projectId:'seed-sky-tower-facade-clean', projectName:'Sky Tower — Facade Clean', workerName:'Mike', date:iso(15), startTime:'06:00', endTime:'14:00', hours:8, description:'High-level wash section A, west face of tower', status:'pending', createdAt:new Date().toISOString()},
+{id:'ts-seed-5', projectId:'seed-sky-tower-facade-clean', projectName:'Sky Tower — Facade Clean', workerName:'Dave', date:iso(15), startTime:'06:00', endTime:'14:00', hours:8, description:'High-level wash section A with Mike, west face', status:'pending', createdAt:new Date().toISOString()},
 ];
 }
 
@@ -762,7 +809,331 @@ return (
 );
 }
 
-// ── CALENDAR ENTRY MODAL (booking form) ─────────────────────────────────────
+// ── TIMESHEET ENTRY MODAL ───────────────────────────────────────────────────
+function TimesheetEntryModal({onClose, onSave, crew, projectId, projectName, editing, timesheets, onAddCrew}) {
+const projectWorkers = useMemo(() => {
+  const names = new Set((timesheets||[]).filter(t=>t.projectId===projectId).map(t=>t.workerName));
+  crew.forEach(c => names.add(c.name));
+  return [...names].sort();
+}, [timesheets, projectId, crew]);
+const [workerName, setWorkerName] = useState(editing?.workerName || '');
+const [date, setDate] = useState(editing?.date || todayISO());
+const [startTime, setStartTime] = useState(editing?.startTime || '07:00');
+const [endTime, setEndTime] = useState(editing?.endTime || '15:30');
+const [description, setDescription] = useState(editing?.description || '');
+const [addingNew, setAddingNew] = useState(false);
+const [newName, setNewName] = useState('');
+const hours = calcHours(startTime, endTime);
+const descOk = description.trim().length >= 20;
+const save = () => {
+  if(!workerName) return alert('Select a worker.');
+  if(!descOk) return alert('Description must be at least 20 characters.');
+  onSave({
+    id: editing?.id || 'ts-'+Date.now().toString(36),
+    projectId, projectName, workerName, date, startTime, endTime,
+    hours, description: description.trim(),
+    status: editing?.status || 'pending',
+    createdAt: editing?.createdAt || new Date().toISOString()
+  });
+  onClose();
+};
+const handleAddNew = () => {
+  if(!newName.trim()) return;
+  onAddCrew({id:'cr-'+Date.now().toString(36), name:newName.trim()});
+  setWorkerName(newName.trim());
+  setNewName(''); setAddingNew(false);
+};
+return (
+<div style={s.overlay} onClick={onClose}>
+<div style={s.modal} onClick={e=>e.stopPropagation()}>
+<div style={s.modalHeader}>
+<div><div style={s.modalKicker}>{editing?'Edit':'New'} · Timesheet entry</div><div style={s.modalTitle}>{projectName}</div></div>
+<button style={s.closeBtn} onClick={onClose}>×</button>
+</div>
+<div style={s.modalBody}>
+<label style={s.label}>Worker *</label>
+{addingNew ? (
+<div style={{display:'flex',gap:8,marginBottom:16}}>
+<input style={{...s.input,marginBottom:0,flex:1}} value={newName} onChange={e=>setNewName(e.target.value)} placeholder="New crew member name" autoFocus onKeyDown={e=>{if(e.key==='Enter')handleAddNew();}}/>
+<button style={s.primaryBtn} onClick={handleAddNew}>Add</button>
+<button style={s.cancelBtn} onClick={()=>setAddingNew(false)}>✕</button>
+</div>
+) : (
+<div style={{display:'flex',gap:8,marginBottom:16}}>
+<select style={{...s.input,marginBottom:0,flex:1}} value={workerName} onChange={e=>setWorkerName(e.target.value)}>
+<option value="">— Select worker —</option>
+{projectWorkers.map(n => <option key={n} value={n}>{n}</option>)}
+</select>
+<button style={s.cancelBtn} onClick={()=>setAddingNew(true)}>+ New</button>
+</div>
+)}
+
+<label style={s.label}>Date *</label>
+<input style={s.input} type="date" value={date} onChange={e=>setDate(e.target.value)}/>
+
+<div style={s.row2}>
+<div><label style={s.label}>Start time *</label><input style={s.input} type="time" value={startTime} onChange={e=>setStartTime(e.target.value)}/></div>
+<div><label style={s.label}>End time *</label><input style={s.input} type="time" value={endTime} onChange={e=>setEndTime(e.target.value)}/></div>
+</div>
+
+<div style={{fontSize:13,color:'var(--accent-text)',fontWeight:700,fontFamily:"'JetBrains Mono',monospace",marginTop:-8,marginBottom:16}}>
+= {hours} hours
+</div>
+
+<label style={s.label}>Description * <span style={{fontWeight:400,textTransform:'none'}}>({description.trim().length}/20 min chars)</span></label>
+<textarea style={{...s.textarea, borderColor: description.trim().length > 0 && !descOk ? 'var(--warn)' : undefined}} value={description} onChange={e=>setDescription(e.target.value)} rows={4} placeholder="Describe work done (minimum 20 characters)..."/>
+</div>
+<div style={s.modalFooter}>
+<button style={s.cancelBtn} onClick={onClose}>Cancel</button>
+<button style={{...s.primaryBtn, opacity:(workerName&&descOk)?1:0.5}} onClick={save}>{editing?'Save':'Add entry'}</button>
+</div>
+</div>
+</div>
+);
+}
+
+// ── PROJECT TIMESHEET VIEW (inside a job's ⏱️ tab) ─────────────────────────
+function ProjectTimesheetView({channel, timesheets, onAdd, onConfirm, onDelete, onBulkConfirm}) {
+const entries = useMemo(() =>
+  (timesheets||[]).filter(t=>t.projectId===channel.id).sort((a,b)=> b.date.localeCompare(a.date) || b.startTime.localeCompare(a.startTime)),
+[timesheets, channel.id]);
+
+const totalHours = entries.reduce((s,e)=>s+e.hours, 0);
+const confirmedHours = entries.filter(e=>e.status==='confirmed').reduce((s,e)=>s+e.hours, 0);
+const pendingCount = entries.filter(e=>e.status==='pending').length;
+
+// Group by date
+const grouped = useMemo(() => {
+  const map = {};
+  entries.forEach(e => { (map[e.date] = map[e.date] || []).push(e); });
+  return Object.entries(map).sort((a,b)=>b[0].localeCompare(a[0]));
+}, [entries]);
+
+return (
+<div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+<div style={s.tsSummary}>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Total hours</div><div style={s.tsSummaryValue}>{totalHours.toFixed(1)}<span style={s.tsSummaryUnit}>hrs</span></div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Confirmed</div><div style={{...s.tsSummaryValue,color:'var(--success)'}}>{confirmedHours.toFixed(1)}<span style={s.tsSummaryUnit}>hrs</span></div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Pending</div><div style={{...s.tsSummaryValue,color:'var(--warn)'}}>{pendingCount}<span style={s.tsSummaryUnit}>entries</span></div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Entries</div><div style={s.tsSummaryValue}>{entries.length}</div></div>
+</div>
+
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,gap:8,flexWrap:'wrap'}}>
+<div style={{fontSize:13,color:'var(--text-dim)'}}>Team leader confirms entries after review.</div>
+<div style={{display:'flex',gap:6}}>
+{pendingCount > 0 && <button style={{...s.copyBtn, color:'var(--success)',borderColor:'var(--success)'}} onClick={onBulkConfirm}>✓ Confirm all pending</button>}
+<button style={s.primaryBtn} onClick={onAdd}>+ Add entry</button>
+</div>
+</div>
+
+<div style={{flex:1,overflowY:'auto'}}>
+{entries.length === 0
+? <div style={{...s.empty,height:'60%'}}><span style={s.emptyIcon}>⏱️</span><span style={s.emptyText}>No timesheet entries yet</span></div>
+: grouped.map(([date, dayEntries]) => (
+<div key={date}>
+<div style={s.tsDateGroup}>{formatDate(date)} · {dayEntries.reduce((s,e)=>s+e.hours,0).toFixed(1)} hrs</div>
+{dayEntries.map(e => (
+<div key={e.id} style={s.tsRow}>
+<div style={s.tsWorker}>👷 {e.workerName}</div>
+<div style={s.tsTime}>{e.startTime} → {e.endTime}</div>
+<div style={s.tsHours}>{e.hours}h</div>
+<div style={s.tsDesc}>{e.description}</div>
+<span style={{...s.tsStatus, ...(e.status==='confirmed'?s.tsConfirmed:s.tsPending)}}
+onClick={()=>{if(e.status==='pending') onConfirm(e.id);}}>
+{e.status==='confirmed'?'✓ Confirmed':'⏳ Pending'}
+</span>
+<button onClick={()=>onDelete(e.id)} style={{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:'0 4px'}}>×</button>
+</div>
+))}
+</div>
+))}
+</div>
+</div>
+);
+}
+
+// ── TIMESHEET OVERVIEW (📊 worked-hours) ────────────────────────────────────
+function TimesheetOverviewView({timesheets, crew, allJobs}) {
+const [selectedWorker, setSelectedWorker] = useState('');
+const [dateFrom, setDateFrom] = useState(monthsAgo(2));
+const [dateTo, setDateTo] = useState(todayISO());
+const allWorkers = useMemo(() => {
+  const names = new Set((timesheets||[]).map(t=>t.workerName));
+  crew.forEach(c=>names.add(c.name));
+  return [...names].sort();
+}, [timesheets, crew]);
+
+const filtered = useMemo(() =>
+  (timesheets||[]).filter(t =>
+    (!selectedWorker || t.workerName === selectedWorker) &&
+    t.date >= dateFrom && t.date <= dateTo
+  ).sort((a,b) => b.date.localeCompare(a.date)),
+[timesheets, selectedWorker, dateFrom, dateTo]);
+
+// Group by project
+const byProject = useMemo(() => {
+  const map = {};
+  filtered.forEach(e => {
+    if(!map[e.projectId]) map[e.projectId] = {name:e.projectName, total:0, confirmed:0, entries:[]};
+    map[e.projectId].total += e.hours;
+    if(e.status==='confirmed') map[e.projectId].confirmed += e.hours;
+    map[e.projectId].entries.push(e);
+  });
+  return Object.entries(map).sort((a,b) => b[1].total - a[1].total);
+}, [filtered]);
+
+const grandTotal = filtered.reduce((s,e)=>s+e.hours, 0);
+const confirmedTotal = filtered.filter(e=>e.status==='confirmed').reduce((s,e)=>s+e.hours, 0);
+
+return (
+<div>
+<div style={{display:'flex',gap:10,marginBottom:20,flexWrap:'wrap',alignItems:'flex-end'}}>
+<div style={{flex:'1 1 180px'}}>
+<label style={s.label}>Worker</label>
+<select style={{...s.input,marginBottom:0}} value={selectedWorker} onChange={e=>setSelectedWorker(e.target.value)}>
+<option value="">All workers</option>
+{allWorkers.map(n => <option key={n} value={n}>{n}</option>)}
+</select>
+</div>
+<div style={{flex:'1 1 140px'}}>
+<label style={s.label}>From</label>
+<input style={{...s.input,marginBottom:0}} type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)}/>
+</div>
+<div style={{flex:'1 1 140px'}}>
+<label style={s.label}>To</label>
+<input style={{...s.input,marginBottom:0}} type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)}/>
+</div>
+</div>
+
+<div style={s.tsSummary}>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Total hours</div><div style={s.tsSummaryValue}>{grandTotal.toFixed(1)}<span style={s.tsSummaryUnit}>hrs</span></div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Confirmed</div><div style={{...s.tsSummaryValue,color:'var(--success)'}}>{confirmedTotal.toFixed(1)}<span style={s.tsSummaryUnit}>hrs</span></div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Projects</div><div style={s.tsSummaryValue}>{byProject.length}</div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Entries</div><div style={s.tsSummaryValue}>{filtered.length}</div></div>
+</div>
+
+{byProject.length === 0
+? <div style={{...s.empty,height:200}}><span style={s.emptyIcon}>📊</span><span style={s.emptyText}>{selectedWorker ? 'No entries for this worker' : 'No timesheet entries yet'}</span></div>
+: byProject.map(([pid, data]) => {
+  const job = allJobs.find(j=>j.id===pid);
+  const col = job?.colorId ? getColor(job.colorId) : null;
+  return (
+  <div key={pid} style={{marginBottom:16}}>
+    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+      {col && <span style={{width:10,height:10,borderRadius:2,background:col.bar,flexShrink:0}}/>}
+      <span style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>{data.name}</span>
+      <span style={{marginLeft:'auto',fontSize:13,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",color:'var(--accent-text)'}}>{data.total.toFixed(1)} hrs</span>
+      <span style={{fontSize:11,color:'var(--success)',fontFamily:"'JetBrains Mono',monospace"}}>({data.confirmed.toFixed(1)} confirmed)</span>
+    </div>
+    {data.entries.map(e => (
+    <div key={e.id} style={{...s.tsRow, padding:'8px 14px'}}>
+      <div style={{...s.tsWorker,fontSize:13}}>{e.workerName}</div>
+      <div style={{...s.tsTime,fontSize:11}}>{formatDate(e.date)}</div>
+      <div style={{...s.tsTime,fontSize:11}}>{e.startTime}→{e.endTime}</div>
+      <div style={s.tsHours}>{e.hours}h</div>
+      <div style={{...s.tsDesc,fontSize:11}}>{e.description}</div>
+      <span style={{...s.tsStatus, fontSize:9, padding:'2px 6px', ...(e.status==='confirmed'?s.tsConfirmed:s.tsPending)}}>
+        {e.status==='confirmed'?'✓':'⏳'}
+      </span>
+    </div>
+    ))}
+  </div>
+  );
+})}
+</div>
+);
+}
+
+// ── TIMESHEET PROJECT CHANNEL (per-project in ⏱️ category) ──────────────────
+function TimesheetProjectChannelView({projectId, timesheets, crew}) {
+const entries = useMemo(() =>
+  (timesheets||[]).filter(t=>t.projectId===projectId).sort((a,b)=>b.date.localeCompare(a.date)),
+[timesheets, projectId]);
+const projectName = entries[0]?.projectName || 'Project';
+
+// Per-worker summary
+const byWorker = useMemo(() => {
+  const map = {};
+  entries.forEach(e => {
+    if(!map[e.workerName]) map[e.workerName] = {total:0, confirmed:0, count:0};
+    map[e.workerName].total += e.hours;
+    if(e.status==='confirmed') map[e.workerName].confirmed += e.hours;
+    map[e.workerName].count++;
+  });
+  return Object.entries(map).sort((a,b)=>b[1].total - a[1].total);
+}, [entries]);
+
+const totalHours = entries.reduce((s,e)=>s+e.hours, 0);
+
+return (
+<div>
+<div style={s.tsSummary}>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Total hours</div><div style={s.tsSummaryValue}>{totalHours.toFixed(1)}<span style={s.tsSummaryUnit}>hrs</span></div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Workers</div><div style={s.tsSummaryValue}>{byWorker.length}</div></div>
+<div style={s.tsSummaryCard}><div style={s.tsSummaryLabel}>Entries</div><div style={s.tsSummaryValue}>{entries.length}</div></div>
+</div>
+
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:10}}>Hours per worker</div>
+{byWorker.map(([name, data]) => (
+<div key={name} style={s.tsWorkerSummary}>
+<span style={s.tsWorkerName}>👷 {name}</span>
+<span style={{fontSize:11,color:'var(--text-dim)',fontFamily:"'JetBrains Mono',monospace"}}>{data.count} entries</span>
+<span style={{fontSize:11,color:'var(--success)',fontFamily:"'JetBrains Mono',monospace"}}>{data.confirmed.toFixed(1)}h confirmed</span>
+<span style={s.tsWorkerHours}>{data.total.toFixed(1)}h</span>
+</div>
+))}
+
+{entries.length > 0 && <>
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginTop:20,marginBottom:10}}>All entries</div>
+{entries.map(e => (
+<div key={e.id} style={{...s.tsRow, padding:'8px 14px'}}>
+<div style={{...s.tsWorker,fontSize:13}}>{e.workerName}</div>
+<div style={{...s.tsTime,fontSize:11}}>{formatDate(e.date)}</div>
+<div style={{...s.tsTime,fontSize:11}}>{e.startTime}→{e.endTime}</div>
+<div style={s.tsHours}>{e.hours}h</div>
+<div style={{...s.tsDesc,fontSize:11}}>{e.description}</div>
+<span style={{...s.tsStatus, fontSize:9, padding:'2px 6px', ...(e.status==='confirmed'?s.tsConfirmed:s.tsPending)}}>
+{e.status==='confirmed'?'✓':'⏳'}
+</span>
+</div>
+))}
+</>}
+</div>
+);
+}
+
+// ── CREW ROSTER VIEW ────────────────────────────────────────────────────────
+function CrewRosterView({crew, onAdd, onRemove}) {
+const [newName, setNewName] = useState('');
+const add = () => { if(!newName.trim()) return; onAdd({id:'cr-'+Date.now().toString(36), name:newName.trim()}); setNewName(''); };
+return (
+<div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,flexWrap:'wrap',gap:8}}>
+<div>
+<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginBottom:2}}>{crew.length} crew member{crew.length===1?'':'s'}</div>
+<div style={{fontSize:13,color:'var(--text-dim)'}}>Manage your team. Names appear in timesheet dropdowns.</div>
+</div>
+</div>
+<div style={{display:'flex',gap:8,marginBottom:16}}>
+<input style={{...s.input,marginBottom:0,flex:1}} value={newName} onChange={e=>setNewName(e.target.value)} placeholder="Add crew member..." onKeyDown={e=>{if(e.key==='Enter')add();}}/>
+<button style={s.primaryBtn} onClick={add}>+ Add</button>
+</div>
+<div style={{flex:1,overflowY:'auto'}}>
+{crew.length === 0
+? <div style={{...s.empty,height:'50%'}}><span style={s.emptyIcon}>👥</span><span style={s.emptyText}>No crew yet</span></div>
+: crew.map(c => (
+<div key={c.id} style={s.crewRow}>
+<span style={{fontSize:15,flexShrink:0}}>👷</span>
+<span style={s.crewName}>{c.name}</span>
+<button style={s.crewRemove} onClick={()=>{if(confirm(`Remove ${c.name} from crew?`)) onRemove(c.id);}}>×</button>
+</div>
+))}
+</div>
+</div>
+);
+}
+
+// ── CALENDAR BOOKING MODAL ──────────────────────────────────────────────────
 function CalendarBookingModal({onClose, onSave, jobChannels, allChannels, getCategory, editing, defaultDate}) {
 const [projectId, setProjectId] = useState(editing?.projectId || jobChannels[0]?.id || '');
 const [startDate, setStartDate] = useState(editing?.startDate || defaultDate || todayISO());
@@ -827,7 +1198,7 @@ return (
 </div>
 
 <label style={s.label}>Technicians involved</label>
-<input style={s.input} value={technicians} onChange={e=>setTechnicians(e.target.value)} placeholder="Felipe, Lionel (@ autocomplete coming with user accounts)"/>
+<input style={s.input} value={technicians} onChange={e=>setTechnicians(e.target.value)} placeholder="Felipe, Lionel"/>
 
 <label style={s.label}>Tools / materials needed</label>
 <div style={s.noteInputWrap}>
@@ -1011,7 +1382,7 @@ return (
 );
 }
 
-// ── CALENDAR VIEW (bookings with duration + colours + overlap) ──────────────
+// ── CALENDAR VIEW ───────────────────────────────────────────────────────────
 function CalendarView({entries, jobChannels, allChannels, getCategory, onNewBooking, onEditBooking, onDeleteBooking, onJumpToProject, onMentionClick}) {
 const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
 const [selectedEntryId, setSelectedEntryId] = useState(null);
@@ -1030,13 +1401,11 @@ for(let i = 0; i < startOffset; i++) { const day = daysInPrev - startOffset + 1 
 for(let i = 1; i <= daysInMonth; i++) cells.push({day:i, other:false, date: new Date(year, month, i).toISOString().slice(0,10)});
 while(cells.length % 7 !== 0) { const day = cells.length - daysInMonth - startOffset + 1; cells.push({day, other:true, date: new Date(year, month+1, day).toISOString().slice(0,10)}); }
 
-// For each date, list of entries active on that date
 const entriesByDate = {};
 entries.forEach(e => {
 (e.dates || []).forEach(d => { (entriesByDate[d] = entriesByDate[d] || []).push(e); });
 });
 
-// Running projects for legend
 const runningWithColor = jobChannels.filter(p => p.status !== 'done').slice(0, 12);
 
 const selectedEntry = selectedEntryId ? entries.find(e => e.id === selectedEntryId) : null;
@@ -1050,7 +1419,6 @@ return (
 <button style={s.calNavBtn} onClick={() => setCursor(new Date(year, month+1, 1))}>›</button>
 </div>
 
-{/* Legend */}
 {runningWithColor.length > 0 && (
 <div style={s.legend}>
 <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:0.14,marginRight:4}}>Projects:</span>
@@ -1144,7 +1512,6 @@ onClick={()=>{ if(confirm('Delete this booking?')) { onDeleteBooking(selectedEnt
 </div>
 )}
 
-{/* Floating + button */}
 <div style={{display:'flex',justifyContent:'flex-end',marginTop:16}}>
 <button style={s.calNewBtn} onClick={()=>onNewBooking(null)}>+ NEW BOOKING</button>
 </div>
@@ -1194,19 +1561,22 @@ onKeyDown={(e) => { const handled = mentions.handleKeyDown(e, inputRef); if(!han
 );
 }
 
-function ThreadView({channel, thread, notes, setNotes, allChannels, incidents, onIncidentSubmit, onIncidentDelete, onMentionClick, onJumpToProject, onUpdateMaterials, onAddMaterial, calendarEntries, onNewBooking, onEditBooking, onDeleteBooking, getCategory, allJobs}) {
+function ThreadView({channel, thread, notes, setNotes, allChannels, incidents, onIncidentSubmit, onIncidentDelete, onMentionClick, onJumpToProject, onUpdateMaterials, onAddMaterial, calendarEntries, onNewBooking, onEditBooking, onDeleteBooking, getCategory, allJobs, timesheets, onAddTimesheet, onConfirmTimesheet, onDeleteTimesheet, onBulkConfirmTimesheet, crew, onAddCrew, onRemoveCrew}) {
 if(channel.type === 'plain') return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} placeholder={`Post in #${channel.name}... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
 if(channel.type === 'materials') return <MaterialsView channel={channel} onUpdate={onUpdateMaterials} onAdd={onAddMaterial}/>;
 if(channel.type === 'calendar') return <CalendarView entries={calendarEntries} jobChannels={allJobs} allChannels={allChannels} getCategory={getCategory}
 onNewBooking={onNewBooking} onEditBooking={onEditBooking} onDeleteBooking={onDeleteBooking}
 onJumpToProject={onJumpToProject} onMentionClick={onMentionClick}/>;
 if(channel.type === 'incidents-bin') return <IncidentsBinView incidentType={channel.incidentType} incidents={incidents} allChannels={allChannels} onMentionClick={onMentionClick} onJumpToProject={onJumpToProject}/>;
+if(channel.type === 'ts-overview') return <TimesheetOverviewView timesheets={timesheets} crew={crew} allJobs={allJobs}/>;
+if(channel.type === 'ts-project') return <TimesheetProjectChannelView projectId={channel._projectId} timesheets={timesheets} crew={crew}/>;
+if(channel.type === 'roster') return <CrewRosterView crew={crew} onAdd={onAddCrew} onRemove={onRemoveCrew}/>;
 
 if(thread.id === 'info') return <InfoDisplay channel={channel}/>;
+if(thread.id === 'timesheet') return <ProjectTimesheetView channel={channel} timesheets={timesheets} onAdd={onAddTimesheet} onConfirm={onConfirmTimesheet} onDelete={onDeleteTimesheet} onBulkConfirm={onBulkConfirmTimesheet}/>;
 if(thread.id === 'incidents') return <ProjectIncidentsView channel={channel} incidents={incidents} allChannels={allChannels} onMentionClick={onMentionClick} onAdd={onIncidentSubmit} onDelete={onIncidentDelete}/>;
 if(thread.id === 'rams') return (<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}><div style={{fontSize:40,opacity:0.7}}>📋</div><div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>RAMS Form</div><a href={RAMS_URL} target="_blank" rel="noreferrer" style={{...s.infoLinkBtn, background:'var(--accent)', color:'#fff', borderColor:'var(--accent)', marginTop:4}}>Open RAMS form →</a></div>);
 if(thread.id === 'survey') return (<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}><div style={{fontSize:40,opacity:0.7}}>🔍</div><div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Quick Survey</div>{channel.surveyLink ? <a href={channel.surveyLink} target="_blank" rel="noreferrer" style={{...s.infoLinkBtn, background:'var(--accent)', color:'#fff', borderColor:'var(--accent)', marginTop:4}}>Open Quick Survey →</a> : <div style={{fontSize:12,color:'var(--text-dim)'}}>No Quick Survey link set.</div>}</div>);
-if(thread.id === 'timesheet') return (<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:14}}><div style={{fontSize:40,opacity:0.7}}>⏱️</div><div style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>Timesheet</div><div style={{fontSize:12,color:'var(--text-dim)'}}>Coming soon.</div></div>);
 return <NotesFeed channelId={channel.id} threadId={thread.id} notes={notes} setNotes={setNotes} placeholder={`Add a ${thread.label} note... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
 }
 
@@ -1221,7 +1591,7 @@ return (
 <span style={s.catLabel}>{category.name}</span>
 </span>
 <span style={s.catCount}>{channels.length}</span>
-{category.system !== 'incidents' && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onAddChannel(category);}}>+</button>)}
+{category.system !== 'incidents' && category.system !== 'timesheets' && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onAddChannel(category);}}>+</button>)}
 {!category.system && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onEditCategory(category);}}>✎</button>)}
 </div>
 {open && channels.map(ch => {
@@ -1232,12 +1602,17 @@ if(ch.type === 'job') hash = '◆';
 else if(ch.type === 'materials') hash = '🧰';
 else if(ch.type === 'calendar') hash = '📅';
 else if(ch.type === 'incidents-bin') { const t = INCIDENT_TYPES.find(t => t.id === ch.incidentType); hash = t?.emoji || '⚠️'; }
+else if(ch.type === 'ts-overview') hash = '📊';
+else if(ch.type === 'ts-project') hash = '🏢';
+else if(ch.type === 'roster') hash = '📋';
 const col = ch.type === 'job' && ch.colorId && ch.status !== 'done' ? getColor(ch.colorId) : null;
+const tsCol = ch.type === 'ts-project' && ch.colorId ? getColor(ch.colorId) : null;
 return (
 <div key={ch.id} style={{...s.chanItem, ...(isActive?s.chanItemActive:{}), ...(isDone?s.chanItemDone:{})}} onClick={()=>onSelect(ch.id)}>
 <span style={s.chanHash}>{hash}</span>
 <span style={{...s.chanName, ...(isActive?s.chanNameActive:{})}}>{ch.name}</span>
 {col && <span style={{...s.chanDot, background:col.bar}}/>}
+{tsCol && <span style={{...s.chanDot, background:tsCol.bar}}/>}
 </div>
 );
 })}
@@ -1252,6 +1627,8 @@ const [data, setData] = useStorage('ral-data-v5', null);
 const [notes, setNotes] = useStorage('ral-notes', {});
 const [incidents, setIncidents] = useStorage('ral-incidents', []);
 const [calendarEntries, setCalendarEntries] = useStorage('ral-calendar-v2', null);
+const [crew, setCrew] = useStorage('ral-crew', [{id:'c1',name:'Lionel'},{id:'c2',name:'Felipe'},{id:'c3',name:'Mike'},{id:'c4',name:'Dave'}]);
+const [timesheets, setTimesheets] = useStorage('ral-timesheets', null);
 const [activeId, setActiveId] = useState(null);
 const [activeThreadId, setActiveThreadId] = useState('info');
 const [showJobWizard, setShowJobWizard] = useState(false);
@@ -1264,11 +1641,13 @@ const [showTypePicker, setShowTypePicker] = useState(null);
 const [showAddThread, setShowAddThread] = useState(false);
 const [showIncidentForm, setShowIncidentForm] = useState(false);
 const [showAddMaterial, setShowAddMaterial] = useState(false);
-const [bookingModal, setBookingModal] = useState(null); // {defaultDate?, editing?}
+const [bookingModal, setBookingModal] = useState(null);
 const [sharedChannel, setSharedChannel] = useState(null);
+const [showTimesheetModal, setShowTimesheetModal] = useState(null); // {projectId, projectName, editing?}
 
 useEffect(() => { if(data === null) setData(seedData()); }, [data]);
 useEffect(() => { if(calendarEntries === null) setCalendarEntries(seedCalendarEntries()); }, [calendarEntries]);
+useEffect(() => { if(timesheets === null) setTimesheets(seedTimesheetEntries()); }, [timesheets]);
 
 useEffect(() => {
 const checkHash = () => {
@@ -1284,16 +1663,40 @@ return () => window.removeEventListener('hashchange', checkHash);
 if(sharedChannel) return <SharedView channel={sharedChannel} onExit={() => { window.location.hash = ''; setSharedChannel(null); }}/>;
 
 const d = data || {categories:[],channels:[]};
-const channel = d.channels.find(c => c.id === activeId);
+const allJobs = d.channels.filter(c => c.type === 'job');
+
+// Dynamic timesheet project channels
+const tsProjectChannels = useMemo(() => {
+  const projectIds = [...new Set((timesheets||[]).map(t => t.projectId))];
+  return projectIds.map(pid => {
+    const project = allJobs.find(j => j.id === pid);
+    return {
+      id: 'ts-proj-' + pid,
+      type: 'ts-project',
+      name: project?.name || 'Unknown project',
+      categoryId: 'cat-timesheets',
+      _projectId: pid,
+      colorId: project?.colorId,
+    };
+  });
+}, [timesheets, allJobs]);
+
+const allChannelsIncludingDynamic = useMemo(() => [...d.channels, ...tsProjectChannels], [d.channels, tsProjectChannels]);
+
+const channel = d.channels.find(c => c.id === activeId) || tsProjectChannels.find(c => c.id === activeId);
 const getCategory = (id) => d.categories.find(c => c.id === id);
 const updateData = (fn) => setData(prev => fn(prev || {categories:[],channels:[]}));
-const allJobs = d.channels.filter(c => c.type === 'job');
+
+const channelsByCat = (catId) => {
+  const regular = d.channels.filter(c => c.categoryId === catId);
+  if(catId === 'cat-timesheets') return [...regular, ...tsProjectChannels];
+  return regular;
+};
 
 const saveJob = (job) => {
 updateData(prev => {
 const idx = prev.channels.findIndex(c => c.id === job.id);
 const targetCategoryId = editingJob ? job.categoryId : jobTargetCategory;
-// Assign color if new
 const colorId = job.colorId || pickProjectColor(prev.channels.filter(c => c.type === 'job'));
 const finalJob = {...job, categoryId: targetCategoryId, colorId};
 if(idx >= 0) { const channels = [...prev.channels]; channels[idx] = finalJob; return {...prev, channels}; }
@@ -1308,7 +1711,7 @@ const createCalendarChannel = (cid, name) => { const ch = {id:'ch-'+Date.now().t
 
 const deleteChannel = (id) => {
 const ch = d.channels.find(c => c.id === id);
-if(ch?.type === 'incidents-bin') return alert('System channels cannot be deleted.');
+if(ch?.type === 'incidents-bin' || ch?.type === 'ts-overview') return alert('System channels cannot be deleted.');
 if(!confirm('Delete this channel?')) return;
 updateData(prev => ({...prev, channels: prev.channels.filter(c => c.id !== id)}));
 if(activeId === id) setActiveId(null);
@@ -1323,7 +1726,6 @@ const doneCat = prev.categories.find(cat => cat.system === 'done');
 let newCatId = c.categoryId;
 if(newStatus === 'done' && c.categoryId === runCat?.id) newCatId = doneCat?.id || c.categoryId;
 if(newStatus === 'running' && c.categoryId === doneCat?.id) newCatId = runCat?.id || c.categoryId;
-// On re-opening, if the job has no color or its color is taken, re-pick
 let colorId = c.colorId;
 if(newStatus === 'running') {
 const others = prev.channels.filter(x => x.type === 'job' && x.id !== c.id && x.status !== 'done');
@@ -1356,12 +1758,34 @@ setBookingModal(null);
 };
 const deleteBooking = (id) => setCalendarEntries(prev => (prev || []).filter(e => e.id !== id));
 
+// Timesheet operations
+const saveTimesheetEntry = (entry) => {
+setTimesheets(prev => {
+const list = prev || [];
+const idx = list.findIndex(e => e.id === entry.id);
+if(idx >= 0) { const n = [...list]; n[idx] = entry; return n; }
+return [entry, ...list];
+});
+};
+const confirmTimesheetEntry = (id) => {
+setTimesheets(prev => (prev||[]).map(e => e.id === id ? {...e, status:'confirmed'} : e));
+};
+const deleteTimesheetEntry = (id) => {
+if(confirm('Delete this timesheet entry?')) setTimesheets(prev => (prev||[]).filter(e => e.id !== id));
+};
+const bulkConfirmTimesheet = () => {
+if(!channel) return;
+setTimesheets(prev => (prev||[]).map(e => e.projectId === channel.id && e.status === 'pending' ? {...e, status:'confirmed'} : e));
+};
+
+const addCrew = (member) => setCrew(prev => [...prev, member]);
+const removeCrew = (id) => setCrew(prev => prev.filter(c => c.id !== id));
+
 const selectChannel = (id) => { setActiveId(id); setActiveThreadId('info'); };
 const handleMentionClick = (id) => selectChannel(id);
 
 const allThreads = channel && channel.type === 'job' ? [...(channel.customThreads || []), ...DEFAULT_THREADS] : [];
 const currentThread = allThreads.find(t => t.id === activeThreadId) || allThreads[0];
-const channelsByCat = (catId) => d.channels.filter(c => c.categoryId === catId);
 const currentCategory = channel ? d.categories.find(c => c.id === channel.categoryId) : null;
 const channelColor = channel && channel.type === 'job' && channel.colorId && channel.status !== 'done' ? getColor(channel.colorId) : null;
 
@@ -1396,13 +1820,17 @@ onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}/>
 <div style={s.headerKicker}>{currentCategory ? `${currentCategory.emoji} ${currentCategory.name}` : ''}{channel.status === 'done' && ' · done'}</div>
 <div style={s.headerTitle}>
 {channelColor && <span style={{...s.headerColorDot, background:channelColor.bar}}/>}
-{(channel.type === 'plain' || channel.type === 'materials' || channel.type === 'calendar' || channel.type === 'incidents-bin') ? '#' + channel.name : channel.name}
+{channel.type === 'ts-project' ? '🏢 ' + channel.name :
+(channel.type === 'plain' || channel.type === 'materials' || channel.type === 'calendar' || channel.type === 'incidents-bin' || channel.type === 'ts-overview' || channel.type === 'roster') ? '#' + channel.name : channel.name}
 </div>
 <div style={s.headerMeta}>
 {channel.type === 'job' ? `${channel.address || 'No address'} · Started ${formatDate(channel.startDate)}` :
 channel.type === 'materials' ? 'Materials list' :
 channel.type === 'calendar' ? 'Work calendar — bookings & crew scheduling' :
 channel.type === 'incidents-bin' ? 'All ' + channel.name + ' reports across projects' :
+channel.type === 'ts-overview' ? 'View hours per worker and project — filter by date range for invoicing' :
+channel.type === 'ts-project' ? 'All workers\' hours on this project' :
+channel.type === 'roster' ? 'Manage crew members — names appear in timesheet dropdowns' :
 'Plain channel'}
 </div>
 </div>
@@ -1413,7 +1841,7 @@ channel.type === 'incidents-bin' ? 'All ' + channel.name + ' reports across proj
 <button style={{...s.badge,...s.badgeGhost}} onClick={() => toggleStatus(channel.id)}>{channel.status === 'done' ? '↻ Re-open' : '✓ Done'}</button>
 <button style={{...s.badge,...s.badgeGhost}} onClick={() => { setEditingJob(channel); setShowJobWizard(true); }}>✏ Edit</button>
 </>)}
-{channel.type !== 'incidents-bin' && (<button style={{...s.badge,...s.badgeGhost}} onClick={() => deleteChannel(channel.id)}>🗑</button>)}
+{channel.type !== 'incidents-bin' && channel.type !== 'ts-overview' && channel.type !== 'ts-project' && channel.type !== 'roster' && (<button style={{...s.badge,...s.badgeGhost}} onClick={() => deleteChannel(channel.id)}>🗑</button>)}
 </div>
 </div>
 
@@ -1430,7 +1858,7 @@ channel.type === 'incidents-bin' ? 'All ' + channel.name + ' reports across proj
 
 <div style={s.content}>
 <ThreadView channel={channel} thread={currentThread} notes={notes} setNotes={setNotes}
-allChannels={d.channels} incidents={incidents}
+allChannels={allChannelsIncludingDynamic} incidents={incidents}
 onIncidentSubmit={() => setShowIncidentForm(true)} onIncidentDelete={deleteIncident}
 onMentionClick={handleMentionClick} onJumpToProject={selectChannel}
 onUpdateMaterials={updateMaterials} onAddMaterial={() => setShowAddMaterial(true)}
@@ -1438,7 +1866,13 @@ calendarEntries={calendarEntries || []}
 onNewBooking={(date) => setBookingModal({defaultDate: date})}
 onEditBooking={(entry) => setBookingModal({editing: entry})}
 onDeleteBooking={deleteBooking}
-getCategory={getCategory} allJobs={allJobs}/>
+getCategory={getCategory} allJobs={allJobs}
+timesheets={timesheets || []}
+onAddTimesheet={() => setShowTimesheetModal({projectId:channel.id, projectName:channel.name})}
+onConfirmTimesheet={confirmTimesheetEntry}
+onDeleteTimesheet={deleteTimesheetEntry}
+onBulkConfirmTimesheet={bulkConfirmTimesheet}
+crew={crew} onAddCrew={addCrew} onRemoveCrew={removeCrew}/>
 </div>
 </>}
 </div>
@@ -1455,8 +1889,11 @@ onPickCalendar={(name) => createCalendarChannel(showTypePicker.category.id, name
 {showIncidentForm && channel && channel.type === 'job' && (<IncidentFormModal onClose={() => setShowIncidentForm(false)} onSave={submitIncident} project={channel}/>)}
 {showAddMaterial && <AddMaterialModal onClose={() => setShowAddMaterial(false)} onSave={addMaterial}/>}
 {bookingModal && (<CalendarBookingModal onClose={() => setBookingModal(null)} onSave={saveBooking}
-jobChannels={allJobs.filter(j => j.status !== 'done')} allChannels={d.channels} getCategory={getCategory}
+jobChannels={allJobs.filter(j => j.status !== 'done')} allChannels={allChannelsIncludingDynamic} getCategory={getCategory}
 editing={bookingModal.editing} defaultDate={bookingModal.defaultDate}/>)}
+{showTimesheetModal && (<TimesheetEntryModal onClose={() => setShowTimesheetModal(null)} onSave={(entry)=>{saveTimesheetEntry(entry); setShowTimesheetModal(null);}}
+crew={crew} projectId={showTimesheetModal.projectId} projectName={showTimesheetModal.projectName}
+editing={showTimesheetModal.editing} timesheets={timesheets || []} onAddCrew={addCrew}/>)}
 </div>
 );
 }
