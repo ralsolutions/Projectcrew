@@ -50,6 +50,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;}
 <body>
   <script>
 // Auto-migration: adds Timesheets category + crew-roster to existing localStorage data
+// Also renames anuncios to 📢announcements and reorders Crew category
 (function(){
 try{
 var raw=localStorage.getItem('ral-data-v5');
@@ -64,12 +65,39 @@ if(!d.channels.find(function(c){return c.id==='ts-overview'})){
 d.channels.push({id:'ts-overview',type:'ts-overview',name:'worked-hours',categoryId:'cat-timesheets',createdAt:new Date().toISOString()});
 ch=true;}
 if(!d.channels.find(function(c){return c.id==='crew-roster'})){
-d.channels.push({id:'crew-roster',type:'roster',name:'crew-roster',categoryId:'cat-crew',createdAt:new Date().toISOString()});
+d.channels.push({id:'crew-roster',type:'roster',name:'📋crew-roster',categoryId:'cat-crew',createdAt:new Date().toISOString()});
 ch=true;}
-var g=d.channels.find(function(c){return c.id==='crew-general'&&c.name==='general'});
-if(g){g.name='anuncios';g.whatsappLink='';ch=true;}
+
+// Rename anuncios to 📢announcements and add WhatsApp link
+var g=d.channels.find(function(c){return (c.id==='crew-general' || c.name==='anuncios') && c.categoryId==='cat-crew'});
+if(g){
+  g.name='📢announcements';
+  g.whatsappLink='https://chat.whatsapp.com/ral-crew-announcements-demo';
+  if(g.id==='crew-general') g.id='crew-announcements';
+  ch=true;
+}
+
+// Add emoji to work-calendar if missing
+var cal=d.channels.find(function(c){return c.id==='crew-calendar'});
+if(cal && !cal.name.includes('📅')){cal.name='📅work-calendar';ch=true;}
+
+// Reorder Crew category channels: announcements, calendar, roster
+var crewChannels = d.channels.filter(function(c){return c.categoryId==='cat-crew';});
+if(crewChannels.length){
+  var order = ['📢announcements','📅work-calendar','📋crew-roster'];
+  crewChannels.sort(function(a,b){
+    var aIdx = order.findIndex(function(n){return a.name.includes(n) || n.includes(a.name);});
+    var bIdx = order.findIndex(function(n){return b.name.includes(n) || n.includes(b.name);});
+    if(aIdx===-1) aIdx=999; if(bIdx===-1) bIdx=999;
+    return aIdx - bIdx;
+  });
+  var otherChannels = d.channels.filter(function(c){return c.categoryId!=='cat-crew';});
+  d.channels = otherChannels.concat(crewChannels);
+  ch=true;
+}
+
 if(ch)localStorage.setItem('ral-data-v5',JSON.stringify(d));
-}catch(e){}
+}catch(e){console.warn('Migration error:',e);}
 })();
 </script>
 <div id="root"></div>
@@ -306,6 +334,13 @@ tsWorkerHours:{fontSize:14,fontWeight:700,fontFamily:"'JetBrains Mono',monospace
 crewRow:{display:'flex',gap:10,padding:'10px 14px',background:'var(--bg-panel)',border:'1px solid var(--border)',borderRadius:8,marginBottom:6,alignItems:'center',boxShadow:'var(--shadow-sm)'},
 crewName:{flex:1,fontSize:14,color:'var(--text)',fontWeight:500},
 crewRemove:{background:'none',border:'none',color:'var(--text-faint)',cursor:'pointer',fontSize:14,padding:'0 4px'},
+
+// Announcements banner
+announcementBanner:{background:'var(--success-bg)',border:'1px solid var(--success)',borderRadius:10,padding:'24px',marginBottom:24,textAlign:'center'},
+announcementIcon:{fontSize:40,marginBottom:12},
+announcementTitle:{fontSize:20,fontWeight:700,color:'var(--text)',marginBottom:8},
+announcementText:{fontSize:14,color:'var(--text-muted)',marginBottom:20},
+announcementBtn:{padding:'14px 28px',background:'var(--success)',border:'1px solid var(--success)',borderRadius:8,color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:"'JetBrains Mono',monospace",textTransform:'uppercase',letterSpacing:0.3,textDecoration:'none',display:'inline-block'},
 };
 
 function useStorage(key, init) {
@@ -484,9 +519,10 @@ materials:[
 {id:'m2',name:'Caulking gun',qty:'2',done:true},
 {id:'m3',name:'Sikaflex 11FC sausages',qty:'24',done:false},
 ]},
-{id:'crew-roster',type:'roster',name:'crew-roster',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
-{id:'crew-calendar',type:'calendar',name:'work-calendar',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
-{id:'crew-general',type:'plain',name:'anuncios',categoryId:'cat-crew',whatsappLink:'',createdAt:new Date(now).toISOString()},
+// Crew category - ordered: announcements, calendar, roster
+{id:'crew-announcements',type:'plain',name:'📢announcements',categoryId:'cat-crew',whatsappLink:'https://chat.whatsapp.com/ral-crew-announcements-demo',createdAt:new Date(now).toISOString()},
+{id:'crew-calendar',type:'calendar',name:'📅work-calendar',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
+{id:'crew-roster',type:'roster',name:'📋crew-roster',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
 ]
 };
 }
@@ -1585,8 +1621,32 @@ onKeyDown={(e) => { const handled = mentions.handleKeyDown(e, inputRef); if(!han
 );
 }
 
+// ── ANNOUNCEMENTS VIEW ──────────────────────────────────────────────────────
+function AnnouncementsView({channel, notes, setNotes, allChannels, onMentionClick, getCategory}) {
+return (
+<div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+<div style={s.announcementBanner}>
+<div style={s.announcementIcon}>📢</div>
+<div style={s.announcementTitle}>Join the Company WhatsApp Channel</div>
+<div style={s.announcementText}>Stay updated with company announcements, job opportunities, and crew news.</div>
+<a href={channel.whatsappLink || 'https://chat.whatsapp.com/ral-crew-announcements-demo'} target="_blank" rel="noreferrer" style={s.announcementBtn}>
+💬 Join WhatsApp Channel →
+</a>
+</div>
+<NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} 
+placeholder="Post an announcement... (type # to mention)" 
+allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>
+</div>
+);
+}
+
 function ThreadView({channel, thread, notes, setNotes, allChannels, incidents, onIncidentSubmit, onIncidentDelete, onMentionClick, onJumpToProject, onUpdateMaterials, onAddMaterial, calendarEntries, onNewBooking, onEditBooking, onDeleteBooking, getCategory, allJobs, timesheets, onAddTimesheet, onConfirmTimesheet, onDeleteTimesheet, onBulkConfirmTimesheet, crew, onAddCrew, onRemoveCrew}) {
-if(channel.type === 'plain') return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} placeholder={`Post in #${channel.name}... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
+if(channel.type === 'plain') {
+  if(channel.name === '📢announcements') {
+    return <AnnouncementsView channel={channel} notes={notes} setNotes={setNotes} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
+  }
+  return <NotesFeed channelId={channel.id} threadId="main" notes={notes} setNotes={setNotes} placeholder={`Post in #${channel.name}... (type # to mention)`} allChannels={allChannels} onMentionClick={onMentionClick} getCategory={getCategory}/>;
+}
 if(channel.type === 'materials') return <MaterialsView channel={channel} onUpdate={onUpdateMaterials} onAdd={onAddMaterial}/>;
 if(channel.type === 'calendar') return <CalendarView entries={calendarEntries} jobChannels={allJobs} allChannels={allChannels} getCategory={getCategory}
 onNewBooking={onNewBooking} onEditBooking={onEditBooking} onDeleteBooking={onDeleteBooking}
@@ -1845,10 +1905,11 @@ onEditCategory={(c) => { setEditingCategory(c); setShowCategoryModal(true); }}/>
 <div style={s.headerTitle}>
 {channelColor && <span style={{...s.headerColorDot, background:channelColor.bar}}/>}
 {channel.type === 'ts-project' ? '🏢 ' + channel.name :
-(channel.type === 'plain' || channel.type === 'materials' || channel.type === 'calendar' || channel.type === 'incidents-bin' || channel.type === 'ts-overview' || channel.type === 'roster') ? '#' + channel.name : channel.name}
+(channel.type === 'plain' || channel.type === 'materials' || channel.type === 'calendar' || channel.type === 'incidents-bin' || channel.type === 'ts-overview' || channel.type === 'roster') ? channel.name : channel.name}
 </div>
 <div style={s.headerMeta}>
 {channel.type === 'job' ? `${channel.address || 'No address'} · Started ${formatDate(channel.startDate)}` :
+channel.name === '📢announcements' ? 'Company-wide announcements — join WhatsApp group' :
 channel.type === 'materials' ? 'Materials list' :
 channel.type === 'calendar' ? 'Work calendar — bookings & crew scheduling' :
 channel.type === 'incidents-bin' ? 'All ' + channel.name + ' reports across projects' :
