@@ -462,7 +462,7 @@ materials:[
 ]},
 {id:'crew-roster',type:'roster',name:'crew-roster',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
 {id:'crew-calendar',type:'calendar',name:'work-calendar',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
-{id:'crew-general',type:'plain',name:'general',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
+{id:'crew-general',type:'plain',name:'anuncios',categoryId:'cat-crew',whatsappLink:'',createdAt:new Date(now).toISOString()},
 ]
 };
 }
@@ -1836,6 +1836,8 @@ channel.type === 'roster' ? 'Manage crew members — names appear in timesheet d
 </div>
 <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
 {channel.type === 'job' && channel.whatsapp && (<a href={channel.whatsapp} target="_blank" rel="noreferrer" style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>💬 Chat</a>)}
+{channel.type !== 'job' && channel.whatsappLink && (<a href={channel.whatsappLink} target="_blank" rel="noreferrer" style={{...s.badge,...s.badgeSuccess,textDecoration:'none'}}>💬 WhatsApp</a>)}
+{channel.type === 'plain' && !channel.whatsappLink && (<button style={{...s.badge,...s.badgeGhost}} onClick={() => { const link = prompt('Paste WhatsApp group invite link:'); if(link && link.trim()) updateData(prev => ({...prev, channels: prev.channels.map(c => c.id === channel.id ? {...c, whatsappLink: link.trim()} : c)})); }}>💬 Set WhatsApp</button>)}
 {channel.type === 'job' && (<>
 <button style={{...s.badge,...s.badgePrimary}} onClick={() => setShowShare(true)}>↗ Share</button>
 <button style={{...s.badge,...s.badgeGhost}} onClick={() => toggleStatus(channel.id)}>{channel.status === 'done' ? '↻ Re-open' : '✓ Done'}</button>
