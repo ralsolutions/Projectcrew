@@ -48,6 +48,30 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;}
 </style>
 </head>
 <body>
+  <script>
+// Auto-migration: adds Timesheets category + crew-roster to existing localStorage data
+(function(){
+try{
+var raw=localStorage.getItem('ral-data-v5');
+if(!raw)return;
+var d=JSON.parse(raw);
+if(!d||!d.categories||!d.channels)return;
+var ch=false;
+if(!d.categories.find(function(c){return c.id==='cat-timesheets'})){
+d.categories.splice(2,0,{id:'cat-timesheets',name:'Timesheets',emoji:'⏱️',system:'timesheets',collapsed:false});
+ch=true;}
+if(!d.channels.find(function(c){return c.id==='ts-overview'})){
+d.channels.push({id:'ts-overview',type:'ts-overview',name:'worked-hours',categoryId:'cat-timesheets',createdAt:new Date().toISOString()});
+ch=true;}
+if(!d.channels.find(function(c){return c.id==='crew-roster'})){
+d.channels.push({id:'crew-roster',type:'roster',name:'crew-roster',categoryId:'cat-crew',createdAt:new Date().toISOString()});
+ch=true;}
+var g=d.channels.find(function(c){return c.id==='crew-general'&&c.name==='general'});
+if(g){g.name='anuncios';g.whatsappLink='';ch=true;}
+if(ch)localStorage.setItem('ral-data-v5',JSON.stringify(d));
+}catch(e){}
+})();
+</script>
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useEffect,useRef,useMemo} = React;
