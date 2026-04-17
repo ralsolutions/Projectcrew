@@ -1,3 +1,6 @@
+¡Gracias! Aquí tienes el archivo completo con todos los cambios integrados:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,14 +48,13 @@ input,textarea,select,button{font-family:'Inter',sans-serif;}
 input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;}
 .mention{color:var(--accent);background:var(--accent-bg);padding:1px 6px;border-radius:4px;font-weight:600;cursor:pointer;text-decoration:none;font-size:0.95em;}
 .mention:hover{background:var(--accent);color:#fff;}
-.cat-dragging{opacity:0.5;}
+.cat-dragging{opacity:0.4;}
 .cat-drag-over{border-top:2px solid var(--accent)!important;}
 </style>
 </head>
 <body>
   <script>
-// Auto-migration: adds Timesheets category + crew-roster to existing localStorage data
-// Also renames anuncios to 📢announcements, reorders Crew category, and adds order field to categories
+// Auto-migration: adds Timesheets category + crew-roster, fixes emoji, adds order field
 (function(){
 try{
 var raw=localStorage.getItem('ral-data-v5');
@@ -77,12 +79,20 @@ if(!d.channels.find(function(c){return c.id==='crew-roster'})){
 d.channels.push({id:'crew-roster',type:'roster',name:'📋crew-roster',categoryId:'cat-crew',createdAt:new Date().toISOString()});
 ch=true;}
 
-// Fix duplicate emoji in work-calendar
+// Fix duplicate emoji in work-calendar - UN SOLO EMOJI
 var cal=d.channels.find(function(c){return c.id==='crew-calendar'});
 if(cal){
   cal.name = '📅work-calendar';
   ch=true;
 }
+
+// Update material channel emojis
+var paint=d.channels.find(function(c){return c.id==='mat-paint'});
+if(paint && !paint.name.includes('🖌️')){paint.name='🖌️paint';ch=true;}
+var netting=d.channels.find(function(c){return c.id==='mat-netting'});
+if(netting && !netting.name.includes('🥅')){netting.name='🥅netting';ch=true;}
+var sealant=d.channels.find(function(c){return c.id==='mat-sealant'});
+if(sealant && !sealant.name.includes('🔫')){sealant.name='🔫sealant';ch=true;}
 
 // Rename anuncios to 📢announcements and add WhatsApp link
 var g=d.channels.find(function(c){return (c.id==='crew-general' || c.name==='anuncios') && c.categoryId==='cat-crew'});
@@ -139,7 +149,7 @@ const INFO_FIELDS = [
 {key:'clientName',emoji:'👤',label:'Client contact'},
 {key:'teamLeader',emoji:'👷',label:'Team Leader on site'},
 ];
-const EMOJI_GRID = ['📁','📂','🏗️','🏢','🏙️','🛠️','🔧','🧰','⚙️','🦺','🪢','🧗','🚧','⚠️','🛡️','📋','📌','🗂️','📊','📈','💼','💬','📣','🗣️','🎯','⭐','🔥','✅','❌','🔒','🔓','🔑','🌏','🌐','🇳🇿','🇦🇺','⏰','📅','🧪','🔬'];
+const EMOJI_GRID = ['📁','📂','🏗️','🏢','🏙️','🛠️','🔧','🧰','⚙️','🦺','🪢','🧗','🚧','⚠️','🛡️','📋','📌','🗂️','📊','📈','💼','💬','📣','🗣️','🎯','⭐','🔥','✅','❌','🔒','🔓','🔑','🌏','🌐','🇳🇿','🇦🇺','⏰','📅','🧪','🔬','🖌️','🥅','🔫'];
 const INCIDENT_TYPES = [
 {id:'near-miss',label:'Near miss',emoji:'⚡',color:'var(--warn)',bg:'var(--warn-bg)'},
 {id:'incident',label:'Incident',emoji:'⚠️',color:'var(--accent)',bg:'var(--accent-bg)'},
@@ -175,7 +185,7 @@ actionBtn:{flex:1,padding:'8px 8px',background:'var(--bg-raised)',border:'1px so
 projList:{flex:1,overflowY:'auto',padding:'4px 8px 12px'},
 
 catWrap:{marginBottom:6,cursor:'grab',userSelect:'none'},
-catWrapDragging:{opacity:0.5},
+catWrapDragging:{opacity:0.4},
 catHeader:{display:'flex',alignItems:'center',gap:6,padding:'9px 8px 6px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--text-dim)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.12,cursor:'pointer',borderRadius:4},
 catCaret:{fontSize:8,color:'var(--text-faint)',transition:'transform 0.15s',display:'inline-block',width:8},
 catEmoji:{fontSize:13},
@@ -514,26 +524,27 @@ teamLeader:'Felipe', startDate:'2026-02-15',
 {id:'inc-near-miss',type:'incidents-bin',incidentType:'near-miss',name:'near-miss',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
 {id:'inc-incident',type:'incidents-bin',incidentType:'incident',name:'incident',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
 {id:'inc-accident',type:'incidents-bin',incidentType:'accident',name:'accident',categoryId:'cat-incidents',createdAt:new Date(now).toISOString()},
-{id:'mat-paint',type:'materials',name:'paint',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
+// Tools & Materials - con emojis personalizados
+{id:'mat-paint',type:'materials',name:'🖌️paint',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
 materials:[
 {id:'m1',name:'Resene Lumbersider — white',qty:'4 × 10L',done:false},
 {id:'m2',name:'Sash brushes (50mm)',qty:'6',done:false},
 {id:'m3',name:'Roller sleeves — short nap',qty:'12',done:true},
 {id:'m4',name:'Drop sheets (4x5m)',qty:'3',done:false},
 ]},
-{id:'mat-netting',type:'materials',name:'netting',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
+{id:'mat-netting',type:'materials',name:'🥅netting',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
 materials:[
 {id:'m1',name:'Bird netting (50m roll)',qty:'2',done:false},
 {id:'m2',name:'Stainless steel clips',qty:'200',done:false},
 {id:'m3',name:'Tensioning wire',qty:'100m',done:false},
 ]},
-{id:'mat-sealant',type:'materials',name:'sealant',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
+{id:'mat-sealant',type:'materials',name:'🔫sealant',categoryId:'cat-tools',createdAt:new Date(now).toISOString(),
 materials:[
 {id:'m1',name:'Sika Liquid Membrane (15L)',qty:'2',done:false},
 {id:'m2',name:'Caulking gun',qty:'2',done:true},
 {id:'m3',name:'Sikaflex 11FC sausages',qty:'24',done:false},
 ]},
-// Crew category - ordered: announcements, calendar, roster
+// Crew category - sin # en el nombre
 {id:'crew-announcements',type:'plain',name:'📢announcements',categoryId:'cat-crew',whatsappLink:'https://chat.whatsapp.com/ral-crew-announcements-demo',createdAt:new Date(now).toISOString()},
 {id:'crew-calendar',type:'calendar',name:'📅work-calendar',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
 {id:'crew-roster',type:'roster',name:'📋crew-roster',categoryId:'cat-crew',createdAt:new Date(now).toISOString()},
@@ -573,8 +584,8 @@ return [
 ];
 }
 
-// ── MENTION SYSTEM ──────────────────────────────────────────────────────────
-function useMentions(text, setText, allChannels, currentChannelId) {
+// ── MENTION SYSTEM - SOLO BUSCA EN CAT-TOOLS ─────────────────────────────────
+function useMentions(text, setText, allChannels, currentChannelId, filterToToolsOnly = false) {
 const [open, setOpen] = useState(false);
 const [query, setQuery] = useState('');
 const [pos, setPos] = useState(0);
@@ -582,8 +593,13 @@ const [activeIdx, setActiveIdx] = useState(0);
 const matches = useMemo(() => {
 if(!open) return [];
 const q = query.toLowerCase();
-return allChannels.filter(c => c.id !== currentChannelId).filter(c => slugify(c.name).includes(q) || c.name.toLowerCase().includes(q)).slice(0,8);
-}, [open, query, allChannels, currentChannelId]);
+let filtered = allChannels.filter(c => c.id !== currentChannelId);
+// Si estamos en el campo de tools, SOLO mostrar canales de cat-tools
+if(filterToToolsOnly) {
+  filtered = filtered.filter(c => c.categoryId === 'cat-tools');
+}
+return filtered.filter(c => slugify(c.name).includes(q) || c.name.toLowerCase().includes(q)).slice(0,8);
+}, [open, query, allChannels, currentChannelId, filterToToolsOnly]);
 useEffect(() => { setActiveIdx(0); }, [query]);
 const handleChange = (e) => {
 const v = e.target.value; setText(v);
@@ -619,7 +635,7 @@ return (
 {mentions.matches.map((c, i) => {
 const cat = getCategory(c.categoryId);
 const isActive = i === mentions.activeIdx;
-const hash = c.type === 'job' ? '◆' : '#';
+const hash = c.type === 'job' ? '◆' : c.type === 'materials' ? c.name.charAt(0) === '🖌' ? '🖌️' : c.name.charAt(0) === '🥅' ? '🥅' : c.name.charAt(0) === '🔫' ? '🔫' : '🧰' : '#';
 return (
 <div key={c.id} style={{...s.mentionItem, ...(isActive ? s.mentionItemActive : {})}}
 onMouseEnter={() => mentions.setActiveIdx(i)} onClick={() => mentions.insert(c, inputRef)}>
@@ -1207,7 +1223,7 @@ return (
 );
 }
 
-// ── CALENDAR BOOKING MODAL ──────────────────────────────────────────────────
+// ── CALENDAR BOOKING MODAL - SOLO HERRAMIENTAS EN MENCIONES ─────────────────
 function CalendarBookingModal({onClose, onSave, jobChannels, allChannels, getCategory, editing, defaultDate}) {
 const [projectId, setProjectId] = useState(editing?.projectId || jobChannels[0]?.id || '');
 const [startDate, setStartDate] = useState(editing?.startDate || defaultDate || todayISO());
@@ -1218,8 +1234,9 @@ const [comment, setComment] = useState(editing?.comment || '');
 
 const toolsRef = useRef(null);
 const commentRef = useRef(null);
-const toolsMentions = useMentions(tools, setTools, allChannels, null);
-const commentMentions = useMentions(comment, setComment, allChannels, null);
+// SOLO herramientas (filterToToolsOnly=true)
+const toolsMentions = useMentions(tools, setTools, allChannels, null, true);
+const commentMentions = useMentions(comment, setComment, allChannels, null, false);
 
 const endDate = useMemo(() => addDays(startDate, Math.max(0, days-1)), [startDate, days]);
 
@@ -1280,7 +1297,7 @@ return (
 <input ref={toolsRef} style={s.input} value={tools}
 onChange={(e)=>toolsMentions.handleChange(e)}
 onKeyDown={(e)=>toolsMentions.handleKeyDown(e, toolsRef)}
-placeholder="Type # to link material channels, e.g. #paint #netting"/>
+placeholder="Type # to link tools (🖌️paint, 🥅netting, 🔫sealant)"/>
 </div>
 
 <label style={s.label}>Comment</label>
@@ -1597,7 +1614,7 @@ onClick={()=>{ if(confirm('Delete this booking?')) { onDeleteBooking(selectedEnt
 function NotesFeed({channelId, threadId, notes, setNotes, placeholder, allChannels, onMentionClick, getCategory}) {
 const [text, setText] = useState('');
 const inputRef = useRef(null);
-const mentions = useMentions(text, setText, allChannels, channelId);
+const mentions = useMentions(text, setText, allChannels, channelId, false);
 const feed = (notes[channelId]?.[threadId] || []).slice().reverse();
 const addNote = () => {
 if(!text.trim()) return;
@@ -1684,7 +1701,7 @@ const dragHandleRef = useRef(null);
 return (
 <div 
   style={{...s.catWrap, ...(isDragging ? s.catWrapDragging : {})}} 
-  draggable={!category.system} 
+  draggable={true}
   onDragStart={(e) => onDragStart(e, category)}
   onDragOver={onDragOver}
   onDrop={(e) => onDrop(e, category)}
@@ -1699,19 +1716,20 @@ return (
 <span style={s.catCount}>{channels.length}</span>
 {category.system !== 'incidents' && category.system !== 'timesheets' && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onAddChannel(category);}}>+</button>)}
 {!category.system && (<button style={s.catAddBtn} onClick={(e)=>{e.stopPropagation();onEditCategory(category);}}>✎</button>)}
-{!category.system && (<span style={s.catDragHandle} ref={dragHandleRef}>⋮⋮</span>)}
+<span style={s.catDragHandle} ref={dragHandleRef}>⋮⋮</span>
 </div>
 {open && channels.map(ch => {
 const isActive = activeId === ch.id;
 const isDone = ch.status === 'done';
 let hash = '#';
 if(ch.type === 'job') hash = '◆';
-else if(ch.type === 'materials') hash = '🧰';
-else if(ch.type === 'calendar') hash = '📅';
+else if(ch.type === 'materials') hash = ch.name.includes('🖌️') ? '🖌️' : ch.name.includes('🥅') ? '🥅' : ch.name.includes('🔫') ? '🔫' : '🧰';
+else if(ch.type === 'calendar') hash = '';
 else if(ch.type === 'incidents-bin') { const t = INCIDENT_TYPES.find(t => t.id === ch.incidentType); hash = t?.emoji || '⚠️'; }
-else if(ch.type === 'ts-overview') hash = '📊';
-else if(ch.type === 'ts-project') hash = '🏢';
-else if(ch.type === 'roster') hash = '📋';
+else if(ch.type === 'ts-overview') hash = '';
+else if(ch.type === 'ts-project') hash = '';
+else if(ch.type === 'roster') hash = '';
+else if(ch.type === 'plain') hash = '';
 const col = ch.type === 'job' && ch.colorId && ch.status !== 'done' ? getColor(ch.colorId) : null;
 const tsCol = ch.type === 'ts-project' && ch.colorId ? getColor(ch.colorId) : null;
 return (
@@ -1808,7 +1826,6 @@ const channelsByCat = (catId) => {
 
 // Drag and drop handlers for categories
 const handleDragStart = (e, category) => {
-  if(category.system) { e.preventDefault(); return; }
   setDraggedCategory(category);
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/plain', category.id);
@@ -1822,7 +1839,6 @@ const handleDragOver = (e) => {
 const handleDrop = (e, targetCategory) => {
   e.preventDefault();
   if(!draggedCategory || draggedCategory.id === targetCategory.id) return;
-  if(draggedCategory.system || targetCategory.system) return;
   
   updateData(prev => {
     const categories = [...prev.categories];
@@ -2067,3 +2083,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
+```
+
+**Resumen de cambios aplicados:**
+
+1. ✅ **Un solo emoji en calendar**: `📅work-calendar` (corregido en seed y migración)
+2. ✅ **Canales sin #**: Se muestran solo con emoji/nombre (announcements, calendar, roster, etc.)
+3. ✅ **Drag & Drop para TODAS las categorías**: Ya no hay restricción, todas se pueden reordenar
+4. ✅ **Menciones con # SOLO en Tools/Materials**: El dropdown en el booking modal solo muestra canales de `cat-tools`
+5. ✅ **Emojis para herramientas**: 🖌️paint, 🥅netting, 🔫sealant
+6. ✅ **Placeholder actualizado**: "Type # to link tools (🖌️paint, 🥅netting, 🔫sealant)"
+
+¡Listo para usar! 🚀
